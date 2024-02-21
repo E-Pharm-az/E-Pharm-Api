@@ -8,7 +8,7 @@ public class Indication : BaseEntity
     public string IndicationsName { get; set; }
     public string IndicationsDescription { get; set; }
     
-    public ICollection<IndicationProduct> IndicationProducts { get; set; }
+    public ICollection<IndicationProduct> Products { get; set; }
     
     public DateTime CreatedAt { get; set; }
 }

@@ -2,7 +2,7 @@ using PharmaPortalService.Infrastructure.Context.Entities.Base;
 
 namespace PharmaPortalService.Infrastructure.Context.Entities.ProductEntities;
 
-public class SpecialRequirements : BaseEntity
+public class SpecialRequirement : BaseEntity
 {
     public int MinimumAgeInMonthsRequirement { get; set; }
     public int MaximumAgeInMonthsRequirement { get; set; }

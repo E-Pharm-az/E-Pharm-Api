@@ -5,6 +5,9 @@ namespace PharmaPortalService.Infrastructure.Context.Entities.ProductEntities;
 
 public class Product : BaseEntity
 {
+    public int PharmaCompanyId { get; set; }
+    public PharmaCompany PharmaCompany { get; set; }
+    
     public string ProductName { get; set; }
     public string ProductDescription { get; set; }
     public decimal StrengthMg { get; set; }
@@ -12,7 +15,7 @@ public class Product : BaseEntity
     public string StorageConditionDescription { get; set; }
     
     public int SpecialRequirementsId { get; set; }
-    public SpecialRequirements SpecialRequirements { get; set; }
+    public SpecialRequirement SpecialRequirement { get; set; }
     
     public int ManufacturerId { get; set; }
     public Manufacturer Manufacturer { get; set; }
