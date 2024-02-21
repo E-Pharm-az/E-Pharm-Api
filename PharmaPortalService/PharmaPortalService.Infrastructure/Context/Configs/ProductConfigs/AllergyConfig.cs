@@ -11,6 +11,10 @@ public class AllergyConfig : IEntityTypeConfiguration<Allergy>
         builder.Property(a => a.Description)
             .IsRequired()
             .HasMaxLength(255);
+        
+        builder.HasMany(a => a.Products)
+            .WithOne(a => a.Allergy)
+            .HasForeignKey(a => a.AllergyId);
 
         builder.Property(a => a.CreatedAt)
             .HasDefaultValueSql("NOW()");

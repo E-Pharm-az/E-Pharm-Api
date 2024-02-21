@@ -11,6 +11,10 @@ public class UsageWarningConfig : IEntityTypeConfiguration<UsageWarning>
         builder.Property(uw => uw.Description)
             .IsRequired()
             .HasMaxLength(500);
+        
+        builder.HasMany(uw => uw.Products)
+            .WithOne(uw => uw.UsageWarning)
+            .HasForeignKey(uw => uw.UsageWarningId);
 
         builder.Property(uw => uw.CreatedAt)
             .HasDefaultValueSql("NOW()");

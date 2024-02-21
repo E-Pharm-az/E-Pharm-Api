@@ -16,6 +16,10 @@ public class ActiveIngredientConfig : IEntityTypeConfiguration<ActiveIngredient>
             .IsRequired()
             .HasMaxLength(500);
 
+        builder.HasMany(ai => ai.Products)
+            .WithOne(ai => ai.ActiveIngredient)
+            .HasForeignKey(ai => ai.ActiveIngredientId);
+
         builder.Property(ai => ai.CreatedAt)
             .HasDefaultValueSql("NOW()");
     }

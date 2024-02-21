@@ -11,6 +11,10 @@ public class RouteOfAdministrationConfig : IEntityTypeConfiguration<RouteOfAdmin
         builder.Property(ra => ra.Description)
             .IsRequired()
             .HasMaxLength(255);
+        
+        builder.HasMany(re => re.Products)
+            .WithOne(re => re.RouteOfAdministration)
+            .HasForeignKey(re => re.RouteOfAdministrationId);
 
         builder.Property(ra => ra.CreatedAt)
             .HasDefaultValueSql("NOW()");

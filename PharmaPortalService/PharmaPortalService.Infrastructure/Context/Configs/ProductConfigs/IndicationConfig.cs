@@ -15,6 +15,10 @@ public class IndicationConfig : IEntityTypeConfiguration<Indication>
         builder.Property(i => i.IndicationsDescription)
             .IsRequired()
             .HasMaxLength(500);
+        
+        builder.HasMany(i => i.Products)
+            .WithOne(si => si.Indication)
+            .HasForeignKey(si => si.IndicationId);
 
         builder.Property(i => i.CreatedAt)
             .HasDefaultValueSql("NOW()");

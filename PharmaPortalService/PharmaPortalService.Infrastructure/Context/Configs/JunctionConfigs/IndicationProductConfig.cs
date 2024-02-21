@@ -11,7 +11,7 @@ public class IndicationProductConfig : IEntityTypeConfiguration<IndicationProduc
         builder.HasKey(ip => new { ip.IndicationId, ip.ProductId });
 
         builder.HasOne(ip => ip.Indication)
-            .WithMany(i => i.IndicationProducts)
+            .WithMany(i => i.Products)
             .HasForeignKey(ip => ip.IndicationId);
 
         builder.HasOne(ip => ip.Product)

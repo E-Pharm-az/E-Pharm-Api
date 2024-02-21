@@ -14,6 +14,10 @@ public class SideEffectConfig : IEntityTypeConfiguration<SideEffect>
 
         builder.Property(se => se.Description)
             .HasMaxLength(500);
+        
+        builder.HasMany(se => se.Products)
+            .WithOne(se => se.SideEffect)
+            .HasForeignKey(se => se.SideEffectId);
 
         builder.Property(se => se.CreatedAt)
             .HasDefaultValueSql("NOW()");

@@ -8,6 +8,9 @@ public class PharmaCompanyManagerConfig : IEntityTypeConfiguration<PharmaCompany
 {
     public void Configure(EntityTypeBuilder<PharmaCompanyManager> builder)
     {
+        builder.Property(pcm => pcm.ExternalId)
+            .IsRequired();
+        
         builder.Property(pcm => pcm.FirstName)
             .IsRequired()
             .HasMaxLength(100);
