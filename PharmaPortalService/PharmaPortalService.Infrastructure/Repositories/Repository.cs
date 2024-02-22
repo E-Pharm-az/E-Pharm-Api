@@ -16,37 +16,33 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         _entities = context.Set<T>();
     }
 
-    public virtual async Task<IEnumerable<T>> GetAllAsync() => await _entities.AsNoTracking().ToListAsync();
+    public virtual async Task<IEnumerable<T>> GetAllAsync() => 
+        await _entities.AsNoTracking().ToListAsync();
 
     public virtual async Task<T?> GetByIdAsync(int? id) =>
         await _entities.AsNoTracking().SingleOrDefaultAsync(s => s.Id == id);
 
-    public virtual async Task<T> InsertAsync(T entity)
+    public virtual async Task InsertAsync(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
         await _entities.AddAsync(entity);
-        await _context.SaveChangesAsync();
-
-        return entity;
     }
 
-    public virtual async Task<bool> UpdateAsync(T entity)
+    public virtual void UpdateAsync(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
-        _entities.Update(entity);
-        await _context.SaveChangesAsync();
-
-        return true;
+         _entities.Update(entity);
     }
 
-    public virtual async Task<bool> DeleteAsync(T entity)
+    public virtual void DeleteAsync(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
         _entities.Remove(entity);
-        await _context.SaveChangesAsync();
-        return true;
     }
+
+    public virtual async Task SaveChangesAsync() =>
+        await _context.SaveChangesAsync();
 } 
