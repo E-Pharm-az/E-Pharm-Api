@@ -18,6 +18,8 @@ public class Startup(IConfiguration configuration)
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddControllers();
+        
+        services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         services.AddScoped<IPharmaCompanyRepository, PharmaCompanyRepository>();
         services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();
