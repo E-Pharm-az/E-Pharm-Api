@@ -22,27 +22,29 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     public virtual async Task<T?> GetByIdAsync(int? id) =>
         await _entities.AsNoTracking().SingleOrDefaultAsync(s => s.Id == id);
 
-    public virtual async Task InsertAsync(T entity)
+    public virtual async Task<T> InsertAsync(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
         await _entities.AddAsync(entity);
+        
+        return entity;
     }
 
-    public virtual void UpdateAsync(T entity)
+    public virtual void Update(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
          _entities.Update(entity);
     }
 
-    public virtual void DeleteAsync(T entity)
+    public virtual void Delete(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
         _entities.Remove(entity);
     }
 
-    public virtual async Task SaveChangesAsync() =>
+    public virtual async Task<int> SaveChangesAsync() =>
         await _context.SaveChangesAsync();
 } 
