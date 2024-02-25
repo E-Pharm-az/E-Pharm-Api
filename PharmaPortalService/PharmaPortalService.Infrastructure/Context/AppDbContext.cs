@@ -9,6 +9,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<PharmaCompany> PharmaCompanies { get; set; }
     public DbSet<PharmaCompanyManager> PharmaCompanyManagers { get; set; }
+    public DbSet<Address> Addresses { get; set; }
     
     public DbSet<ActiveIngredient> ActiveIngredients { get; set; }
     public DbSet<Allergy> Allergies { get; set; }
