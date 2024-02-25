@@ -1,3 +1,5 @@
+using PharmaPortalService.Domain.Interfaces;
+using PharmaPortalService.Domain.Services;
 using PharmaPortalService.Infrastructure.Interfaces;
 using PharmaPortalService.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using PharmaPortalService.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
@@ -19,7 +21,7 @@ public class Startup(IConfiguration configuration)
 
         services.AddScoped<IPharmaCompanyRepository, PharmaCompanyRepository>();
         services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();
-        
+
         services.AddScoped<IActiveIngredientRepository, ActiveIngredientRepository>();
         services.AddScoped<IAllergyRepository, AllergyRepository>();
         services.AddScoped<IDosageFormRepository, DosageFormRepository>();
@@ -31,7 +33,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<ISideEffectRepository, SideEffectRepository>();
         services.AddScoped<ISpecialRequirementRepository, SpecialRequirementRepository>();
         services.AddScoped<IUsageWarningRepository, UsageWarningRepository>();
-        
+
         services.AddScoped<IIndicationProductRepository, IndicationProductRepository>();
         services.AddScoped<IProductActiveIngredientRepository, ProductActiveIngredientRepository>();
         services.AddScoped<IProductAllergyRepository, ProductAllergyRepository>();
@@ -39,6 +41,9 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IProductRouteOfAdministrationRepository, ProductRouteOfAdministrationRepository>();
         services.AddScoped<IProductSideEffectRepository, ProductSideEffectRepository>();
         services.AddScoped<IProductUsageWarningRepository, ProductUsageWarningRepository>();
+
+        services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
+        services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
