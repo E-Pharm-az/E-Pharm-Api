@@ -1,17 +1,13 @@
-var builder = WebApplication.CreateBuilder(args);
+namespace PharmaPortalService.Api;
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddControllers();
-
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
+public static class Program
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    public static void Main(string[] args)
+    {
+        CreateHostBuilder(args).Build().Run();
+    }
+
+    private static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
 }
-
-app.UseHttpsRedirection();
-
-app.Run();
