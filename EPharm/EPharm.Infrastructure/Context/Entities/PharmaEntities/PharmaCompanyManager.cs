@@ -1,6 +1,6 @@
 using EPharm.Infrastructure.Context.Entities.Base;
 
-namespace EPharm.Infrastructure.Context.Entities;
+namespace EPharm.Infrastructure.Context.Entities.PharmaEntities;
 
 public class PharmaCompanyManager : BaseEntity
 {

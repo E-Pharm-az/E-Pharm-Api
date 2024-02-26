@@ -1,5 +1,6 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities;
+using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using EPharm.Infrastructure.Interfaces;
 
 namespace EPharm.Infrastructure.Repositories;

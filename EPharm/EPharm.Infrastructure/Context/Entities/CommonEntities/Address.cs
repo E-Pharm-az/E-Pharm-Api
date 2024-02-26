@@ -1,6 +1,7 @@
 using EPharm.Infrastructure.Context.Entities.Base;
+using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 
-namespace EPharm.Infrastructure.Context.Entities;
+namespace EPharm.Infrastructure.Context.Entities.CommonEntities;
 
 public class Address : BaseEntity
 {

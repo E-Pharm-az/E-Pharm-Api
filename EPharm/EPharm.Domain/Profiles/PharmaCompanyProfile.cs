@@ -1,6 +1,7 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Infrastructure.Context.Entities;
+using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 
 namespace EPharm.Domain.Profiles;
 

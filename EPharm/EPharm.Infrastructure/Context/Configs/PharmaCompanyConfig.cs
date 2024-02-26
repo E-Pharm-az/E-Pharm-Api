@@ -1,4 +1,6 @@
 using EPharm.Infrastructure.Context.Entities;
+using EPharm.Infrastructure.Context.Entities.CommonEntities;
+using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -29,7 +31,7 @@ public class PharmaCompanyConfig : IEntityTypeConfiguration<PharmaCompany>
         
         builder.HasOne(pc => pc.PharmaCompanyOwner)
             .WithOne(pc => pc.PharmaCompany)
-            .HasForeignKey<PharmaCompany>(a => a.PharmaCompanyOwnerId);
+            .HasForeignKey<PharmaCompany>(o => o.PharmaCompanyOwnerId);
 
         builder.HasOne(pc => pc.Address)
             .WithOne(pc => pc.PharmaCompany)

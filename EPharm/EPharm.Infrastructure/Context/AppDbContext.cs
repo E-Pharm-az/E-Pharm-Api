@@ -1,5 +1,6 @@
-using EPharm.Infrastructure.Context.Entities;
+using EPharm.Infrastructure.Context.Entities.CommonEntities;
 using EPharm.Infrastructure.Context.Entities.Junctions;
+using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using Microsoft.EntityFrameworkCore;
 

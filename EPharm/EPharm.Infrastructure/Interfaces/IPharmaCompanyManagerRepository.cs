@@ -1,4 +1,5 @@
 using EPharm.Infrastructure.Context.Entities;
+using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 
 namespace EPharm.Infrastructure.Interfaces;
 

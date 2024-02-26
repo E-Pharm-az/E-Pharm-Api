@@ -1,7 +1,8 @@
 using EPharm.Infrastructure.Context.Entities.Base;
+using EPharm.Infrastructure.Context.Entities.CommonEntities;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 
-namespace EPharm.Infrastructure.Context.Entities;
+namespace EPharm.Infrastructure.Context.Entities.PharmaEntities;
 
 public class PharmaCompany : BaseEntity
 {

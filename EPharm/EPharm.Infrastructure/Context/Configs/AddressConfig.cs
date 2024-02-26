@@ -1,4 +1,5 @@
 using EPharm.Infrastructure.Context.Entities;
+using EPharm.Infrastructure.Context.Entities.CommonEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

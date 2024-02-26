@@ -2,6 +2,7 @@ using AutoMapper;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Interfaces;
 using EPharm.Infrastructure.Context.Entities;
+using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using EPharm.Infrastructure.Interfaces;
 
 namespace EPharm.Domain.Services;
