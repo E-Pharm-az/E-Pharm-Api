@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPharm.Domain", "EPharm.Domain\EPharm.Domain.csproj", "{F441127E-85F2-4034-9FD5-9464FFD0F624}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPharm.Infrastructure", "EPharm.Infrastructure\EPharm.Infrastructure.csproj", "{2588E884-3E28-41C5-A49D-E4863DFE88FA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EPharm.Api", "EPharm.Api\EPharm.Api.csproj", "{8AC3EC4D-6F6E-48BD-95AC-FB757A45A755}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F441127E-85F2-4034-9FD5-9464FFD0F624}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F441127E-85F2-4034-9FD5-9464FFD0F624}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F441127E-85F2-4034-9FD5-9464FFD0F624}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F441127E-85F2-4034-9FD5-9464FFD0F624}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2588E884-3E28-41C5-A49D-E4863DFE88FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2588E884-3E28-41C5-A49D-E4863DFE88FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2588E884-3E28-41C5-A49D-E4863DFE88FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2588E884-3E28-41C5-A49D-E4863DFE88FA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8AC3EC4D-6F6E-48BD-95AC-FB757A45A755}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8AC3EC4D-6F6E-48BD-95AC-FB757A45A755}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8AC3EC4D-6F6E-48BD-95AC-FB757A45A755}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8AC3EC4D-6F6E-48BD-95AC-FB757A45A755}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
