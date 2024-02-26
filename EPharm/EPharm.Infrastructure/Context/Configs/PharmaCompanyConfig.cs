@@ -26,6 +26,10 @@ public class PharmaCompanyConfig : IEntityTypeConfiguration<PharmaCompany>
         builder.HasMany(pc => pc.PharmaCompanyManagers)
             .WithOne(pcm => pcm.PharmaCompany)
             .HasForeignKey(pcm => pcm.PharmaCompanyId);
+        
+        builder.HasOne(pc => pc.PharmaCompanyOwner)
+            .WithOne(pc => pc.PharmaCompany)
+            .HasForeignKey<PharmaCompany>(a => a.PharmaCompanyOwnerId);
 
         builder.HasOne(pc => pc.Address)
             .WithOne(pc => pc.PharmaCompany)
