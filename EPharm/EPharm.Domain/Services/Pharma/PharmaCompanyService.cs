@@ -1,11 +1,11 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
-using EPharm.Domain.Interfaces;
-using EPharm.Infrastructure.Context.Entities;
+using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using EPharm.Infrastructure.Interfaces;
+using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
 
-namespace EPharm.Domain.Services;
+namespace EPharm.Domain.Services.Pharma;
 
 public class PharmaCompanyService(IPharmaCompanyRepository pharmaCompanyRepository, IMapper mapper)
     : IPharmaCompanyService
