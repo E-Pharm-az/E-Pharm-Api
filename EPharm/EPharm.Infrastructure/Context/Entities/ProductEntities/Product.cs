@@ -24,7 +24,7 @@ public class Product : BaseEntity
     public DateTime ManufacturingDate { get; set; }
     public DateTime ExpiryDate { get; set; }
     
-    public RegulatoryInformation RegulatoryInformationId { get; set; }
+    public int RegulatoryInformationId { get; set; }
     public RegulatoryInformation RegulatoryInformation { get; set; }
     
     public int Stock { get; set; }

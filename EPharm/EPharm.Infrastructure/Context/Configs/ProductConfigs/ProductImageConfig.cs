@@ -12,7 +12,7 @@ public class ProductImageConfig : IEntityTypeConfiguration<ProductImage>
             .IsRequired();
 
         builder.Property(pi => pi.UpdatedAt)
-            .HasColumnType("datetime");
+            .HasColumnType("timestamp");
 
         builder.Property(pi => pi.CreatedAt)
             .HasDefaultValueSql("NOW()");

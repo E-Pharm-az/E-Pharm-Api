@@ -5,7 +5,4 @@ using Microsoft.EntityFrameworkCore;
 namespace EPharm.Infrastructure.Context;
 
 public class AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options)
-    : IdentityDbContext<AppIdentity>(options)
-{
-    
-}
+    : IdentityDbContext<AppIdentityUser>(options);
