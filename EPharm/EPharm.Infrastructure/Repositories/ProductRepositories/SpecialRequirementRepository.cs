@@ -1,12 +1,9 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
+using EPharm.Infrastructure.Repositories.BaseRepositories;
 
 namespace EPharm.Infrastructure.Repositories.ProductRepositories;
 
-public class SpecialRequirementRepository : Repository<SpecialRequirement>, ISpecialRequirementRepository
-{
-    protected SpecialRequirementRepository(AppDbContext context) : base(context)
-    {
-    }
-}
+public class SpecialRequirementRepository(AppDbContext context)
+    : Repository<SpecialRequirement>(context), ISpecialRequirementRepository;

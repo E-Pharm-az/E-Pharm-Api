@@ -1,12 +1,9 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
+using EPharm.Infrastructure.Repositories.BaseRepositories;
 
 namespace EPharm.Infrastructure.Repositories.ProductRepositories;
 
-public class RegulatoryInformationRepository : Repository<RegulatoryInformation>, IRegulatoryInformationRepository
-{
-    protected RegulatoryInformationRepository(AppDbContext context) : base(context)
-    {
-    }
-}
+public class RegulatoryInformationRepository(AppDbContext context)
+    : Repository<RegulatoryInformation>(context), IRegulatoryInformationRepository;

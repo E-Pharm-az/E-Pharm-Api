@@ -1,9 +1,9 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.Base;
-using EPharm.Infrastructure.Interfaces;
+using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace EPharm.Infrastructure.Repositories;
+namespace EPharm.Infrastructure.Repositories.BaseRepositories;
 
 public class Repository<T> : IRepository<T> where T : BaseEntity
 {
@@ -19,13 +19,12 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     public virtual async Task<IEnumerable<T>> GetAllAsync() => 
         await _entities.AsNoTracking().ToListAsync();
 
-    public virtual async Task<T?> GetByIdAsync(int? id) =>
+    public virtual async Task<T?> GetByIdAsync(int id) =>
         await _entities.AsNoTracking().SingleOrDefaultAsync(s => s.Id == id);
 
     public virtual async Task<T> InsertAsync(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-
         await _entities.AddAsync(entity);
         
         return entity;
@@ -34,14 +33,12 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     public virtual void Update(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-
          _entities.Update(entity);
     }
 
     public virtual void Delete(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-
         _entities.Remove(entity);
     }
 

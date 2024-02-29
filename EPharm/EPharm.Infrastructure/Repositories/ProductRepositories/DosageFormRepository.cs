@@ -1,12 +1,8 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
+using EPharm.Infrastructure.Repositories.BaseRepositories;
 
 namespace EPharm.Infrastructure.Repositories.ProductRepositories;
 
-public class DosageFormRepository : Repository<DosageForm>, IDosageFormRepository
-{
-    protected DosageFormRepository(AppDbContext context) : base(context)
-    {
-    }
-}
+public class DosageFormRepository(AppDbContext context) : Repository<DosageForm>(context), IDosageFormRepository;
