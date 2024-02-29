@@ -1,5 +1,5 @@
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
-using EPharm.Domain.Interfaces;
+using EPharm.Domain.Interfaces.Pharma;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EPharmApi.Controllers;
