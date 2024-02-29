@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 
-namespace EPharm.Domain.Interfaces;
+namespace EPharm.Domain.Interfaces.Pharma;
 
 public interface IPharmaCompanyManagerService
 {
