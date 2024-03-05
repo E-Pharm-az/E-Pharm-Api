@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.User;
 using EPharm.Domain.Models.Identity;
@@ -21,7 +20,7 @@ public class UserController(IUserService userService) : ControllerBase
 
         return NotFound("Users not found.");
     }
-    
+
     [HttpGet("{userId}")]
     [Authorize(Roles = IdentityData.Admin)]
     public async Task<ActionResult<GetUserDto>> GetUserById(string userId)
@@ -72,16 +71,16 @@ public class UserController(IUserService userService) : ControllerBase
     [HttpPost]
     [Route("register/pharma-admin")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<IActionResult> RegisterPharmaAdmin([FromBody] CreateUserDto userRequest, [FromBody] CreatePharmaCompanyDto pharmaCompanyRequest)
+    public async Task<IActionResult> RegisterPharmaAdmin([FromBody] CreatePharmaAdminDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         try
         {
-            await userService.CreatePharmaAdminAsync(userRequest, pharmaCompanyRequest);
+            await userService.CreatePharmaAdminAsync(request.UserRequest, request.PharmaCompanyRequest);
             return Ok();
-        }            
+        }
         catch (Exception ex)
         {
             return BadRequest(ex.Message);
@@ -106,19 +105,19 @@ public class UserController(IUserService userService) : ControllerBase
             return BadRequest(ex.Message);
         }
     }
-    
+
     [HttpPut]
     [Authorize]
     public async Task<ActionResult> UpdateUser([FromBody] GetUserDto userDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
-        
+
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (!User.IsInRole(IdentityData.Admin) && currentUserId != userDto.Id)
             return Forbid();
-        
+
         var result = await userService.UpdateUserAsync(userDto);
 
         if (result)
@@ -135,7 +134,7 @@ public class UserController(IUserService userService) : ControllerBase
 
         if (!User.IsInRole(IdentityData.Admin) && currentUserId != userId)
             return Forbid();
-        
+
         var result = await userService.DeleteUserAsync(userId);
 
         if (result) return Ok($"User with ID: {userId} deleted with success.");

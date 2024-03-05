@@ -5,7 +5,10 @@ using Microsoft.Extensions.Configuration;
 
 namespace EPharm.Domain.Services.DataServices;
 
-public class DbSeeder(UserManager<AppIdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+public class DbSeeder(
+    UserManager<AppIdentityUser> userManager,
+    RoleManager<IdentityRole> roleManager,
+    IConfiguration configuration)
 {
     public async Task SeedSuperAdminAsync()
     {
@@ -17,11 +20,15 @@ public class DbSeeder(UserManager<AppIdentityUser> userManager, RoleManager<Iden
 
         var superAdmin = await userManager.FindByNameAsync(configuration["SuperAdmin:Email"]!);
 
-        if (superAdmin == null)
+        if (superAdmin is null)
         {
             superAdmin = new AppIdentityUser
             {
-                UserName = configuration["SuperAdmin:Email"],
+                UserName = configuration["SuperAdmin:UserName"],
+                Email = configuration["SuperAdmin:Email"],
+                FirstName = configuration["SuperAdmin:FirstName"],
+                LastName = configuration["SuperAdmin:LastName"],
+                Fin = configuration["SuperAdmin:Fin"] 
             };
 
             var result = await userManager.CreateAsync(superAdmin, configuration["SuperAdmin:Password"]!);
@@ -36,5 +43,5 @@ public class DbSeeder(UserManager<AppIdentityUser> userManager, RoleManager<Iden
                 throw new Exception($"Failed to create SuperAdmin user: {string.Join(", ", result.Errors)}");
             }
         }
-    } 
+    }
 }

@@ -36,7 +36,7 @@ public class Startup(IConfiguration configuration)
 
         services.AddSwaggerGen(ops =>
         {
-            ops.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+            ops.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 Name = "Authorization",
                 Type = SecuritySchemeType.ApiKey,
@@ -63,7 +63,7 @@ public class Startup(IConfiguration configuration)
                 }
             });
         });
-
+        
         services.AddIdentity<AppIdentityUser, IdentityRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
@@ -92,8 +92,7 @@ public class Startup(IConfiguration configuration)
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidAudience = configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
                 };
             });
 
@@ -130,7 +129,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IProductRouteOfAdministrationRepository, ProductRouteOfAdministrationRepository>();
         services.AddScoped<IProductSideEffectRepository, ProductSideEffectRepository>();
         services.AddScoped<IProductUsageWarningRepository, ProductUsageWarningRepository>();
-        
+
         services.AddScoped<IPharmaCompanyRepository, PharmaCompanyRepository>();
         services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();
         services.AddScoped<IAppIdentityUserRepository, AppIdentityUserRepository>();
@@ -145,23 +144,21 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<ITokenRefreshService, TokenRefreshService>();
     }
 
-    public async Task Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder)
     {
         if (env.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-
-        await dbSeeder.SeedSuperAdminAsync();
-
         app.UseCors("AllowAnyOrigins");
-
-        app.UseHttpsRedirection();
+        
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseHsts();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        
+        dbSeeder.SeedSuperAdminAsync().Wait();
     }
 }
