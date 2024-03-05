@@ -145,13 +145,15 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<ITokenRefreshService, TokenRefreshService>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+    public async Task Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder)
     {
         if (env.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+
+        await dbSeeder.SeedSuperAdminAsync();
 
         app.UseCors("AllowAnyOrigins");
 

@@ -8,8 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EPharmApi.Controllers;
 
-// TODO: When seeding db, create a super admin user with two roles: Super Admin and Admin.
-
 [ApiController]
 [Route("api/[controller]")]
 public class UserController(IUserService userService) : ControllerBase

@@ -12,6 +12,7 @@ public class DbSeeder(UserManager<AppIdentityUser> userManager, RoleManager<Iden
         if (!await roleManager.RoleExistsAsync(IdentityData.SuperAdmin))
         {
             await roleManager.CreateAsync(new IdentityRole(IdentityData.SuperAdmin));
+            await roleManager.CreateAsync(new IdentityRole(IdentityData.Admin));
         }
 
         var superAdmin = await userManager.FindByNameAsync(configuration["SuperAdmin:Email"]!);
@@ -28,6 +29,7 @@ public class DbSeeder(UserManager<AppIdentityUser> userManager, RoleManager<Iden
             if (result.Succeeded)
             {
                 await userManager.AddToRoleAsync(superAdmin, IdentityData.SuperAdmin);
+                await userManager.AddToRoleAsync(superAdmin, IdentityData.Admin);
             }
             else
             {
