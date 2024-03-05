@@ -10,6 +10,10 @@ public class DosageFormConfig : IEntityTypeConfiguration<DosageForm>
     {
         builder.HasKey(df => df.Id);
         
+        builder.HasOne(a => a.PharmaCompany)
+            .WithMany(a => a.DosageForms)
+            .HasForeignKey(a => a.PharmaCompanyId);
+        
         builder.HasMany(df => df.Products)
             .WithOne(df => df.DosageForm)
             .HasForeignKey(df => df.DosageFormId);

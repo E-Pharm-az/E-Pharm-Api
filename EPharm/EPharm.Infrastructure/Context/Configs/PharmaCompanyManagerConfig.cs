@@ -1,4 +1,3 @@
-using EPharm.Infrastructure.Context.Entities;
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -24,7 +23,7 @@ public class PharmaCompanyManagerConfig : IEntityTypeConfiguration<PharmaCompany
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(pcm => pcm.Phone)
+        builder.Property(pcm => pcm.PhoneNumber)
             .HasMaxLength(20);
 
         builder.HasOne(pcm => pcm.PharmaCompany)

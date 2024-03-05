@@ -12,6 +12,10 @@ public class RouteOfAdministrationConfig : IEntityTypeConfiguration<RouteOfAdmin
             .IsRequired()
             .HasMaxLength(255);
         
+        builder.HasOne(a => a.PharmaCompany)
+            .WithMany(a => a.RouteOfAdministrations)
+            .HasForeignKey(a => a.PharmaCompanyId);
+ 
         builder.HasMany(re => re.Products)
             .WithOne(re => re.RouteOfAdministration)
             .HasForeignKey(re => re.RouteOfAdministrationId);

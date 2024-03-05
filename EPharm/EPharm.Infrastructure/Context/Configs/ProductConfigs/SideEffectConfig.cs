@@ -11,6 +11,10 @@ public class SideEffectConfig : IEntityTypeConfiguration<SideEffect>
         builder.Property(se => se.Name)
             .IsRequired()
             .HasMaxLength(255);
+        
+        builder.HasOne(a => a.PharmaCompany)
+            .WithMany(a => a.SideEffects)
+            .HasForeignKey(a => a.PharmaCompanyId);
 
         builder.Property(se => se.Description)
             .HasMaxLength(500);

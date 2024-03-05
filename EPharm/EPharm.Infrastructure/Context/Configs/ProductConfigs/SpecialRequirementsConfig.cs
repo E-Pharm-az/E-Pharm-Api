@@ -8,6 +8,10 @@ public class SpecialRequirementsConfig : IEntityTypeConfiguration<SpecialRequire
 {
     public void Configure(EntityTypeBuilder<SpecialRequirement> builder)
     {
+        builder.HasOne(a => a.PharmaCompany)
+            .WithMany(a => a.SpecialRequirements)
+            .HasForeignKey(a => a.PharmaCompanyId);
+        
         builder.Property(sr => sr.MinimumAgeInMonthsRequirement)
             .IsRequired();
 

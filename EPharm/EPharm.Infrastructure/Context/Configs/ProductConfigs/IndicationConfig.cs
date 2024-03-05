@@ -11,6 +11,10 @@ public class IndicationConfig : IEntityTypeConfiguration<Indication>
         builder.Property(i => i.IndicationsName)
             .IsRequired()
             .HasMaxLength(255);
+        
+        builder.HasOne(a => a.PharmaCompany)
+            .WithMany(a => a.Indications)
+            .HasForeignKey(a => a.PharmaCompanyId);
 
         builder.Property(i => i.IndicationsDescription)
             .IsRequired()

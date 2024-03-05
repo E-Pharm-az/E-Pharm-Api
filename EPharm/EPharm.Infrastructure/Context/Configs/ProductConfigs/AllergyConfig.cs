@@ -12,6 +12,10 @@ public class AllergyConfig : IEntityTypeConfiguration<Allergy>
             .IsRequired()
             .HasMaxLength(255);
         
+        builder.HasOne(a => a.PharmaCompany)
+            .WithMany(a => a.Allergies)
+            .HasForeignKey(a => a.PharmaCompanyId);
+        
         builder.HasMany(a => a.Products)
             .WithOne(a => a.Allergy)
             .HasForeignKey(a => a.AllergyId);

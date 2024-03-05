@@ -11,6 +11,10 @@ public class RegulatoryInformationConfig : IEntityTypeConfiguration<RegulatoryIn
         builder.Property(ri => ri.RegulatoryStandards)
             .IsRequired()
             .HasMaxLength(255);
+        
+        builder.HasOne(a => a.PharmaCompany)
+            .WithMany(a => a.RegulatoryInformations)
+            .HasForeignKey(a => a.PharmaCompanyId);
 
         builder.Property(ri => ri.ApprovalDate)
             .HasColumnType("date");

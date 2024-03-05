@@ -12,6 +12,10 @@ public class ActiveIngredientConfig : IEntityTypeConfiguration<ActiveIngredient>
             .IsRequired()
             .HasMaxLength(255);
 
+        builder.HasOne(ai => ai.PharmaCompany)
+            .WithMany(ai => ai.ActiveIngredients)
+            .HasForeignKey(ai => ai.PharmaCompanyId);
+        
         builder.Property(ai => ai.IngredientDescription)
             .IsRequired()
             .HasMaxLength(500);
