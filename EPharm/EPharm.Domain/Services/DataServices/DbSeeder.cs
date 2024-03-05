@@ -1,0 +1,38 @@
+using EPharm.Domain.Models.Identity;
+using EPharm.Infrastructure.Context.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+
+namespace EPharm.Domain.Services.DataServices;
+
+public class DbSeeder(UserManager<AppIdentityUser> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+{
+    public async Task SeedSuperAdminAsync()
+    {
+        if (!await roleManager.RoleExistsAsync(IdentityData.SuperAdmin))
+        {
+            await roleManager.CreateAsync(new IdentityRole(IdentityData.SuperAdmin));
+        }
+
+        var superAdmin = await userManager.FindByNameAsync(configuration["SuperAdmin:Email"]!);
+
+        if (superAdmin == null)
+        {
+            superAdmin = new AppIdentityUser
+            {
+                UserName = configuration["SuperAdmin:Email"],
+            };
+
+            var result = await userManager.CreateAsync(superAdmin, configuration["SuperAdmin:Password"]!);
+
+            if (result.Succeeded)
+            {
+                await userManager.AddToRoleAsync(superAdmin, IdentityData.SuperAdmin);
+            }
+            else
+            {
+                throw new Exception($"Failed to create SuperAdmin user: {string.Join(", ", result.Errors)}");
+            }
+        }
+    } 
+}

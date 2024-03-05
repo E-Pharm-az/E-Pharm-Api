@@ -2,7 +2,6 @@ using AutoMapper;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
-using EPharm.Infrastructure.Interfaces;
 using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
 
 namespace EPharm.Domain.Services.Pharma;
@@ -22,9 +21,10 @@ public class PharmaCompanyService(IPharmaCompanyRepository pharmaCompanyReposito
         return mapper.Map<GetPharmaCompanyDto>(pharmaCompany);
     }
 
-    public async Task<GetPharmaCompanyDto> CreatePharmaCompanyAsync(CreatePharmaCompanyDto pharmaCompanyDto)
+    public async Task<GetPharmaCompanyDto> CreatePharmaCompanyAsync(CreatePharmaCompanyDto pharmaCompanyDto, string pharmaAdminId)
     {
         var pharmaCompanyEntity = mapper.Map<PharmaCompany>(pharmaCompanyDto);
+        pharmaCompanyEntity.PharmaCompanyOwnerId = pharmaAdminId;
         var pharmaCompany = pharmaCompanyRepository.InsertAsync(pharmaCompanyEntity);
 
         var result = await pharmaCompanyRepository.SaveChangesAsync();
