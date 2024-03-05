@@ -1,11 +1,14 @@
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Interfaces.Pharma;
+using EPharm.Domain.Models.Identity;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(Roles = IdentityData.Admin)]
 public class PharmaCompanyController(IPharmaCompanyService pharmaCompanyService) : ControllerBase
 {
     [HttpGet]
@@ -25,17 +28,6 @@ public class PharmaCompanyController(IPharmaCompanyService pharmaCompanyService)
         
         return NotFound($"Pharmaceutical company with ID: {pharmaCompanyId} not found.");
     }
-    
-    [HttpPost]
-    public async Task<ActionResult<GetPharmaCompanyDto>> CreatePharmaCompany([FromBody] CreatePharmaCompanyDto pharmaCompanyDto)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest("Model not valid.");
-
-        await pharmaCompanyService.CreatePharmaCompanyAsync(pharmaCompanyDto);
-
-        return Ok("Pharmaceutical company created with success.");
-    } 
     
     [HttpPut]
     public async Task<ActionResult> UpdatePharmaCompany([FromBody] CreatePharmaCompanyDto pharmaCompanyDto)

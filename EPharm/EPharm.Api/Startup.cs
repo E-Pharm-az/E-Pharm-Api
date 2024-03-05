@@ -1,9 +1,12 @@
 using System.Text;
 using EPharm.Domain.Interfaces.Jwt;
 using EPharm.Domain.Interfaces.Pharma;
+using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Interfaces.User;
+using EPharm.Domain.Services.DataServices;
 using EPharm.Domain.Services.Jwt;
 using EPharm.Domain.Services.Pharma;
+using EPharm.Domain.Services.ProductServices;
 using EPharm.Domain.Services.User;
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.Identity;
@@ -25,8 +28,6 @@ namespace EPharmApi;
 
 public class Startup(IConfiguration configuration)
 {
-    public IConfiguration Configuration { get; } = configuration;
-
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddEndpointsApiExplorer();
@@ -42,11 +43,12 @@ public class Startup(IConfiguration configuration)
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description =
-                    "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 1s\""
+                Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n" +
+                              "Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\n" +
+                              "Example: \"Bearer 1s\""
             });
 
-            ops.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            ops.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme
@@ -90,8 +92,8 @@ public class Startup(IConfiguration configuration)
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidAudience = configuration["JwtSettings:Audience"],
-                    IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]))
                 };
             });
 
@@ -100,16 +102,13 @@ public class Startup(IConfiguration configuration)
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-        services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        services.AddDbContext<AppDbContext>(
+            options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 
         services.AddDbContext<AppIdentityDbContext>(
             options => options.UseNpgsql(configuration.GetConnectionString("UserDefaultConnection")));
 
-        services.AddScoped<IAppIdentityUserRepository, AppIdentityUserRepository>();
-
-        services.AddScoped<IPharmaCompanyRepository, PharmaCompanyRepository>();
-        services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();
+        services.AddScoped<DbSeeder>();
 
         services.AddScoped<IActiveIngredientRepository, ActiveIngredientRepository>();
         services.AddScoped<IAllergyRepository, AllergyRepository>();
@@ -123,6 +122,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<ISpecialRequirementRepository, SpecialRequirementRepository>();
         services.AddScoped<IUsageWarningRepository, UsageWarningRepository>();
 
+        services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IIndicationProductRepository, IndicationProductRepository>();
         services.AddScoped<IProductActiveIngredientRepository, ProductActiveIngredientRepository>();
         services.AddScoped<IProductAllergyRepository, ProductAllergyRepository>();
@@ -130,9 +130,14 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IProductRouteOfAdministrationRepository, ProductRouteOfAdministrationRepository>();
         services.AddScoped<IProductSideEffectRepository, ProductSideEffectRepository>();
         services.AddScoped<IProductUsageWarningRepository, ProductUsageWarningRepository>();
+        
+        services.AddScoped<IPharmaCompanyRepository, PharmaCompanyRepository>();
+        services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();
+        services.AddScoped<IAppIdentityUserRepository, AppIdentityUserRepository>();
 
         services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
+        services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IUserService, UserService>();
 
         services.AddScoped<ITokenService, TokenService>();
@@ -156,6 +161,5 @@ public class Startup(IConfiguration configuration)
         app.UseAuthorization();
         app.UseHsts();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-        
     }
 }

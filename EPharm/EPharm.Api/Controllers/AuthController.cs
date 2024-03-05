@@ -1,10 +1,7 @@
 using System.Security.Claims;
-using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.Jwt;
-using EPharm.Domain.Interfaces.User;
 using EPharm.Domain.Models.Jwt;
 using EPharm.Infrastructure.Context.Entities.Identity;
-using EPharm.Infrastructure.Interfaces.IdentityRepositoriesInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,33 +9,10 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(
-    UserManager<AppIdentityUser> userManager,
-    IAppIdentityUserRepository userRepository,
-    IUserService userService,
-    ITokenService tokenService
-) : ControllerBase
+public class AuthController(UserManager<AppIdentityUser> userManager, ITokenService tokenService) : ControllerBase
 {
-    [Route("register")]
     [HttpPost]
-    public async Task<IActionResult> Register([FromBody] UserRegistrationDto request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            await userService.CreateUser(request);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
-    }
-
     [Route("login")]
-    [HttpPost]
     public async Task<IActionResult> Login([FromBody] AuthRequest request)
     {
         if (!ModelState.IsValid)
@@ -72,8 +46,8 @@ public class AuthController(
         }
     }
 
-    [Route("refreshToken")]
     [HttpPost]
+    [Route("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromBody] TokenModel request)
     {
         if (!ModelState.IsValid)
