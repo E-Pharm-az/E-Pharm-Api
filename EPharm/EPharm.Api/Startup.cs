@@ -3,7 +3,6 @@ using EPharm.Domain.Interfaces.Jwt;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Interfaces.User;
-using EPharm.Domain.Services.DataServices;
 using EPharm.Domain.Services.Jwt;
 using EPharm.Domain.Services.Pharma;
 using EPharm.Domain.Services.ProductServices;
@@ -18,11 +17,13 @@ using EPharm.Infrastructure.Repositories.IdentityRepositories;
 using EPharm.Infrastructure.Repositories.JunctionsRepositories;
 using EPharm.Infrastructure.Repositories.PharmaRepositories;
 using EPharm.Infrastructure.Repositories.ProductRepositories;
+using EPharmApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 namespace EPharmApi;
 
@@ -33,7 +34,14 @@ public class Startup(IConfiguration configuration)
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddControllers();
+        
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+            .ReadFrom.Configuration(configuration)
+            .CreateLogger();
 
+        services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
+        
         services.AddSwaggerGen(ops =>
         {
             ops.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -151,6 +159,11 @@ public class Startup(IConfiguration configuration)
             app.UseSwagger();
             app.UseSwaggerUI();
         }
+        
+        app.UseSerilogRequestLogging();
+        
+        dbSeeder.SeedSuperAdminAsync().Wait();
+        
         app.UseCors("AllowAnyOrigins");
         
         app.UseRouting();
@@ -158,7 +171,6 @@ public class Startup(IConfiguration configuration)
         app.UseAuthorization();
         app.UseHsts();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-        
-        dbSeeder.SeedSuperAdminAsync().Wait();
+
     }
 }

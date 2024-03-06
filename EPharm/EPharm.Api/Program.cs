@@ -1,3 +1,5 @@
+using Serilog;
+
 namespace EPharmApi;
 
 public static class Program
@@ -9,5 +11,6 @@ public static class Program
 
     private static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
+            .UseSerilog()
             .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
 }
