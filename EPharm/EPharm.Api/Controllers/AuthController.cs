@@ -4,6 +4,7 @@ using EPharm.Domain.Models.Jwt;
 using EPharm.Infrastructure.Context.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace EPharmApi.Controllers;
 
@@ -42,6 +43,7 @@ public class AuthController(UserManager<AppIdentityUser> userManager, ITokenServ
         }
         catch (Exception ex)
         {
+            Log.Error("Error logging in, User id: {UserId}, Error: {Error}", user.Id, ex.Message);
             return BadRequest(ex.Message);
         }
     }

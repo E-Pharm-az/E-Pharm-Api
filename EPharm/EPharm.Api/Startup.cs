@@ -4,7 +4,7 @@ using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Interfaces.User;
 using EPharm.Domain.Services.Jwt;
-using EPharm.Domain.Services.Pharma;
+using EPharm.Domain.Services.PharmaServices;
 using EPharm.Domain.Services.ProductServices;
 using EPharm.Domain.Services.User;
 using EPharm.Infrastructure.Context;
@@ -34,14 +34,14 @@ public class Startup(IConfiguration configuration)
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddControllers();
-        
+
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .ReadFrom.Configuration(configuration)
             .CreateLogger();
 
         services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
-        
+
         services.AddSwaggerGen(ops =>
         {
             ops.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -71,7 +71,7 @@ public class Startup(IConfiguration configuration)
                 }
             });
         });
-        
+
         services.AddIdentity<AppIdentityUser, IdentityRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = false;
@@ -100,7 +100,8 @@ public class Startup(IConfiguration configuration)
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidAudience = configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
                 };
             });
 
@@ -142,9 +143,11 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();
         services.AddScoped<IAppIdentityUserRepository, AppIdentityUserRepository>();
 
+        services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IActiveIngredientService, ActiveIngredientService>();
+
         services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
-        services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IUserService, UserService>();
 
         services.AddScoped<ITokenService, TokenService>();
@@ -159,18 +162,15 @@ public class Startup(IConfiguration configuration)
             app.UseSwagger();
             app.UseSwaggerUI();
         }
-        
-        app.UseSerilogRequestLogging();
-        
+
         dbSeeder.SeedSuperAdminAsync().Wait();
-        
+
+        app.UseSerilogRequestLogging();
         app.UseCors("AllowAnyOrigins");
-        
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseHsts();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
-
     }
 }

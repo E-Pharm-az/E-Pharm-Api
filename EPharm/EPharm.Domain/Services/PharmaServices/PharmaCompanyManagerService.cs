@@ -4,7 +4,7 @@ using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
 
-namespace EPharm.Domain.Services.Pharma;
+namespace EPharm.Domain.Services.PharmaServices;
 
 public class PharmaCompanyManagerService(IPharmaCompanyManagerRepository pharmaCompanyManagerRepository, IMapper mapper)
     : IPharmaCompanyManagerService
@@ -35,10 +35,17 @@ public class PharmaCompanyManagerService(IPharmaCompanyManagerRepository pharmaC
         throw new InvalidOperationException("Failed to create pharmaceutical company manager.");
     }
 
-    public async Task<bool> UpdatePharmaCompanyManagerAsync(CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
+    public async Task<bool> UpdatePharmaCompanyManagerAsync(int id, CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
     {
+        var pharmaCompanyManager = await pharmaCompanyManagerRepository.GetByIdAsync(id);
+        
+        if (pharmaCompanyManager is null)
+            return false;
+        
         var pharmaCompanyManagerEntity = mapper.Map<PharmaCompanyManager>(pharmaCompanyManagerDto);
-        pharmaCompanyManagerRepository.Update(pharmaCompanyManagerEntity);
+        mapper.Map(pharmaCompanyManagerEntity, pharmaCompanyManager);
+        
+        pharmaCompanyManagerRepository.Update(pharmaCompanyManager);
 
         var result = await pharmaCompanyManagerRepository.SaveChangesAsync();
         return result > 0;

@@ -33,10 +33,17 @@ public class ProductService(IProductRepository productRepository, IMapper mapper
         throw new InvalidOperationException("Failed to create product.");
     }
 
-    public async Task<bool> UpdateProductAsync(CreateProductDto productDto)
+    public async Task<bool> UpdateProductAsync(int id, CreateProductDto productDto)
     {
+        var product = await productRepository.GetByIdAsync(id);
+        
+        if (product is null)
+            return false;
+        
         var productEntity = mapper.Map<Product>(productDto);
-        productRepository.Update(productEntity);
+        mapper.Map(productEntity, product);
+        
+        productRepository.Update(product);
 
         var result = await productRepository.SaveChangesAsync();
         return result > 0;

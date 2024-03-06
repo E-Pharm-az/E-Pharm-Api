@@ -3,6 +3,7 @@ using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace EPharmApi.Controllers;
 
@@ -20,7 +21,7 @@ public class PharmaCompanyController(IPharmaCompanyService pharmaCompanyService)
         return NotFound("Pharmaceutical companies not found.");
     }
     
-    [HttpGet("{pharmaCompanyId:int}")]
+    [HttpGet("{id:int}")]
     public async Task<ActionResult<GetPharmaCompanyDto>> GetAllPharmaCompanies(int pharmaCompanyId)
     {
         var result = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
@@ -29,26 +30,28 @@ public class PharmaCompanyController(IPharmaCompanyService pharmaCompanyService)
         return NotFound($"Pharmaceutical company with ID: {pharmaCompanyId} not found.");
     }
     
-    [HttpPut]
-    public async Task<ActionResult> UpdatePharmaCompany([FromBody] CreatePharmaCompanyDto pharmaCompanyDto)
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> UpdatePharmaCompany(int id, [FromBody] CreatePharmaCompanyDto pharmaCompanyDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var result = await pharmaCompanyService.UpdatePharmaCompanyAsync(pharmaCompanyDto);
+        var result = await pharmaCompanyService.UpdatePharmaCompanyAsync(id, pharmaCompanyDto);
             
         if (result) return Ok("Pharmaceutical company updated with success.");
 
+        Log.Error("Error updating pharma company");
         return BadRequest("Error updating pharmaceutical company.");
     }
    
-    [HttpDelete("{pharmaCompanyId:int}")] 
-    public async Task<ActionResult> DeletePharmaCompany(int pharmaCompanyId)
+    [HttpDelete("{id:int}")] 
+    public async Task<ActionResult> DeletePharmaCompany(int id)
     {
-        var result = await pharmaCompanyService.DeletePharmaCompanyAsync(pharmaCompanyId);
+        var result = await pharmaCompanyService.DeletePharmaCompanyAsync(id);
 
-        if (result) return Ok($"Pharmaceutical company with ID: {pharmaCompanyId} deleted with success.");
+        if (result) return Ok($"Pharmaceutical company with ID: {id} deleted with success.");
 
-        return BadRequest($"Pharmaceutical company with ID: {pharmaCompanyId} could not be deleted.");
+        Log.Error("Error deleting pharma company");
+        return BadRequest($"Pharmaceutical company with ID: {id} could not be deleted.");
     } 
 }

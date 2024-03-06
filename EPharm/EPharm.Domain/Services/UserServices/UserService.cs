@@ -62,7 +62,6 @@ public class UserService(
         }
     }
 
-    // Creates a pharma company with a pharma company admin
     public async Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(CreateUserDto createUserDto, CreatePharmaCompanyDto createPharmaCompanyDto)
     {
         try
@@ -97,10 +96,17 @@ public class UserService(
         }
     }
 
-    public async Task<bool> UpdateUserAsync(GetUserDto getUserDto)
+    public async Task<bool> UpdateUserAsync(string id, CreateUserDto createUserDto)
     {
-        var userEntity = mapper.Map<AppIdentityUser>(getUserDto);
-        var result = await userManager.UpdateAsync(userEntity);
+        var user = await userManager.FindByIdAsync(id);
+        
+        if (user is null)
+            return false;
+        
+        var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
+        mapper.Map(userEntity, user);
+        
+        var result = await userManager.UpdateAsync(user);
 
         return result.Succeeded;
     }

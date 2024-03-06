@@ -12,6 +12,6 @@ public interface IUserService
     public Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, CreateUserDto createUserDto);
     public Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(CreateUserDto createUserDto, CreatePharmaCompanyDto createPharmaCompanyDto);
     public Task<GetUserDto> CreateAdminAsync(CreateUserDto createUserDto);
-    public Task<bool> UpdateUserAsync(GetUserDto getUserDto);
+    public Task<bool> UpdateUserAsync(string id, CreateUserDto createUserDto);
     public Task<bool> DeleteUserAsync(string userId);
 }

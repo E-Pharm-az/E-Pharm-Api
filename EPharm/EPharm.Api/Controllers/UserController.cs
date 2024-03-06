@@ -4,6 +4,7 @@ using EPharm.Domain.Interfaces.User;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace EPharmApi.Controllers;
 
@@ -45,6 +46,7 @@ public class UserController(IUserService userService) : ControllerBase
         }
         catch (Exception ex)
         {
+            Log.Error("Error creating user, {Error}", ex.Message);
             return BadRequest(ex.Message);
         }
     }
@@ -64,6 +66,7 @@ public class UserController(IUserService userService) : ControllerBase
         }
         catch (Exception ex)
         {
+            Log.Error("Error creating admin, {Error}", ex.Message);
             return BadRequest(ex.Message);
         }
     }
@@ -83,6 +86,7 @@ public class UserController(IUserService userService) : ControllerBase
         }
         catch (Exception ex)
         {
+            Log.Error("Error creating pharma admin, {Error}", ex.Message);
             return BadRequest(ex.Message);
         }
     }
@@ -102,27 +106,29 @@ public class UserController(IUserService userService) : ControllerBase
         }
         catch (Exception ex)
         {
+            Log.Error("Error creating pharma manager, {Error}", ex.Message);
             return BadRequest(ex.Message);
         }
     }
 
-    [HttpPut]
+    [HttpPut("{id}")]
     [Authorize]
-    public async Task<ActionResult> UpdateUser([FromBody] GetUserDto userDto)
+    public async Task<ActionResult> UpdateUser(string id, [FromBody] CreateUserDto userDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-        if (!User.IsInRole(IdentityData.Admin) && currentUserId != userDto.Id)
+        if (!User.IsInRole(IdentityData.Admin) && currentUserId != id)
             return Forbid();
 
-        var result = await userService.UpdateUserAsync(userDto);
+        var result = await userService.UpdateUserAsync(id, userDto);
 
         if (result)
             return Ok("User updated successfully.");
 
+        Log.Error("Error updating user");
         return BadRequest("Error updating user.");
     }
 
@@ -139,6 +145,7 @@ public class UserController(IUserService userService) : ControllerBase
 
         if (result) return Ok($"User with ID: {userId} deleted with success.");
 
+        Log.Error("Error updating user");
         return BadRequest($"User with ID: {userId} could not be deleted.");
     }
 }

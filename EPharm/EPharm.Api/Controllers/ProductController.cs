@@ -3,6 +3,7 @@ using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace EPharmApi.Controllers;
 
@@ -20,13 +21,13 @@ public class ProductController(IProductService productService) : ControllerBase
         return NotFound("Products not found.");
     }
 
-    [HttpGet("{productId:int}", Name = "getProductById")]
-    public async Task<ActionResult<GetProductDto>> GetProductById(int productId)
+    [HttpGet("{id:int}", Name = "getProductById")]
+    public async Task<ActionResult<GetProductDto>> GetProductById(int id)
     {
-        var result = await productService.GetProductByIdAsync(productId);
+        var result = await productService.GetProductByIdAsync(id);
         if (result is not null) return Ok(result);
 
-        return NotFound($"Product with ID: {productId} not found.");
+        return NotFound($"Product with ID: {id} not found.");
     }
 
     [HttpPost]
@@ -40,32 +41,35 @@ public class ProductController(IProductService productService) : ControllerBase
             var product = await productService.CreateProductAsync(productDto);
             return CreatedAtRoute("getProductById", new { productId = product.Id }, product);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            return BadRequest(e.Message);
+            Log.Error("Error creating product, {Error}", ex.Message);
+            return BadRequest(ex.Message);
         }
     }
 
-    [HttpPut]
-    public async Task<ActionResult> UpdateProduct([FromBody] CreateProductDto productDto)
+    [HttpPut("{id:int}")]
+    public async Task<ActionResult> UpdateProduct(int id, [FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var result = await productService.UpdateProductAsync(productDto);
+        var result = await productService.UpdateProductAsync(id, productDto);
 
         if (result) return Ok("Product updated with success.");
 
+        Log.Error("Error updating product");
         return BadRequest("Error updating product.");
     }
 
-    [HttpDelete("{productId:int}")]
-    public async Task<ActionResult> DeleteProduct(int productId)
+    [HttpDelete("{id:int}")]
+    public async Task<ActionResult> DeleteProduct(int id)
     {
-        var result = await productService.DeleteProductAsync(productId);
+        var result = await productService.DeleteProductAsync(id);
 
-        if (result) return Ok($"Product with ID: {productId} deleted with success.");
-
-        return BadRequest($"Product with ID: {productId} could not be deleted.");
+        if (result) return Ok($"Product with ID: {id} deleted with success.");
+        
+        Log.Error("Error deleting product");
+        return BadRequest($"Product with ID: {id} could not be deleted.");
     }
 }
