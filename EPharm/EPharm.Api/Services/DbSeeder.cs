@@ -20,7 +20,7 @@ public class DbSeeder(
                 await roleManager.CreateAsync(new IdentityRole(IdentityData.Admin));
             }
 
-            var superAdmin = await userManager.FindByNameAsync(configuration["SuperAdmin:Email"]!);
+            var superAdmin = await userManager.FindByEmailAsync(configuration["SuperAdmin:Email"]!);
 
             if (superAdmin is null)
             {
