@@ -143,7 +143,7 @@ public class UserController(IUserService userService) : ControllerBase
 
         var result = await userService.DeleteUserAsync(userId);
 
-        if (result) return Ok($"User with ID: {userId} deleted with success.");
+        if (result) return NoContent();
 
         Log.Error("Error updating user");
         return BadRequest($"User with ID: {userId} could not be deleted.");
