@@ -6,7 +6,7 @@ namespace EPharm.Domain.Interfaces.Jwt;
 
 public interface ITokenService
 {
-    public AuthResponse CreateToken(IdentityUser user);
+    public AuthResponse CreateToken(IdentityUser user, List<string> roles);
     public string RefreshToken();
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token); 
 }

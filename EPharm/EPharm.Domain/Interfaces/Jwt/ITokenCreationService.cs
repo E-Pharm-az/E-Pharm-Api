@@ -5,5 +5,5 @@ namespace EPharm.Domain.Interfaces.Jwt;
 
 public interface ITokenCreationService
 {
-    public AuthResponse CreateToken(IdentityUser user);
+    public AuthResponse CreateToken(IdentityUser user, IList<string> roles);
 }
