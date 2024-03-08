@@ -24,15 +24,17 @@ public class ActiveIngredientService(IActiveIngredientRepository activeIngredien
     public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(
         CreateActiveIngredientDto createActiveIngredientDto)
     {
-        var activeIngredientEntity = mapper.Map<ActiveIngredient>(createActiveIngredientDto);
-        var activeIngredient = activeIngredientRepository.InsertAsync(activeIngredientEntity);
+        try
+        {
+            var activeIngredientEntity = mapper.Map<ActiveIngredient>(createActiveIngredientDto);
+            var activeIngredient = await activeIngredientRepository.InsertAsync(activeIngredientEntity);
 
-        var result = await activeIngredientRepository.SaveChangesAsync();
-
-        if (result > 0)
             return mapper.Map<GetActiveIngredientDto>(activeIngredient);
-
-        throw new InvalidOperationException("Failed to create active ingredient.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to create active ingredient. Details: {ex.Message}");
+        }
     }
 
     public async Task<bool> UpdateActiveIngredientAsync(int id, CreateActiveIngredientDto createActiveIngredientDto)
@@ -42,9 +44,8 @@ public class ActiveIngredientService(IActiveIngredientRepository activeIngredien
         if (activeIngredient is null)
             return false;
 
-        var activeIngredientEntity = mapper.Map<ActiveIngredient>(createActiveIngredientDto);
-        mapper.Map(activeIngredientEntity, activeIngredient);
-        
+        mapper.Map(createActiveIngredientDto, activeIngredient);
+
         activeIngredientRepository.Update(activeIngredient);
 
         var result = await activeIngredientRepository.SaveChangesAsync();

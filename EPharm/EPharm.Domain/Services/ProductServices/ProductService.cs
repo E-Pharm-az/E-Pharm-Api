@@ -1,16 +1,33 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.ProductDtos.ProductDtos;
 using EPharm.Domain.Interfaces.Product;
+using EPharm.Infrastructure.Context.Entities.Junctions;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 namespace EPharm.Domain.Services.ProductServices;
 
-public class ProductService(IProductRepository productRepository, IMapper mapper) : IProductService
+public class ProductService(
+    IProductRepository productRepository,
+    IProductActiveIngredientRepository productActiveIngredientRepository,
+    IIndicationProductRepository productIndicationRepository,
+    IProductAllergyRepository productAllergyRepository,
+    IProductDosageFormRepository productDosageFormRepository,
+    IProductRouteOfAdministrationRepository productRouteOfAdministrationRepository,
+    IProductSideEffectRepository productSideEffectRepository,
+    IProductUsageWarningRepository productUsageWarningRepository,
+    IMapper mapper) : IProductService
 {
     public async Task<IEnumerable<GetProductDto>> GetAllProductsAsync()
     {
         var products = await productRepository.GetAllAsync();
+        return mapper.Map<IEnumerable<GetProductDto>>(products);
+    }
+
+    public async Task<IEnumerable<GetProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId)
+    {
+        var products = await productRepository.GetAllPharmaCompanyProductsAsync(pharmaCompanyId);
         return mapper.Map<IEnumerable<GetProductDto>>(products);
     }
 
@@ -20,29 +37,57 @@ public class ProductService(IProductRepository productRepository, IMapper mapper
         return mapper.Map<GetProductDto>(product);
     }
 
-    public async Task<GetProductDto> CreateProductAsync(CreateProductDto productDto)
+    public async Task<GetProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)
     {
-        var productEntity = mapper.Map<Product>(productDto);
-        var product = productRepository.InsertAsync(productEntity);
+        try
+        {
+            var productEntity = mapper.Map<Product>(productDto);
 
-        var result = await productRepository.SaveChangesAsync();
+            var product = await productRepository.InsertAsync(productEntity);
 
-        if (result > 0)
+            await CreateProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsId);
+            // await CreateProductIndicationAsync(product.Id, productDto.IndicationId);
+            // await CreateProductAllergyAsync(product.Id, productDto.AllergyId);
+            // await CreateProductDosageFormAsync(product.Id, productDto.DosageFormId);
+            // await CreateProductRouteOfAdministrationAsync(product.Id, productDto.RouteOfAdministrationId);
+            // await CreateProductSideEffectAsync(product.Id, productDto.SideEffectId);
+            // await CreateProductUsageWarningAsync(product.Id, productDto.UsageWarningId);
+
             return mapper.Map<GetProductDto>(product);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to create product, detail: {ex}");
+        }
+    }
 
-        throw new InvalidOperationException("Failed to create product.");
+    private async Task CreateProductActiveIngredientAsync(int productId, int activeIngredientId)
+    {
+        try
+        {
+            var productActiveIngredient = new ProductActiveIngredient
+            {
+                ProductId = productId,
+                ActiveIngredientId = activeIngredientId
+            };
+
+            await productActiveIngredientRepository.InsertAsync(productActiveIngredient);
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to create many-to-many relation with products and active ingredients. Details: {ex.Message}");
+        }
     }
 
     public async Task<bool> UpdateProductAsync(int id, CreateProductDto productDto)
     {
         var product = await productRepository.GetByIdAsync(id);
-        
+
         if (product is null)
             return false;
-        
-        var productEntity = mapper.Map<Product>(productDto);
-        mapper.Map(productEntity, product);
-        
+
+        mapper.Map(productDto, product);
+
         productRepository.Update(product);
 
         var result = await productRepository.SaveChangesAsync();

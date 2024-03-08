@@ -6,16 +6,18 @@ using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.User;
 using EPharm.Domain.Models.Identity;
 using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace EPharm.Domain.Services.User;
+namespace EPharm.Domain.Services.UserServices;
 
 public class UserService(
     UserManager<AppIdentityUser> userManager,
     RoleManager<IdentityRole> roleManager,
     IPharmaCompanyManagerService pharmaCompanyManagerService,
     IPharmaCompanyService pharmaCompanyService,
+    IUnitOfWork unitOfWork,
     IMapper mapper) : IUserService
 {
     public async Task<IEnumerable<GetUserDto>> GetAllUsersAsync()
@@ -37,9 +39,9 @@ public class UserService(
             var user = await CreateUserAsync(createUserDto, IdentityData.Customer);
             return user;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            throw new Exception(e.Message);
+            throw new Exception(ex.Message);
         }
     }
 
@@ -56,9 +58,9 @@ public class UserService(
             var result = await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
             return result;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            throw new Exception(e.Message);
+            throw new Exception(ex.Message);
         }
     }
 
@@ -67,19 +69,23 @@ public class UserService(
         try
         {
             var user = await CreateUserAsync(createUserDto, IdentityData.PharmaCompanyAdmin);
+
+            await unitOfWork.BeginTransactionAsync();
+            var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
             
             var pharmaCompanyAdminEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
-            await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
-
-            var pharmaCompanyAdmin = await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyAdminEntity);
             pharmaCompanyAdminEntity.ExternalId = user.Id;
-            pharmaCompanyAdminEntity.PharmaCompanyId = pharmaCompanyAdmin.Id;
+            pharmaCompanyAdminEntity.PharmaCompanyId = pharmaCompany.Id;
+
+            var result = await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyAdminEntity);
+            await unitOfWork.CommitTransactionAsync();
             
-            return pharmaCompanyAdmin;
+            return result;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            throw new Exception(e.Message);
+            await unitOfWork.RollbackTransactionAsync();
+            throw new Exception(ex.Message);
         }
     }
 
@@ -90,9 +96,9 @@ public class UserService(
             var user = await CreateUserAsync(createUserDto, IdentityData.Admin);
             return user;
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            throw new Exception(e.Message);
+            throw new Exception(ex.Message);
         }
     }
 
@@ -103,8 +109,7 @@ public class UserService(
         if (user is null)
             return false;
         
-        var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
-        mapper.Map(userEntity, user);
+        mapper.Map(createUserDto, user);
         
         var result = await userManager.UpdateAsync(user);
 
@@ -124,33 +129,21 @@ public class UserService(
 
     private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string identityRole)
     {
-        try
+        var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
+        userEntity.UserName = createUserDto.Email;
+        var result = await userManager.CreateAsync(userEntity, createUserDto.Password);
+
+        if (!await roleManager.RoleExistsAsync(identityRole))
         {
-            var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
-
-            var role = await roleManager.FindByNameAsync(identityRole);
-
-            if (role is null)
-                await roleManager.CreateAsync(new IdentityRole(identityRole));
-
-            await userManager.AddToRoleAsync(userEntity, role.Name);
-            userEntity.UserName = createUserDto.Email;
-
-            var createUserResult = await userManager.CreateAsync(userEntity, createUserDto.Password);
-
-            if (!createUserResult.Succeeded)
-            {
-                var errors = createUserResult.Errors.Select(e => e.Description);
-                var errorMessage = string.Join("; ", errors);
-
-                throw new Exception($"Failed to create user: {errorMessage}");
-            }
-
-            return mapper.Map<GetUserDto>(createUserDto);
+            await roleManager.CreateAsync(new IdentityRole(identityRole));
         }
-        catch (Exception e)
+
+        if (result.Succeeded)
         {
-            throw new Exception(e.Message);
+            await userManager.AddToRoleAsync(userEntity, identityRole);
+            return mapper.Map<GetUserDto>(userEntity);
         }
+
+        throw new InvalidOperationException($"Failed to create user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
     }
 }

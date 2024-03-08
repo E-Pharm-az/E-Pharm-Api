@@ -6,8 +6,7 @@ using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
 
 namespace EPharm.Domain.Services.PharmaServices;
 
-public class PharmaCompanyManagerService(IPharmaCompanyManagerRepository pharmaCompanyManagerRepository, IMapper mapper)
-    : IPharmaCompanyManagerService
+public class PharmaCompanyManagerService(IPharmaCompanyManagerRepository pharmaCompanyManagerRepository, IMapper mapper) : IPharmaCompanyManagerService
 {
     public async Task<IEnumerable<GetPharmaCompanyManagerDto>> GetAllPharmaCompanyManagersAsync()
     {
@@ -21,30 +20,30 @@ public class PharmaCompanyManagerService(IPharmaCompanyManagerRepository pharmaC
         return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManager);
     }
 
-    public async Task<GetPharmaCompanyManagerDto> CreatePharmaCompanyManagerAsync(
-        CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
+    public async Task<GetPharmaCompanyManagerDto> CreatePharmaCompanyManagerAsync(CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
     {
-        var pharmaCompanyManagerEntity = mapper.Map<PharmaCompanyManager>(pharmaCompanyManagerDto);
-        var pharmaCompanyManger = pharmaCompanyManagerRepository.InsertAsync(pharmaCompanyManagerEntity);
+        try
+        {
+            var pharmaCompanyManagerEntity = mapper.Map<PharmaCompanyManager>(pharmaCompanyManagerDto);
+            var pharmaCompanyManger = await pharmaCompanyManagerRepository.InsertAsync(pharmaCompanyManagerEntity);
 
-        var result = await pharmaCompanyManagerRepository.SaveChangesAsync();
-
-        if (result > 0)
             return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManger);
-
-        throw new InvalidOperationException("Failed to create pharmaceutical company manager.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to create pharmaceutical company manager. Details: {ex.Message}");
+        }
     }
 
     public async Task<bool> UpdatePharmaCompanyManagerAsync(int id, CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
     {
         var pharmaCompanyManager = await pharmaCompanyManagerRepository.GetByIdAsync(id);
-        
+
         if (pharmaCompanyManager is null)
             return false;
-        
-        var pharmaCompanyManagerEntity = mapper.Map<PharmaCompanyManager>(pharmaCompanyManagerDto);
-        mapper.Map(pharmaCompanyManagerEntity, pharmaCompanyManager);
-        
+
+        mapper.Map(pharmaCompanyManagerDto, pharmaCompanyManager);
+
         pharmaCompanyManagerRepository.Update(pharmaCompanyManager);
 
         var result = await pharmaCompanyManagerRepository.SaveChangesAsync();

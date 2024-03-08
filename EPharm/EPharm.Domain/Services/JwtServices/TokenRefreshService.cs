@@ -1,7 +1,7 @@
 using System.Security.Cryptography;
 using EPharm.Domain.Interfaces.Jwt;
 
-namespace EPharm.Domain.Services.Jwt;
+namespace EPharm.Domain.Services.JwtServices;
 
 public class TokenRefreshService : ITokenRefreshService
 {

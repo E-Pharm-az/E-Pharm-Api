@@ -7,16 +7,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace EPharm.Domain.Services.Jwt;
+namespace EPharm.Domain.Services.JwtServices;
 
 public class TokenService(
     ITokenCreationService tokenCreationService,
     ITokenRefreshService tokenRefreshService,
     IConfiguration configuration) : ITokenService
 {
-    public AuthResponse CreateToken(IdentityUser user)
+    public AuthResponse CreateToken(IdentityUser user, List<string> roles)
     {
-        return tokenCreationService.CreateToken(user);
+        return tokenCreationService.CreateToken(user, roles);
     }
 
     public string RefreshToken()

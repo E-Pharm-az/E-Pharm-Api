@@ -3,21 +3,24 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using EPharm.Domain.Interfaces.Jwt;
+using EPharm.Domain.Models.Identity;
 using EPharm.Domain.Models.Jwt;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace EPharm.Domain.Services.Jwt;
+namespace EPharm.Domain.Services.JwtServices;
 
 public class TokenCreationService(IConfiguration configuration) : ITokenCreationService
 {
-    public AuthResponse CreateToken(IdentityUser user)
+    public AuthResponse CreateToken(IdentityUser user, IList<string> roles)
     {
-        var claims = new[]
+        var claims = new List<Claim>
         {
-            new Claim(JwtRegisteredClaimNames.Email, user.Email)
+            new(JwtRegisteredClaimNames.Email, user.Email)
         };
+        
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var signingCredentials = new SigningCredentials(
             new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"])),

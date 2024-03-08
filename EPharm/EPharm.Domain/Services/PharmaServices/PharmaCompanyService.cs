@@ -21,18 +21,21 @@ public class PharmaCompanyService(IPharmaCompanyRepository pharmaCompanyReposito
         return mapper.Map<GetPharmaCompanyDto>(pharmaCompany);
     }
 
-    public async Task<GetPharmaCompanyDto> CreatePharmaCompanyAsync(CreatePharmaCompanyDto pharmaCompanyDto, string pharmaAdminId)
+    public async Task<GetPharmaCompanyDto> CreatePharmaCompanyAsync(CreatePharmaCompanyDto pharmaCompanyDto,
+        string pharmaAdminId)
     {
-        var pharmaCompanyEntity = mapper.Map<PharmaCompany>(pharmaCompanyDto);
-        pharmaCompanyEntity.PharmaCompanyOwnerId = pharmaAdminId;
-        var pharmaCompany = pharmaCompanyRepository.InsertAsync(pharmaCompanyEntity);
+        try
+        {
+            var pharmaCompanyEntity = mapper.Map<PharmaCompany>(pharmaCompanyDto);
+            pharmaCompanyEntity.PharmaCompanyOwnerId = pharmaAdminId;
+            var pharmaCompany = await pharmaCompanyRepository.InsertAsync(pharmaCompanyEntity);
 
-        var result = await pharmaCompanyRepository.SaveChangesAsync();
-
-        if (result > 0)
             return mapper.Map<GetPharmaCompanyDto>(pharmaCompany);
-
-        throw new InvalidOperationException("Failed to create pharmaceutical company.");
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidOperationException($"Failed to create pharmaceutical company. Details: {ex.Message}");
+        }
     }
 
     public async Task<bool> UpdatePharmaCompanyAsync(int id, CreatePharmaCompanyDto pharmaCompanyDto)
@@ -42,8 +45,7 @@ public class PharmaCompanyService(IPharmaCompanyRepository pharmaCompanyReposito
         if (pharmaCompany is null)
             return false;
 
-        var pharmaCompanyEntity = mapper.Map<PharmaCompany>(pharmaCompanyDto);
-        mapper.Map(pharmaCompanyEntity, pharmaCompany);
+        mapper.Map(pharmaCompanyDto, pharmaCompany);
 
         pharmaCompanyRepository.Update(pharmaCompany);
 
@@ -54,12 +56,12 @@ public class PharmaCompanyService(IPharmaCompanyRepository pharmaCompanyReposito
     public async Task<bool> DeletePharmaCompanyAsync(int pharmaCompanyId)
     {
         var pharmaCompany = await pharmaCompanyRepository.GetByIdAsync(pharmaCompanyId);
-        
+
         if (pharmaCompany is null)
             return false;
 
         pharmaCompanyRepository.Delete(pharmaCompany);
-        
+
         var result = await pharmaCompanyRepository.SaveChangesAsync();
         return result > 0;
     }
