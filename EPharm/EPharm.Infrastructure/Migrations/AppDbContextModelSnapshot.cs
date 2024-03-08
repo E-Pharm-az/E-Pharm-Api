@@ -8,7 +8,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EPharm.Infrastructure.Migrations.AppDb
+namespace EPharm.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -21,64 +21,6 @@ namespace EPharm.Infrastructure.Migrations.AppDb
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.CommonEntities.Address", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BuildingNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("City")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("Country")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
-
-                    b.Property<int>("Floor")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("PharmaCompanyId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("PostalCode")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("Region")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("RoomNumber")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("StreetAddress")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PharmaCompanyId")
-                        .IsUnique();
-
-                    b.ToTable("Addresses");
-                });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.Junctions.IndicationProduct", b =>
                 {
@@ -217,8 +159,13 @@ namespace EPharm.Infrastructure.Migrations.AppDb
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("AddressId")
+                    b.Property<int>("BuildingNumber")
                         .HasColumnType("integer");
+
+                    b.Property<string>("City")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("CompanyName")
                         .IsRequired()
@@ -235,17 +182,42 @@ namespace EPharm.Infrastructure.Migrations.AppDb
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
 
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
 
-                    b.Property<string>("Location")
+                    b.Property<int>("Floor")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("PharmaCompanyOwnerId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PostalCode")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("Region")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<string>("PharmaCompanyOwnerId")
+                    b.Property<int>("RoomNumber")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("StreetAddress")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("TIN")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -747,17 +719,6 @@ namespace EPharm.Infrastructure.Migrations.AppDb
                     b.ToTable("UsageWarnings");
                 });
 
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.CommonEntities.Address", b =>
-                {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
-                        .WithOne("Address")
-                        .HasForeignKey("EPharm.Infrastructure.Context.Entities.CommonEntities.Address", "PharmaCompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PharmaCompany");
-                });
-
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.Junctions.IndicationProduct", b =>
                 {
                     b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Indication", "Indication")
@@ -1061,9 +1022,6 @@ namespace EPharm.Infrastructure.Migrations.AppDb
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", b =>
                 {
                     b.Navigation("ActiveIngredients");
-
-                    b.Navigation("Address")
-                        .IsRequired();
 
                     b.Navigation("Allergies");
 

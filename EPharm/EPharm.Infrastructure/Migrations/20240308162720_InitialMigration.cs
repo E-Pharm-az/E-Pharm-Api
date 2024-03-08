@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EPharm.Infrastructure.Migrations.AppDb
+namespace EPharm.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration
@@ -18,12 +18,19 @@ namespace EPharm.Infrastructure.Migrations.AppDb
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    PharmaCompanyOwnerId = table.Column<string>(type: "text", nullable: false),
+                    TIN = table.Column<string>(type: "text", nullable: false),
                     CompanyName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Location = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     ContactEmail = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     ContactPhone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    AddressId = table.Column<int>(type: "integer", nullable: false),
-                    PharmaCompanyOwnerId = table.Column<string>(type: "text", nullable: false),
+                    StreetAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    PostalCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
+                    City = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Country = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Region = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    BuildingNumber = table.Column<int>(type: "integer", nullable: false),
+                    Floor = table.Column<int>(type: "integer", nullable: false),
+                    RoomNumber = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
@@ -47,34 +54,6 @@ namespace EPharm.Infrastructure.Migrations.AppDb
                     table.PrimaryKey("PK_ActiveIngredients", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ActiveIngredients_PharmaCompanies_PharmaCompanyId",
-                        column: x => x.PharmaCompanyId,
-                        principalTable: "PharmaCompanies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Addresses",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    StreetAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    PostalCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    City = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Country = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Region = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    BuildingNumber = table.Column<int>(type: "integer", nullable: false),
-                    Floor = table.Column<int>(type: "integer", nullable: false),
-                    RoomNumber = table.Column<int>(type: "integer", nullable: false),
-                    PharmaCompanyId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Addresses", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Addresses_PharmaCompanies_PharmaCompanyId",
                         column: x => x.PharmaCompanyId,
                         principalTable: "PharmaCompanies",
                         principalColumn: "Id",
@@ -564,12 +543,6 @@ namespace EPharm.Infrastructure.Migrations.AppDb
                 column: "PharmaCompanyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Addresses_PharmaCompanyId",
-                table: "Addresses",
-                column: "PharmaCompanyId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Allergies_PharmaCompanyId",
                 table: "Allergies",
                 column: "PharmaCompanyId");
@@ -684,9 +657,6 @@ namespace EPharm.Infrastructure.Migrations.AppDb
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "Addresses");
-
             migrationBuilder.DropTable(
                 name: "IndicationProducts");
 
