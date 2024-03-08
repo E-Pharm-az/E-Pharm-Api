@@ -31,7 +31,9 @@ public class AuthController(UserManager<AppIdentityUser> userManager, ITokenServ
 
         try
         {
-            var auth = tokenService.CreateToken(user);
+            var roles = (await userManager.GetRolesAsync(user)).ToList();
+            Log.Information("User role sare -------> {@roles}", roles);
+            var auth = tokenService.CreateToken(user, roles);
 
             user.RefreshToken = tokenService.RefreshToken();
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
@@ -69,7 +71,8 @@ public class AuthController(UserManager<AppIdentityUser> userManager, ITokenServ
             return BadRequest("Invalid access token or refresh token");
         }
 
-        var response = tokenService.CreateToken(user);
+        var roles = (await userManager.GetRolesAsync(user)).ToList();
+        var response = tokenService.CreateToken(user, roles);
         response.RefreshToken = tokenService.RefreshToken();
 
         user.RefreshToken = response.RefreshToken;
