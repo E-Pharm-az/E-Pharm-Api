@@ -22,12 +22,12 @@ public class PharmaCompanyController(IPharmaCompanyService pharmaCompanyService)
     }
     
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GetPharmaCompanyDto>> GetAllPharmaCompanies(int pharmaCompanyId)
+    public async Task<ActionResult<GetPharmaCompanyDto>> GetAllPharmaCompanies(int id)
     {
-        var result = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var result = await pharmaCompanyService.GetPharmaCompanyByIdAsync(id);
         if (result is not null) return Ok(result);
         
-        return NotFound($"Pharmaceutical company with ID: {pharmaCompanyId} not found.");
+        return NotFound($"Pharmaceutical company with ID: {id} not found.");
     }
     
     [HttpPut("{id:int}")]
@@ -49,7 +49,7 @@ public class PharmaCompanyController(IPharmaCompanyService pharmaCompanyService)
     {
         var result = await pharmaCompanyService.DeletePharmaCompanyAsync(id);
 
-        if (result) return Ok($"Pharmaceutical company with ID: {id} deleted with success.");
+        if (result) return NoContent();
 
         Log.Error("Error deleting pharma company");
         return BadRequest($"Pharmaceutical company with ID: {id} could not be deleted.");
