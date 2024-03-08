@@ -20,6 +20,15 @@ public class ProductController(IProductService productService) : ControllerBase
 
         return NotFound("Products not found.");
     }
+    
+    [HttpGet("pharma-company/{pharmaCompanyId:int}/products")]
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllPharmaCompanyProducts(int pharmaCompanyId)
+    {
+        var result = await productService.GetAllPharmaCompanyProductsAsync(pharmaCompanyId);
+        if (result.Any()) return Ok(result);
+
+        return NotFound("Pharma company products not found.");
+    }
 
     [HttpGet("{id:int}", Name = "getProductById")]
     public async Task<ActionResult<GetProductDto>> GetProductById(int id)
@@ -30,15 +39,15 @@ public class ProductController(IProductService productService) : ControllerBase
         return NotFound($"Product with ID: {id} not found.");
     }
 
-    [HttpPost]
-    public async Task<ActionResult<GetProductDto>> CreateProduct([FromBody] CreateProductDto productDto)
+    [HttpPost("pharma-company/{pharmaCompanyId:int}/products")]
+    public async Task<ActionResult<GetProductDto>> CreateProduct(int pharmaCompanyId, [FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
         try
         {
-            var product = await productService.CreateProductAsync(productDto);
+            var product = await productService.CreateProductAsync(pharmaCompanyId, productDto);
             return CreatedAtRoute("getProductById", new { productId = product.Id }, product);
         }
         catch (Exception ex)
@@ -67,7 +76,7 @@ public class ProductController(IProductService productService) : ControllerBase
     {
         var result = await productService.DeleteProductAsync(id);
 
-        if (result) return Ok($"Product with ID: {id} deleted with success.");
+        if (result) return NoContent();
         
         Log.Error("Error deleting product");
         return BadRequest($"Product with ID: {id} could not be deleted.");
