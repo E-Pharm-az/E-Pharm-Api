@@ -8,40 +8,42 @@ namespace EPharm.Infrastructure.Repositories.BaseRepositories;
 public class Repository<T> : IRepository<T> where T : BaseEntity
 {
     private readonly AppDbContext _context;
-    private readonly DbSet<T> _entities;
+    protected readonly DbSet<T> Entities;
 
     protected Repository(AppDbContext context)
     {
         _context = context;
-        _entities = context.Set<T>();
+        Entities = context.Set<T>();
     }
 
-    public virtual async Task<IEnumerable<T>> GetAllAsync() => 
-        await _entities.AsNoTracking().ToListAsync();
+    public virtual async Task<IEnumerable<T>> GetAllAsync() =>
+        await Entities.AsNoTracking().ToListAsync();
 
     public virtual async Task<T?> GetByIdAsync(int id) =>
-        await _entities.AsNoTracking().SingleOrDefaultAsync(s => s.Id == id);
+        await Entities.AsNoTracking().SingleOrDefaultAsync(s => s.Id == id);
 
     public virtual async Task<T> InsertAsync(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        await _entities.AddAsync(entity);
+        var entityItem = await Entities.AddAsync(entity);
         
-        return entity;
+        await _context.SaveChangesAsync();
+
+        return (await Entities.AsNoTracking().SingleOrDefaultAsync(s => s.Id == entityItem.Entity.Id))!;
     }
 
     public virtual void Update(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-         _entities.Update(entity);
+        Entities.Update(entity);
     }
 
     public virtual void Delete(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
-        _entities.Remove(entity);
+        Entities.Remove(entity);
     }
 
     public virtual async Task<int> SaveChangesAsync() =>
         await _context.SaveChangesAsync();
-} 
+}
