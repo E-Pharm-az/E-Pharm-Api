@@ -67,7 +67,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
     {
         var result = await activeIngredientService.DeleteActiveIngredientAsync(id);
 
-        if (result) return Ok("Active ingredient deleted with success.");
+        if (result) return NoContent();
         
         Log.Error("Error deleting active ingredient");
         return BadRequest("Error deleting active ingredient.");
