@@ -11,6 +11,7 @@ public class GetProductDto
     public string ContraindicationsDescription { get; set; }
     public string StorageConditionDescription { get; set; }
 
+    public int ActiveIngredientsId { get; set; }
     public int SpecialRequirementsId { get; set; }
     public int ManufacturerId { get; set; }
     public int RegulatoryInformationId { get; set; }
