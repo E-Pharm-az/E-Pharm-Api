@@ -1,4 +1,3 @@
-using EPharm.Infrastructure.Context.Entities.CommonEntities;
 using EPharm.Infrastructure.Context.Entities.Junctions;
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
@@ -10,7 +9,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<PharmaCompany> PharmaCompanies { get; set; }
     public DbSet<PharmaCompanyManager> PharmaCompanyManagers { get; set; }
-    public DbSet<Address> Addresses { get; set; }
     
     public DbSet<ActiveIngredient> ActiveIngredients { get; set; }
     public DbSet<Allergy> Allergies { get; set; }

@@ -1,5 +1,4 @@
 using EPharm.Infrastructure.Context.Entities.Base;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 namespace EPharm.Infrastructure.Context.Entities.PharmaEntities;
 
