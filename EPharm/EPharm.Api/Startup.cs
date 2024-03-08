@@ -3,16 +3,18 @@ using EPharm.Domain.Interfaces.Jwt;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Interfaces.User;
-using EPharm.Domain.Services.Jwt;
+using EPharm.Domain.Services.JwtServices;
 using EPharm.Domain.Services.PharmaServices;
 using EPharm.Domain.Services.ProductServices;
-using EPharm.Domain.Services.User;
+using EPharm.Domain.Services.UserServices;
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.IdentityRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
+using EPharm.Infrastructure.Repositories.BaseRepositories;
 using EPharm.Infrastructure.Repositories.IdentityRepositories;
 using EPharm.Infrastructure.Repositories.JunctionsRepositories;
 using EPharm.Infrastructure.Repositories.PharmaRepositories;
@@ -39,7 +41,7 @@ public class Startup(IConfiguration configuration)
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .ReadFrom.Configuration(configuration)
             .CreateLogger();
-
+        
         services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
 
         services.AddSwaggerGen(ops =>
@@ -92,7 +94,7 @@ public class Startup(IConfiguration configuration)
             })
             .AddJwtBearer(options =>
             {
-                options.TokenValidationParameters = new()
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
                     ValidateAudience = true,
@@ -116,6 +118,8 @@ public class Startup(IConfiguration configuration)
         services.AddDbContext<AppIdentityDbContext>(
             options => options.UseNpgsql(configuration.GetConnectionString("UserDefaultConnection")));
 
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        
         services.AddScoped<DbSeeder>();
 
         services.AddScoped<IActiveIngredientRepository, ActiveIngredientRepository>();
@@ -165,11 +169,14 @@ public class Startup(IConfiguration configuration)
 
         dbSeeder.SeedSuperAdminAsync().Wait();
 
-        app.UseSerilogRequestLogging();
+        // app.UseSerilogRequestLogging();
+        
         app.UseCors("AllowAnyOrigins");
         app.UseRouting();
+        
         app.UseAuthentication();
         app.UseAuthorization();
+        
         app.UseHsts();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
