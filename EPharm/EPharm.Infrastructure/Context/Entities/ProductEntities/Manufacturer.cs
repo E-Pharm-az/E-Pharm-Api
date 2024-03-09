@@ -9,7 +9,9 @@ public class Manufacturer : BaseEntity
     public PharmaCompany PharmaCompany { get; set; }
     
     public string ManufacturerName { get; set; }
-    public string ManufacturerLocation { get; set; }
+    public string Country { get; set; }
+    public string Website { get; set; }
+    public string Email { get; set; }
     
     public ICollection<Product> Products { get; set; }
     public DateTime CreatedAt { get; set; }

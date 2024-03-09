@@ -148,7 +148,10 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IAppIdentityUserRepository, AppIdentityUserRepository>();
 
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IManufacturerService, ManufacturerService>();
         services.AddScoped<IActiveIngredientService, ActiveIngredientService>();
+        services.AddScoped<ISpecialRequirementService, SpecialRequirementService>();
+        services.AddScoped<IRegulatoryInformationService, RegulatoryInformationService>();
 
         services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();

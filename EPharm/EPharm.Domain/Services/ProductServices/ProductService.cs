@@ -11,12 +11,6 @@ namespace EPharm.Domain.Services.ProductServices;
 public class ProductService(
     IProductRepository productRepository,
     IProductActiveIngredientRepository productActiveIngredientRepository,
-    IIndicationProductRepository productIndicationRepository,
-    IProductAllergyRepository productAllergyRepository,
-    IProductDosageFormRepository productDosageFormRepository,
-    IProductRouteOfAdministrationRepository productRouteOfAdministrationRepository,
-    IProductSideEffectRepository productSideEffectRepository,
-    IProductUsageWarningRepository productUsageWarningRepository,
     IMapper mapper) : IProductService
 {
     public async Task<IEnumerable<GetProductDto>> GetAllProductsAsync()
@@ -42,40 +36,22 @@ public class ProductService(
         try
         {
             var productEntity = mapper.Map<Product>(productDto);
-
+            productEntity.PharmaCompanyId = pharmaCompanyId;
             var product = await productRepository.InsertAsync(productEntity);
-
-            await CreateProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsId);
-            // await CreateProductIndicationAsync(product.Id, productDto.IndicationId);
-            // await CreateProductAllergyAsync(product.Id, productDto.AllergyId);
-            // await CreateProductDosageFormAsync(product.Id, productDto.DosageFormId);
-            // await CreateProductRouteOfAdministrationAsync(product.Id, productDto.RouteOfAdministrationId);
-            // await CreateProductSideEffectAsync(product.Id, productDto.SideEffectId);
-            // await CreateProductUsageWarningAsync(product.Id, productDto.UsageWarningId);
-
+            
+            // await productActiveIngredientRepository.InsertAsync(
+            //     new ProductActiveIngredient
+            //     {
+            //         ProductId = product.Id,
+            //         ActiveIngredientId = productDto.ActiveIngredientsId
+            //     }
+            // );
+            
             return mapper.Map<GetProductDto>(product);
         }
         catch (Exception ex)
         {
             throw new InvalidOperationException($"Failed to create product, detail: {ex}");
-        }
-    }
-
-    private async Task CreateProductActiveIngredientAsync(int productId, int activeIngredientId)
-    {
-        try
-        {
-            var productActiveIngredient = new ProductActiveIngredient
-            {
-                ProductId = productId,
-                ActiveIngredientId = activeIngredientId
-            };
-
-            await productActiveIngredientRepository.InsertAsync(productActiveIngredient);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Failed to create many-to-many relation with products and active ingredients. Details: {ex.Message}");
         }
     }
 
@@ -87,7 +63,6 @@ public class ProductService(
             return false;
 
         mapper.Map(productDto, product);
-
         productRepository.Update(product);
 
         var result = await productRepository.SaveChangesAsync();

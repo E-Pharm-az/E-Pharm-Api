@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 public interface ISpecialRequirementRepository : IRepository<SpecialRequirement>
 {
+    Task<IEnumerable<SpecialRequirement>> GetAllCompanySpecialRequirementsAsync(int pharmaCompanyId);
 }

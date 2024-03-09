@@ -36,7 +36,7 @@ public class UserService(
     {
         try
         {
-            var user = await CreateUserAsync(createUserDto, IdentityData.Customer);
+            var user = await CreateUserAsync(createUserDto, [IdentityData.Customer]);
             return user;
         }
         catch (Exception ex)
@@ -49,7 +49,7 @@ public class UserService(
     {
         try
         {
-            var user = await CreateUserAsync(createUserDto, IdentityData.PharmaCompanyManager);
+            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager]);
 
             var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
             pharmaCompanyManagerEntity.ExternalId = user.Id;
@@ -68,7 +68,7 @@ public class UserService(
     {
         try
         {
-            var user = await CreateUserAsync(createUserDto, IdentityData.PharmaCompanyAdmin);
+            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager]);
 
             await unitOfWork.BeginTransactionAsync();
             var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
@@ -93,7 +93,7 @@ public class UserService(
     {
         try
         {
-            var user = await CreateUserAsync(createUserDto, IdentityData.Admin);
+            var user = await CreateUserAsync(createUserDto, [IdentityData.Admin]);
             return user;
         }
         catch (Exception ex)
@@ -127,20 +127,27 @@ public class UserService(
         return result.Succeeded;
     }
 
-    private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string identityRole)
+    private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string[] identityRole)
     {
         var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
         userEntity.UserName = createUserDto.Email;
         var result = await userManager.CreateAsync(userEntity, createUserDto.Password);
 
-        if (!await roleManager.RoleExistsAsync(identityRole))
+        foreach (var role in identityRole)
         {
-            await roleManager.CreateAsync(new IdentityRole(identityRole));
+            if (!await roleManager.RoleExistsAsync(role))
+            {
+                await roleManager.CreateAsync(new IdentityRole(role));
+            }
         }
-
+        
         if (result.Succeeded)
         {
-            await userManager.AddToRoleAsync(userEntity, identityRole);
+            foreach (var role in identityRole)
+            {
+                await userManager.AddToRoleAsync(userEntity, role);
+            }
+            
             return mapper.Map<GetUserDto>(userEntity);
         }
 

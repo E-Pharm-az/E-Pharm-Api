@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 public interface IActiveIngredientRepository : IRepository<ActiveIngredient>
 {
+    Task<IEnumerable<ActiveIngredient>> GetAllCompanyActiveIngredientsAsync(int pharmaCompanyId);
 }

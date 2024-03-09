@@ -131,7 +131,9 @@ namespace EPharm.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PharmaCompanyId = table.Column<int>(type: "integer", nullable: false),
                     ManufacturerName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ManufacturerLocation = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Country = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Website = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>

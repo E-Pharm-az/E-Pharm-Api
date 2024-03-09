@@ -21,11 +21,10 @@ public class Product : BaseEntity
     public int ManufacturerId { get; set; }
     public Manufacturer Manufacturer { get; set; }
     
-    public DateTime ManufacturingDate { get; set; }
-    public DateTime ExpiryDate { get; set; }
-    
     public int RegulatoryInformationId { get; set; }
     public RegulatoryInformation RegulatoryInformation { get; set; }
+    public DateTime ManufacturingDate { get; set; }
+    public DateTime ExpiryDate { get; set; }
     
     public int Stock { get; set; }
     public double Price { get; set; }

@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 public interface IRegulatoryInformationRepository : IRepository<RegulatoryInformation>
 {
+    Task<IEnumerable<RegulatoryInformation>> GetAllCompanyRegulatoryInformationAsync(int pharmaCompanyId);
 }

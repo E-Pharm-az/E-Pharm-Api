@@ -8,9 +8,9 @@ namespace EPharm.Domain.Services.PharmaServices;
 
 public class PharmaCompanyManagerService(IPharmaCompanyManagerRepository pharmaCompanyManagerRepository, IMapper mapper) : IPharmaCompanyManagerService
 {
-    public async Task<IEnumerable<GetPharmaCompanyManagerDto>> GetAllPharmaCompanyManagersAsync()
+    public async Task<IEnumerable<GetPharmaCompanyManagerDto>> GetAllPharmaCompanyManagersAsync(int companyId)
     {
-        var pharmaCompanyManagers = await pharmaCompanyManagerRepository.GetAllAsync();
+        var pharmaCompanyManagers = await pharmaCompanyManagerRepository.GetAllPharmaCompanyManagersAsync(companyId);
         return mapper.Map<IEnumerable<GetPharmaCompanyManagerDto>>(pharmaCompanyManagers);
     }
 

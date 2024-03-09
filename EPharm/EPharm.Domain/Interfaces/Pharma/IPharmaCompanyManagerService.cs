@@ -4,7 +4,7 @@ namespace EPharm.Domain.Interfaces.Pharma;
 
 public interface IPharmaCompanyManagerService
 {
-    public Task<IEnumerable<GetPharmaCompanyManagerDto>> GetAllPharmaCompanyManagersAsync();
+    public Task<IEnumerable<GetPharmaCompanyManagerDto>> GetAllPharmaCompanyManagersAsync(int pharmaCompanyId);
     public Task<GetPharmaCompanyManagerDto?> GetPharmaCompanyManagerByIdAsync(int pharmaCompanyManagerId);
     public Task<GetPharmaCompanyManagerDto> CreatePharmaCompanyManagerAsync(
         CreatePharmaCompanyManagerDto pharmaCompanyManagerDto);

@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 public interface IManufacturerRepository : IRepository<Manufacturer>
 {
+    public Task<IEnumerable<Manufacturer>> GetAllCompanyManufacturersAsync(int pharmaCompanyId);
 }

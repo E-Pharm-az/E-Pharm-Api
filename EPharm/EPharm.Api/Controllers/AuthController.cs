@@ -32,7 +32,6 @@ public class AuthController(UserManager<AppIdentityUser> userManager, ITokenServ
         try
         {
             var roles = (await userManager.GetRolesAsync(user)).ToList();
-            Log.Information("User role sare -------> {@roles}", roles);
             var auth = tokenService.CreateToken(user, roles);
 
             user.RefreshToken = tokenService.RefreshToken();

@@ -17,9 +17,10 @@ public class TokenCreationService(IConfiguration configuration) : ITokenCreation
     {
         var claims = new List<Claim>
         {
+            new(JwtRegisteredClaimNames.Jti, user.Id),
             new(JwtRegisteredClaimNames.Email, user.Email)
         };
-        
+
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         var signingCredentials = new SigningCredentials(

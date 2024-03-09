@@ -9,9 +9,15 @@ namespace EPharm.Domain.Services.ProductServices;
 public class ActiveIngredientService(IActiveIngredientRepository activeIngredientRepository, IMapper mapper)
     : IActiveIngredientService
 {
-    public async Task<List<GetActiveIngredientDto>> GetAllActiveIngredientsAsync()
+    public async Task<IEnumerable<GetActiveIngredientDto>> GetAllActiveIngredientsAsync()
     {
         var activeIngredients = await activeIngredientRepository.GetAllAsync();
+        return mapper.Map<List<GetActiveIngredientDto>>(activeIngredients);
+    }
+
+    public async Task<IEnumerable<GetActiveIngredientDto>> GetAllCompanyActiveIngredientsAsync(int pharmaCompanyId)
+    {
+        var activeIngredients = await activeIngredientRepository.GetAllCompanyActiveIngredientsAsync(pharmaCompanyId);
         return mapper.Map<List<GetActiveIngredientDto>>(activeIngredients);
     }
 
@@ -21,12 +27,12 @@ public class ActiveIngredientService(IActiveIngredientRepository activeIngredien
         return mapper.Map<GetActiveIngredientDto>(activeIngredient);
     }
 
-    public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(
-        CreateActiveIngredientDto createActiveIngredientDto)
+    public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(int pharmaCompanyId, CreateActiveIngredientDto createActiveIngredientDto)
     {
         try
         {
             var activeIngredientEntity = mapper.Map<ActiveIngredient>(createActiveIngredientDto);
+            activeIngredientEntity.PharmaCompanyId = pharmaCompanyId;
             var activeIngredient = await activeIngredientRepository.InsertAsync(activeIngredientEntity);
 
             return mapper.Map<GetActiveIngredientDto>(activeIngredient);
@@ -45,7 +51,6 @@ public class ActiveIngredientService(IActiveIngredientRepository activeIngredien
             return false;
 
         mapper.Map(createActiveIngredientDto, activeIngredient);
-
         activeIngredientRepository.Update(activeIngredient);
 
         var result = await activeIngredientRepository.SaveChangesAsync();
