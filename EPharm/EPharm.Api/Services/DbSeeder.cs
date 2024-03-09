@@ -39,11 +39,17 @@ public class DbSeeder(
                 {
                     await userManager.AddToRoleAsync(superAdmin, IdentityData.SuperAdmin);
                     await userManager.AddToRoleAsync(superAdmin, IdentityData.Admin);
+                    
+                    Log.Information("SuperAdmin user created successfully.");
                 }
                 else
                 {
                     Log.Warning("Failed to create SuperAdmin user: {@error}", result.Errors);
                 }
+            }
+            else
+            {
+                Log.Information("SuperAdmin user already exists.");
             }
         }
         catch (Exception ex)
