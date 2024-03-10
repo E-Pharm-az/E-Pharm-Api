@@ -2,14 +2,23 @@ using AutoMapper;
 using EPharm.Domain.Dtos.ProductDtos.ProductDtos;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 namespace EPharm.Domain.Services.ProductServices;
 
 public class ProductService(
+    IUnitOfWork unitOfWork,
+    IRegulatoryInformationService regulatoryInformationService,
     IProductRepository productRepository,
     IProductActiveIngredientRepository productActiveIngredientRepository,
+    IProductAllergyRepository productAllergyRepository,
+    IProductDosageFormRepository productDosageFormRepository,
+    IIndicationProductRepository indicationProductRepository,
+    IProductRouteOfAdministrationRepository productRouteOfAdministrationRepository,
+    IProductSideEffectRepository productSideEffectRepository,
+    IProductUsageWarningRepository productUsageWarningRepository,
     IMapper mapper) : IProductService
 {
     public async Task<IEnumerable<GetProductDto>> GetAllProductsAsync()
@@ -36,17 +45,33 @@ public class ProductService(
         {
             var productEntity = mapper.Map<Product>(productDto);
             productEntity.PharmaCompanyId = pharmaCompanyId;
+
+            var regulatoryInformation = await regulatoryInformationService.GetRegulatoryInformationByIdAsync(productEntity.RegulatoryInformationId);
+
+            if (regulatoryInformation is null)
+                throw new ArgumentException("Regulatory information not found");
+            
             var product = await productRepository.InsertAsync(productEntity);
-            
-            // await productActiveIngredientRepository.InsertAsync(
-            //     new ProductActiveIngredient
-            //     {
-            //         ProductId = product.Id,
-            //         ActiveIngredientId = productDto.ActiveIngredientsId
-            //     }
-            // );
-            
+
+            await unitOfWork.BeginTransactionAsync();
+
+            await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsIds);
+            await productAllergyRepository.InsertProductAllergyAsync(product.Id, productDto.AllergiesIds);
+            await productDosageFormRepository.InsertProductDosageFormAsync(product.Id, productDto.DosageFormsIds);
+            await indicationProductRepository.InsertIndicationProductAsync(product.Id, productDto.IndicationsIds);
+            await productRouteOfAdministrationRepository.InsertProductRouteOfAdministrationAsync(product.Id, productDto.RouteOfAdministrationsIds);
+            await productSideEffectRepository.InsertProductSideEffectAsync(product.Id, productDto.SideEffectsIds);
+            await productUsageWarningRepository.InsertProductUsageWarningAsync(product.Id, productDto.UsageWarningsIds);
+                
+            await unitOfWork.CommitTransactionAsync();
+            await unitOfWork.SaveChangesAsync();
+
             return mapper.Map<GetProductDto>(product);
+        }
+        catch (ArgumentException ex)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            throw new ArgumentException($"Failed to create product, detail: {ex}");
         }
         catch (Exception ex)
         {

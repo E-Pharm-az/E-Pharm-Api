@@ -20,9 +20,6 @@ public class CreateProductDto
     public string StorageConditionDescription { get; set; }
     
     [Required]
-    public int ActiveIngredientsId { get; set; }
-    
-    [Required]
     public int SpecialRequirementsId { get; set; }
     
     [Required]
@@ -33,6 +30,24 @@ public class CreateProductDto
 
     [Required]
     public DateTime ManufacturingDate { get; set; }
+    
+    [Required]
+    public int[] ActiveIngredientsIds { get; set; }
+    
+    public int[] AllergiesIds { get; set; }
+    
+    [Required]
+    public int[] DosageFormsIds { get; set; }
+    
+    [Required]
+    public int[] IndicationsIds { get; set; }
+    
+    [Required]
+    public int[] RouteOfAdministrationsIds { get; set; }
+    
+    public int[] SideEffectsIds { get; set; }
+    
+    public int[] UsageWarningsIds { get; set; }
     
     [Required]
     public DateTime ExpiryDate { get; set; }

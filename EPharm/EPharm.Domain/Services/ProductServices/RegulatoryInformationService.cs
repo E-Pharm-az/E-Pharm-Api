@@ -14,7 +14,7 @@ public class RegulatoryInformationService(IRegulatoryInformationRepository regul
         return mapper.Map<IEnumerable<GetRegulatoryInformationDto>>(regulatoryInformation);
     }
     
-    public async Task<GetRegulatoryInformationDto?> GetCompanyRegulatoryInformationAsync(int regulatoryInformationId)
+    public async Task<GetRegulatoryInformationDto?> GetRegulatoryInformationByIdAsync(int regulatoryInformationId)
     {
         var regulatoryInformation = await regulatoryInformationRepository.GetByIdAsync(regulatoryInformationId);
         return mapper.Map<GetRegulatoryInformationDto>(regulatoryInformation);

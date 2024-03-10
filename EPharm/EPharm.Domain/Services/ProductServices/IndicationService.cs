@@ -8,19 +8,19 @@ namespace EPharm.Domain.Services.ProductServices;
 
 public class IndicationService(IIndicationRepository indicationRepository, IMapper mapper) : IIndicationService
 {
-    public async Task<List<GetIndicationDto>> GetAllIndications()
+    public async Task<List<GetIndicationDto>> GetAllIndicationsAsync()
     {
         var indications = await indicationRepository.GetAllAsync();
         return mapper.Map<List<GetIndicationDto>>(indications);
     }
 
-    public async Task<GetIndicationDto?> GetIndicationById(int id)
+    public async Task<GetIndicationDto?> GetIndicationByIdAsync(int id)
     {
         var indication = await indicationRepository.GetByIdAsync(id);
         return mapper.Map<GetIndicationDto>(indication);
     }
 
-    public async Task<GetIndicationDto> CreateIndication(CreateIndicationDto newIndication)
+    public async Task<GetIndicationDto> CreateIndicationAsync(CreateIndicationDto newIndication)
     {
         try
         {
@@ -35,7 +35,7 @@ public class IndicationService(IIndicationRepository indicationRepository, IMapp
         }
     }
 
-    public async Task<bool> UpdateIndication(int id, CreateIndicationDto updatedIndication)
+    public async Task<bool> UpdateIndicationAsync(int id, CreateIndicationDto updatedIndication)
     {
         var indication = await indicationRepository.GetByIdAsync(id);
 
@@ -49,7 +49,7 @@ public class IndicationService(IIndicationRepository indicationRepository, IMapp
         return result > 0;
     }
 
-    public async Task<bool> DeleteIndication(int id)
+    public async Task<bool> DeleteIndicationAsync(int id)
     {
         var indication = await indicationRepository.GetByIdAsync(id);
 

@@ -4,9 +4,9 @@ namespace EPharm.Domain.Interfaces.Product;
 
 public interface IIndicationService
 {
-    Task<List<GetIndicationDto>> GetAllIndications();
-    Task<GetIndicationDto?> GetIndicationById(int id);
-    Task<GetIndicationDto> CreateIndication(CreateIndicationDto newIndication);
-    Task<bool> UpdateIndication(int id, CreateIndicationDto updatedIndication);
-    Task<bool> DeleteIndication(int id);
+    Task<List<GetIndicationDto>> GetAllIndicationsAsync();
+    Task<GetIndicationDto?> GetIndicationByIdAsync(int id);
+    Task<GetIndicationDto> CreateIndicationAsync(CreateIndicationDto newIndication);
+    Task<bool> UpdateIndicationAsync(int id, CreateIndicationDto updatedIndication);
+    Task<bool> DeleteIndicationAsync(int id);
 }
