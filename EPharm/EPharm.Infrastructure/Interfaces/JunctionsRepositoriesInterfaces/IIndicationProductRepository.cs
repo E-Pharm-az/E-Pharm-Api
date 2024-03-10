@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 
 public interface IIndicationProductRepository : IRepository<IndicationProduct>
 {
+    public Task InsertIndicationProductAsync(int productId, int[] indicationsIds);
 }

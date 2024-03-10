@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 
 public interface IProductUsageWarningRepository : IRepository<ProductUsageWarning>
 {
+    public Task InsertProductUsageWarningAsync(int productId, int[] usageWarningsIds);
 }

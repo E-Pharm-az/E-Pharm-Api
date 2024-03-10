@@ -6,7 +6,7 @@ namespace EPharm.Infrastructure.Repositories.BaseRepositories;
 
 public class UnitOfWork(AppDbContext context) : IUnitOfWork
 {
-    private IDbContextTransaction? _transaction;
+    private IDbContextTransaction? _transaction ;
     
     public async Task<bool> SaveChangesAsync()
     {
@@ -20,13 +20,13 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
 
     public async Task CommitTransactionAsync()
     {
-        if (_transaction is null) throw new ArgumentException("Transaction is not started");
+        if (_transaction is null) throw new ArgumentException("Transaction has not started");
         await _transaction.CommitAsync();
     }
 
     public async Task RollbackTransactionAsync()
     {
-        if (_transaction is null) throw new ArgumentException("Transaction is not started");
+        if (_transaction is null) throw new ArgumentException("Transaction has not started");
         await _transaction.RollbackAsync();
     }
 }

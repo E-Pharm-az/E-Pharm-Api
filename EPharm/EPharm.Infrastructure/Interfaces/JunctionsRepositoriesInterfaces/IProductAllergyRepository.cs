@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 
 public interface IProductAllergyRepository : IRepository<ProductAllergy>
 {
+    public Task InsertProductAllergyAsync(int productId, int[] allergiesIds);
 }

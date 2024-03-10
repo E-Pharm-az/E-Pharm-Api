@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 
 public interface IProductDosageFormRepository : IRepository<ProductDosageForm>
 {
+    public Task InsertProductDosageFormAsync(int productId, int[] dosageFormsIds);
 }
