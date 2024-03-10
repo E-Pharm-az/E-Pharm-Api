@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EPharm.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240310062404_InitialMigration")]
+    [Migration("20240310161531_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -41,6 +41,38 @@ namespace EPharm.Infrastructure.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("IndicationProducts");
+                });
+
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.Junctions.OrderProduct", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("double precision");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("OrderProducts");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.Junctions.ProductActiveIngredient", b =>
@@ -436,6 +468,54 @@ namespace EPharm.Infrastructure.Migrations
                     b.ToTable("Manufacturers");
                 });
 
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Order", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OrderStatus")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<int>("PharmaCompanyId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ShippingAddress")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<double>("TotalPrice")
+                        .HasColumnType("double precision");
+
+                    b.Property<string>("TrackingId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PharmaCompanyId");
+
+                    b.HasIndex("WarehouseId");
+
+                    b.ToTable("Orders");
+                });
+
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -518,6 +598,9 @@ namespace EPharm.Infrastructure.Migrations
                     b.Property<decimal>("StrengthMg")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ManufacturerId");
@@ -528,6 +611,8 @@ namespace EPharm.Infrastructure.Migrations
                         .IsUnique();
 
                     b.HasIndex("SpecialRequirementsId");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("Products");
                 });
@@ -732,6 +817,37 @@ namespace EPharm.Infrastructure.Migrations
                     b.ToTable("UsageWarnings");
                 });
 
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("PharmaCompanyId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PharmaCompanyId");
+
+                    b.ToTable("Warehouses");
+                });
+
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.Junctions.IndicationProduct", b =>
                 {
                     b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Indication", "Indication")
@@ -747,6 +863,25 @@ namespace EPharm.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Indication");
+
+                    b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.Junctions.OrderProduct", b =>
+                {
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Order", "Order")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Product", "Product")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
 
                     b.Navigation("Product");
                 });
@@ -919,6 +1054,25 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("PharmaCompany");
                 });
 
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Order", b =>
+                {
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                        .WithMany("Orders")
+                        .HasForeignKey("PharmaCompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", "Warehouse")
+                        .WithMany("Orders")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PharmaCompany");
+
+                    b.Navigation("Warehouse");
+                });
+
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Product", b =>
                 {
                     b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Manufacturer", "Manufacturer")
@@ -945,6 +1099,12 @@ namespace EPharm.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", "Warehouse")
+                        .WithMany("Products")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Manufacturer");
 
                     b.Navigation("PharmaCompany");
@@ -952,6 +1112,8 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("RegulatoryInformation");
 
                     b.Navigation("SpecialRequirement");
+
+                    b.Navigation("Warehouse");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.ProductImage", b =>
@@ -1008,6 +1170,17 @@ namespace EPharm.Infrastructure.Migrations
                         .HasForeignKey("PharmaCompanyId");
                 });
 
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", b =>
+                {
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                        .WithMany("Warehouses")
+                        .HasForeignKey("PharmaCompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("PharmaCompany");
+                });
+
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", b =>
                 {
                     b.Navigation("ActiveIngredients");
@@ -1019,6 +1192,8 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("Indications");
 
                     b.Navigation("Manufacturers");
+
+                    b.Navigation("Orders");
 
                     b.Navigation("PharmaCompanyManagers");
 
@@ -1033,6 +1208,8 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("SpecialRequirements");
 
                     b.Navigation("UsageWarnings");
+
+                    b.Navigation("Warehouses");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.ActiveIngredient", b =>
@@ -1060,6 +1237,11 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Order", b =>
+                {
+                    b.Navigation("OrderProducts");
+                });
+
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Product", b =>
                 {
                     b.Navigation("ActiveIngredients");
@@ -1069,6 +1251,8 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("DosageForms");
 
                     b.Navigation("Indications");
+
+                    b.Navigation("OrderProducts");
 
                     b.Navigation("ProductImages");
 
@@ -1102,6 +1286,13 @@ namespace EPharm.Infrastructure.Migrations
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.UsageWarning", b =>
                 {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", b =>
+                {
+                    b.Navigation("Orders");
+
                     b.Navigation("Products");
                 });
 #pragma warning restore 612, 618

@@ -20,6 +20,8 @@ public class PharmaCompany : BaseEntity
     public int RoomNumber { get; set; }  
     
     public ICollection<PharmaCompanyManager> PharmaCompanyManagers { get; set; }
+    public ICollection<Warehouse> Warehouses { get; set; }
+    public ICollection<Order> Orders { get; set; }
     public ICollection<Product> Products { get; set; }
     public ICollection<ActiveIngredient> ActiveIngredients { get; set; }
     public ICollection<Allergy> Allergies { get; set; }

@@ -9,6 +9,9 @@ public class Product : BaseEntity
     public int PharmaCompanyId { get; set; }
     public PharmaCompany PharmaCompany { get; set; }
     
+    public int WarehouseId { get; set; }
+    public Warehouse Warehouse { get; set; }
+    
     public string ProductName { get; set; }
     public string ProductDescription { get; set; }
     public decimal StrengthMg { get; set; }
@@ -40,6 +43,7 @@ public class Product : BaseEntity
     public ICollection<ProductAllergy> Allergies { get; set; }
     public ICollection<IndicationProduct> Indications { get; set; }
     public ICollection<ProductImage> ProductImages { get; set; }
+    public ICollection<OrderProduct> OrderProducts;
     
     public decimal PackagingWidth { get; set; }
     public decimal PackagingHeight { get; set; }

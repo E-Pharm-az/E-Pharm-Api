@@ -280,12 +280,67 @@ namespace EPharm.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Warehouses",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Address = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    PharmaCompanyId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Warehouses", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Warehouses_PharmaCompanies_PharmaCompanyId",
+                        column: x => x.PharmaCompanyId,
+                        principalTable: "PharmaCompanies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    TrackingId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    OrderStatus = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    TotalPrice = table.Column<double>(type: "double precision", nullable: false),
+                    ShippingAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    PharmaCompanyId = table.Column<int>(type: "integer", nullable: false),
+                    WarehouseId = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_PharmaCompanies_PharmaCompanyId",
+                        column: x => x.PharmaCompanyId,
+                        principalTable: "PharmaCompanies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Orders_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     PharmaCompanyId = table.Column<int>(type: "integer", nullable: false),
+                    WarehouseId = table.Column<int>(type: "integer", nullable: false),
                     ProductName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     ProductDescription = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     StrengthMg = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
@@ -333,6 +388,12 @@ namespace EPharm.Infrastructure.Migrations
                         principalTable: "SpecialRequirements",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Products_Warehouses_WarehouseId",
+                        column: x => x.WarehouseId,
+                        principalTable: "Warehouses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -354,6 +415,35 @@ namespace EPharm.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_IndicationProducts_Products_ProductId",
+                        column: x => x.ProductId,
+                        principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderProducts",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    OrderId = table.Column<int>(type: "integer", nullable: false),
+                    ProductId = table.Column<int>(type: "integer", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    TotalPrice = table.Column<double>(type: "double precision", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderProducts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderProducts_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderProducts_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -564,6 +654,26 @@ namespace EPharm.Infrastructure.Migrations
                 column: "PharmaCompanyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OrderProducts_OrderId",
+                table: "OrderProducts",
+                column: "OrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OrderProducts_ProductId",
+                table: "OrderProducts",
+                column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_PharmaCompanyId",
+                table: "Orders",
+                column: "PharmaCompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_WarehouseId",
+                table: "Orders",
+                column: "WarehouseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_PharmaCompanyManagers_PharmaCompanyId",
                 table: "PharmaCompanyManagers",
                 column: "PharmaCompanyId");
@@ -625,6 +735,11 @@ namespace EPharm.Infrastructure.Migrations
                 column: "SpecialRequirementsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Products_WarehouseId",
+                table: "Products",
+                column: "WarehouseId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RegulatoryInformations_PharmaCompanyId",
                 table: "RegulatoryInformations",
                 column: "PharmaCompanyId");
@@ -648,6 +763,11 @@ namespace EPharm.Infrastructure.Migrations
                 name: "IX_UsageWarnings_PharmaCompanyId",
                 table: "UsageWarnings",
                 column: "PharmaCompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Warehouses_PharmaCompanyId",
+                table: "Warehouses",
+                column: "PharmaCompanyId");
         }
 
         /// <inheritdoc />
@@ -655,6 +775,9 @@ namespace EPharm.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "IndicationProducts");
+
+            migrationBuilder.DropTable(
+                name: "OrderProducts");
 
             migrationBuilder.DropTable(
                 name: "PharmaCompanyManagers");
@@ -682,6 +805,9 @@ namespace EPharm.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Indications");
+
+            migrationBuilder.DropTable(
+                name: "Orders");
 
             migrationBuilder.DropTable(
                 name: "ActiveIngredients");
@@ -712,6 +838,9 @@ namespace EPharm.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "SpecialRequirements");
+
+            migrationBuilder.DropTable(
+                name: "Warehouses");
 
             migrationBuilder.DropTable(
                 name: "PharmaCompanies");

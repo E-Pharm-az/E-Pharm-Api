@@ -127,12 +127,15 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IDosageFormRepository, DosageFormRepository>();
         services.AddScoped<IIndicationRepository, IndicationRepository>();
         services.AddScoped<IManufacturerRepository, ManufacturerRepository>();
+        services.AddScoped<IWarehouseRepository, WarehouseRepository>();
         services.AddScoped<IProductImageRepository, ProductImageRepository>();
         services.AddScoped<IRegulatoryInformationRepository, RegulatoryInformationRepository>();
         services.AddScoped<IRouteOfAdministrationRepository, RouteOfAdministrationRepository>();
         services.AddScoped<ISideEffectRepository, SideEffectRepository>();
         services.AddScoped<ISpecialRequirementRepository, SpecialRequirementRepository>();
         services.AddScoped<IUsageWarningRepository, UsageWarningRepository>();
+        services.AddScoped<IWarehouseRepository, WarehouseRepository>();
+        services.AddScoped<IOrderRepository, OrderRepository>();
 
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IIndicationProductRepository, IndicationProductRepository>();
@@ -142,6 +145,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IProductRouteOfAdministrationRepository, ProductRouteOfAdministrationRepository>();
         services.AddScoped<IProductSideEffectRepository, ProductSideEffectRepository>();
         services.AddScoped<IProductUsageWarningRepository, ProductUsageWarningRepository>();
+        services.AddScoped<IOrderProductRepository, OrderProductRepository>();
 
         services.AddScoped<IPharmaCompanyRepository, PharmaCompanyRepository>();
         services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();
@@ -153,11 +157,13 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<ISpecialRequirementService, SpecialRequirementService>();
         services.AddScoped<IRegulatoryInformationService, RegulatoryInformationService>();
         services.AddScoped<IAllergyService, AllergyService>();
+        services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<IDosageFormService, DosageFormService>();
         services.AddScoped<IIndicationService, IndicationService>();
         services.AddScoped<IRouteOfAdministrationService, RouteOfAdministrationService>();
         services.AddScoped<ISideEffectService, SideEffectService>();
         services.AddScoped<IUsageWarningService, UsageWarningService>();
+        services.AddScoped<IWarehouseService, WarehouseService>();
 
         services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
