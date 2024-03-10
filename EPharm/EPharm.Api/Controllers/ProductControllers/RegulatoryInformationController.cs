@@ -1,21 +1,20 @@
-using EPharm.Domain.Dtos.ProductDtos.SpecialRequirementsDto;
+using EPharm.Domain.Dtos.ProductDtos.RegulatoryInformationDto;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
-using Serilog;
 
-namespace EPharmApi.Controllers;
+namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]/{pharmaCompanyId:int}/[controller]")]
-public class SpecialRequirementController(ISpecialRequirementService specialRequirementService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
+public class RegulatoryInformationController(IRegulatoryInformationService regulatoryInformationService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetSpecialRequirementDto>>> GetAllCompanySpecialRequirements(int pharmaCompanyId)
+    public async Task<ActionResult<IEnumerable<GetRegulatoryInformationDto>>> GetAllCompanyRegulatoryInformation(int pharmaCompanyId)
     {
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
@@ -29,15 +28,15 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
                 return Forbid();
         }
         
-        var result = await specialRequirementService.GetAllCompanySpecialRequirementsAsync(pharmaCompanyId);
+        var result = await regulatoryInformationService.GetAllCompanyRegulatoryInformationAsync(pharmaCompanyId);
         if (result.Any()) return Ok(result);
 
-        return NotFound("Special requirements not found.");
+        return NotFound("Regulatory information not found.");
     }
 
     [HttpGet("{id:int}")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
-    public async Task<ActionResult<GetSpecialRequirementDto>> GetSpecialRequirementById(int pharmaCompanyId, int id)
+    public async Task<ActionResult<GetRegulatoryInformationDto>> GetRegulatoryInformationById(int pharmaCompanyId, int id)
     {
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
@@ -49,67 +48,41 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
             if (company.PharmaCompanyOwnerId != userId.Value)
                 return Forbid();
-        } 
+        }
         
-        var result = await specialRequirementService.GetSpecialRequirementByIdAsync(id);
+        var result = await regulatoryInformationService.GetRegulatoryInformationByIdAsync(id);
         if (result is not null) return Ok(result);
 
-        return NotFound($"Special requirement with ID: {id} not found.");
+        return NotFound($"Regulatory information with ID: {id} not found.");
     }
 
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmaCompanyManager)]
-    public async Task<ActionResult<GetSpecialRequirementDto>> CreateSpecialRequirement(int pharmaCompanyId, [FromBody] CreateSpecialRequirementDto specialRequirementDto)
+    public async Task<ActionResult<GetRegulatoryInformationDto>> CreateRegulatoryInformation(
+        int pharmaCompanyId, [FromBody] CreateRegulatoryInformationDto regulatoryInformationDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
-        
+
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
-        
+
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
 
         try
         {
-            var result = await specialRequirementService.AddCompanySpecialRequirementAsync(pharmaCompanyId, specialRequirementDto);
+            var result = await regulatoryInformationService.AddCompanyRegulatoryInformationAsync(pharmaCompanyId, regulatoryInformationDto);
             return Ok(result);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            Log.Error("Error creating special requirement, {Error}", ex.Message);
             return BadRequest(ex.Message);
         }
     }
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
-    public async Task<ActionResult> UpdateSpecialRequirement(int pharmaCompanyId, int id, [FromBody] CreateSpecialRequirementDto specialRequirement)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest("Model not valid.");
-
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
-        
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-        
-        if (!User.IsInRole(IdentityData.Admin))
-        {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
-                return Forbid();
-        } 
-        
-        var result = await specialRequirementService.UpdateCompanySpecialRequirementAsync(id, specialRequirement);
-        if (result) return Ok();
-        
-        Log.Error("Error updating special requirement with Id: {id}", id);
-        return NotFound($"Special requirement with ID: {id} not found.");
-    }
-
-    [HttpDelete("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
-    public async Task<ActionResult> DeleteSpecialRequirement(int pharmaCompanyId, int id)
+    public async Task<ActionResult> UpdateRegulatoryInformation(int pharmaCompanyId, int id, [FromBody] CreateRegulatoryInformationDto regulatoryInformation)
     {
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
@@ -123,10 +96,31 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
                 return Forbid();
         }
         
-        var result = await specialRequirementService.DeleteCompanySpecialRequirementAsync(id);
+        var result = await regulatoryInformationService.UpdateCompanyRegulatoryInformationAsync(id, regulatoryInformation);
         if (result) return Ok();
 
-        Log.Error("Error deleting special requirement with Id: {id}", id);
-        return NotFound($"Special requirement with ID: {id} not found.");
+        return NotFound($"Regulatory information with ID: {id} not found.");
+    }
+
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    public async Task<ActionResult> DeleteRegulatoryInformation(int pharmaCompanyId, int id)
+    {
+        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        
+        if (company is null)
+            return NotFound("Pharmaceutical company not found.");
+        
+        if (!User.IsInRole(IdentityData.Admin))
+        {
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
+            if (company.PharmaCompanyOwnerId != userId.Value)
+                return Forbid();
+        }
+        
+        var result = await regulatoryInformationService.DeleteCompanyRegulatoryInformationAsync(id);
+        if (result) return Ok();
+
+        return NotFound($"Regulatory information with ID: {id} not found.");
     }
 }

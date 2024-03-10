@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
-namespace EPharmApi.Controllers;
+namespace EPharmApi.Controllers.PharmaControllers;
 
 [ApiController]
 [Route("api/[controller]")]

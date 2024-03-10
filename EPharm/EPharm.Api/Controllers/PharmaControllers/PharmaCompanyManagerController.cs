@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 
-namespace EPharmApi.Controllers;
+namespace EPharmApi.Controllers.PharmaControllers;
 
 [ApiController]
 [Route("api/[controller]/{pharmaCompanyId:int}")]

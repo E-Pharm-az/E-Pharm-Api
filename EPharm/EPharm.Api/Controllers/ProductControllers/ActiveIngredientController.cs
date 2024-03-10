@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
-namespace EPharmApi.Controllers;
+namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/active-ingredient")]
