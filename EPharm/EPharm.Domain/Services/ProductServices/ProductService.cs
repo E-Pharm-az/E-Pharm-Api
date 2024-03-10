@@ -1,7 +1,6 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.ProductDtos.ProductDtos;
 using EPharm.Domain.Interfaces.Product;
-using EPharm.Infrastructure.Context.Entities.Junctions;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;

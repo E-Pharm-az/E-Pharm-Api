@@ -152,6 +152,12 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IActiveIngredientService, ActiveIngredientService>();
         services.AddScoped<ISpecialRequirementService, SpecialRequirementService>();
         services.AddScoped<IRegulatoryInformationService, RegulatoryInformationService>();
+        services.AddScoped<IAllergyService, AllergyService>();
+        services.AddScoped<IDosageFormService, DosageFormService>();
+        services.AddScoped<IIndicationService, IndicationService>();
+        services.AddScoped<IRouteOfAdministrationService, RouteOfAdministrationService>();
+        services.AddScoped<ISideEffectService, SideEffectService>();
+        services.AddScoped<IUsageWarningService, UsageWarningService>();
 
         services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
@@ -172,7 +178,7 @@ public class Startup(IConfiguration configuration)
 
         dbSeeder.SeedSuperAdminAsync().Wait();
 
-        // app.UseSerilogRequestLogging();
+        app.UseSerilogRequestLogging();
         
         app.UseCors("AllowAnyOrigins");
         app.UseRouting();

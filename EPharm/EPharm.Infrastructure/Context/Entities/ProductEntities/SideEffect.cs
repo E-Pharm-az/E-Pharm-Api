@@ -6,9 +6,6 @@ namespace EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 public class SideEffect : BaseEntity
 {
-    public int PharmaCompanyId { get; set; }
-    public PharmaCompany PharmaCompany { get; set; }
-    
     public string Name { get; set; }
     public string Description { get; set; }
     

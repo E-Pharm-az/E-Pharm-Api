@@ -8,10 +8,6 @@ public class UsageWarningConfig : IEntityTypeConfiguration<UsageWarning>
 {
     public void Configure(EntityTypeBuilder<UsageWarning> builder)
     {
-        builder.HasOne(a => a.PharmaCompany)
-            .WithMany(a => a.UsageWarnings)
-            .HasForeignKey(a => a.PharmaCompanyId);
-        
         builder.Property(uw => uw.Description)
             .IsRequired()
             .HasMaxLength(500);
