@@ -7,6 +7,7 @@
         <InvariantGlobalization>true</InvariantGlobalization>
         <AssemblyName>EPharm.Api</AssemblyName>
         <RootNamespace>EPharmApi</RootNamespace>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,6 +29,9 @@
 
     <ItemGroup>
       <None Remove="Properties\launchSettings.json" />
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
       <Content Include="Properties\launchSettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
