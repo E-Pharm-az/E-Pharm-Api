@@ -30,6 +30,10 @@ public class CheckoutController(IUnitOfWork unitOfWork, IOrderService orderServi
             {
                 Amount = order.TotalPrice,
                 Currency = "usd",
+                AutomaticPaymentMethods = new()
+                {
+                    Enabled = true
+                }
             });
             
             await unitOfWork.CommitTransactionAsync();
