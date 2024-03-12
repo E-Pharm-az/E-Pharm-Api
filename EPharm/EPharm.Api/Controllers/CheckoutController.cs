@@ -22,7 +22,6 @@ public class CheckoutController(IUnitOfWork unitOfWork, IOrderService orderServi
             await unitOfWork.BeginTransactionAsync();
             
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            // fix error where order total is 0
             var order = await orderService.CreateOrderAsync(userId.Value, orderDto);
             Console.WriteLine("Order total: " + order.TotalPrice);
 
