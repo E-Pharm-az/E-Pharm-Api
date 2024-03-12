@@ -8,7 +8,8 @@ public class OrderProfile : Profile
 {
     public OrderProfile()
     {
-        CreateMap<Order, GetOrderDto>();
         CreateMap<CreateOrderDto, Order>();
+        CreateMap<Order, GetOrderDto>().ForMember(dest => dest.ProductIds,
+            opt => opt.MapFrom(src => src.OrderProducts.Select(op => op.ProductId).ToArray()));
     }
 }

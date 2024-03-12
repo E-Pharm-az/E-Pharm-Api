@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.ProductDtos.SideEffectDto;
+using EPharm.Domain.Dtos.SideEffectDto;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;

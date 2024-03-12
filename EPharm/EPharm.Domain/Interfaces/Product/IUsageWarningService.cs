@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.UsageWarningDto;
+using EPharm.Domain.Dtos.UsageWarningDto;
 
 namespace EPharm.Domain.Interfaces.Product;
 

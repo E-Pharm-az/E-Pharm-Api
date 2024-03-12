@@ -23,16 +23,14 @@ public class TokenCreationService(IConfiguration configuration) : ITokenCreation
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-        var signingCredentials = new SigningCredentials(
-            new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"])),
-            SecurityAlgorithms.HmacSha256);
-
         var token = new JwtSecurityToken(
-            issuer: configuration["JwtSettings:Issuer"],
-            audience: configuration["JwtSettings:Audience"],
+            issuer: configuration["JwtSettings:Issuer"]!,
+            audience: configuration["JwtSettings:Audience"]!,
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])),
-            signingCredentials: signingCredentials);
+            signingCredentials: new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!)),
+                SecurityAlgorithms.HmacSha256));
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
 

@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.ProductDtos.DosageFormDto;
+using EPharm.Domain.Dtos.DosageFormDto;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 namespace EPharm.Domain.Profiles;

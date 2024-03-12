@@ -30,7 +30,7 @@ public class Product : BaseEntity
     public DateTime ExpiryDate { get; set; }
     
     public int Stock { get; set; }
-    public double Price { get; set; }
+    public int Price { get; set; }
     
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }

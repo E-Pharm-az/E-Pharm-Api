@@ -1,3 +1,4 @@
+using EPharm.Domain.Dtos.ProductDtos;
 using EPharm.Domain.Dtos.ProductDtos.ProductDtos;
 
 namespace EPharm.Domain.Interfaces.Product;

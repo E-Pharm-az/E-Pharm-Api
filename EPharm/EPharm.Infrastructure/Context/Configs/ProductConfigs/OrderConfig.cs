@@ -23,16 +23,6 @@ public class OrderConfig : IEntityTypeConfiguration<Order>
             .IsRequired()
             .HasMaxLength(255);
         
-        builder.HasOne(o => o.PharmaCompany)
-            .WithMany(pc => pc.Orders)
-            .HasForeignKey(o => o.PharmaCompanyId)
-            .IsRequired();
-        
-        builder.HasOne(o => o.Warehouse)
-            .WithMany(w => w.Orders)
-            .HasForeignKey(o => o.WarehouseId)
-            .IsRequired();
-        
         builder.Property(o => o.CreatedAt)
             .IsRequired();
     }

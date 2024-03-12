@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.RegulatoryInformationDto;
+using EPharm.Domain.Dtos.RegulatoryInformationDto;
 
 namespace EPharm.Domain.Interfaces.Product;
 

@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.ProductDtos.RegulatoryInformationDto;
+using EPharm.Domain.Dtos.RegulatoryInformationDto;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 namespace EPharm.Domain.Profiles;

@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.SideEffectDto;
+using EPharm.Domain.Dtos.SideEffectDto;
 
 namespace EPharm.Domain.Interfaces.Product;
 

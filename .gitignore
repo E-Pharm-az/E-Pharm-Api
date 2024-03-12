@@ -46,3 +46,4 @@ _[Ss]cripts
 **/.idea/
 
 **/appsettings.json
+**/appsettings.Development.json

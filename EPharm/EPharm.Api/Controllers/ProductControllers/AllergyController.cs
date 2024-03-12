@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.AllergyDto;
+using EPharm.Domain.Dtos.AllergyDto;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;

@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.DosageFormDto;
+using EPharm.Domain.Dtos.DosageFormDto;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;

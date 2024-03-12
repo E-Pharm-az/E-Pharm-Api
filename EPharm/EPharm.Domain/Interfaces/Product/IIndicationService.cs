@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.IndicationDto;
+using EPharm.Domain.Dtos.IndicationDto;
 
 namespace EPharm.Domain.Interfaces.Product;
 

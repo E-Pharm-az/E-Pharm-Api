@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.ActiveIngredientDto;
+using EPharm.Domain.Dtos.ActiveIngredientDto;
 
 namespace EPharm.Domain.Interfaces.Product;
 

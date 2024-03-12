@@ -1,8 +1,10 @@
 using System.Text;
+using EPharm.Domain.Interfaces;
 using EPharm.Domain.Interfaces.Jwt;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Interfaces.User;
+using EPharm.Domain.Services;
 using EPharm.Domain.Services.JwtServices;
 using EPharm.Domain.Services.PharmaServices;
 using EPharm.Domain.Services.ProductServices;
@@ -26,6 +28,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using Stripe;
+using OrderService = EPharm.Domain.Services.OrderService;
+using ProductService = EPharm.Domain.Services.ProductServices.ProductService;
+using TokenService = EPharm.Domain.Services.JwtServices.TokenService;
 
 namespace EPharmApi;
 
@@ -37,12 +43,12 @@ public class Startup(IConfiguration configuration)
         services.AddSwaggerGen();
         services.AddControllers();
 
-        Log.Logger = new LoggerConfiguration()
-            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-            .ReadFrom.Configuration(configuration)
-            .CreateLogger();
-        
-        services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
+        // Log.Logger = new LoggerConfiguration()
+        //     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+        //     .ReadFrom.Configuration(configuration)
+        //     .CreateLogger();
+        //
+        // services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
 
         services.AddSwaggerGen(ops =>
         {
@@ -109,15 +115,17 @@ public class Startup(IConfiguration configuration)
 
         services.AddCors(ops =>
             ops.AddPolicy("AllowAnyOrigins", builder => builder.AllowAnyOrigin()));
+        
+        StripeConfiguration.ApiKey = configuration["StripeConfig:SecretKey"];
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         services.AddDbContext<AppDbContext>(
             options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-
+        
         services.AddDbContext<AppIdentityDbContext>(
             options => options.UseNpgsql(configuration.GetConnectionString("UserDefaultConnection")));
-
+        
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
         services.AddScoped<DbSeeder>();
@@ -164,6 +172,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<ISideEffectService, SideEffectService>();
         services.AddScoped<IUsageWarningService, UsageWarningService>();
         services.AddScoped<IWarehouseService, WarehouseService>();
+        services.AddScoped<IProductImageService, ProductImageService>();
 
         services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
@@ -184,7 +193,7 @@ public class Startup(IConfiguration configuration)
 
         dbSeeder.SeedSuperAdminAsync().Wait();
 
-        app.UseSerilogRequestLogging();
+        // app.UseSerilogRequestLogging();
         
         app.UseCors("AllowAnyOrigins");
         app.UseRouting();
@@ -193,6 +202,7 @@ public class Startup(IConfiguration configuration)
         app.UseAuthorization();
         
         app.UseHsts();
+        app.UseHttpsRedirection();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 }

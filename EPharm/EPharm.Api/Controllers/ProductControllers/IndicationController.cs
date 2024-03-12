@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.IndicationDto;
+using EPharm.Domain.Dtos.IndicationDto;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;

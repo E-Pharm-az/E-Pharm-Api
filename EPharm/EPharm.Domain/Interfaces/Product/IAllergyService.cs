@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.AllergyDto;
+using EPharm.Domain.Dtos.AllergyDto;
 
 namespace EPharm.Domain.Interfaces.Product;
 

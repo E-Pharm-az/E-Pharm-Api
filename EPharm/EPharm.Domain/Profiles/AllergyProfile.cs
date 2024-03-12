@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.ProductDtos.AllergyDto;
+using EPharm.Domain.Dtos.AllergyDto;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 namespace EPharm.Domain.Profiles;

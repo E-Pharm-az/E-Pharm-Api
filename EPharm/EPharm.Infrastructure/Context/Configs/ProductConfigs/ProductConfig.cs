@@ -12,6 +12,11 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
             .WithMany(p => p.Products)
             .HasForeignKey(p => p.PharmaCompanyId)
             .IsRequired();
+
+        builder.HasOne(p => p.Warehouse)
+            .WithMany(p => p.Products)
+            .HasForeignKey(p => p.WarehouseId)
+            .IsRequired();
         
         builder.Property(p => p.ProductName)
             .IsRequired()

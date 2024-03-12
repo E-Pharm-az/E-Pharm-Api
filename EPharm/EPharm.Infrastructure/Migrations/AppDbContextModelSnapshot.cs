@@ -481,16 +481,13 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
 
-                    b.Property<int>("PharmaCompanyId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<double>("TotalPrice")
-                        .HasColumnType("double precision");
+                    b.Property<int>("TotalPrice")
+                        .HasColumnType("integer");
 
                     b.Property<string>("TrackingId")
                         .IsRequired()
@@ -501,14 +498,7 @@ namespace EPharm.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("WarehouseId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("PharmaCompanyId");
-
-                    b.HasIndex("WarehouseId");
 
                     b.ToTable("Orders");
                 });
@@ -565,8 +555,8 @@ namespace EPharm.Infrastructure.Migrations
                     b.Property<int>("PharmaCompanyId")
                         .HasColumnType("integer");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("double precision");
+                    b.Property<int>("Price")
+                        .HasColumnType("integer");
 
                     b.Property<string>("ProductDescription")
                         .IsRequired()
@@ -1051,25 +1041,6 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("PharmaCompany");
                 });
 
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Order", b =>
-                {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
-                        .WithMany("Orders")
-                        .HasForeignKey("PharmaCompanyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", "Warehouse")
-                        .WithMany("Orders")
-                        .HasForeignKey("WarehouseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("PharmaCompany");
-
-                    b.Navigation("Warehouse");
-                });
-
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Product", b =>
                 {
                     b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Manufacturer", "Manufacturer")
@@ -1190,8 +1161,6 @@ namespace EPharm.Infrastructure.Migrations
 
                     b.Navigation("Manufacturers");
 
-                    b.Navigation("Orders");
-
                     b.Navigation("PharmaCompanyManagers");
 
                     b.Navigation("Products");
@@ -1288,8 +1257,6 @@ namespace EPharm.Infrastructure.Migrations
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", b =>
                 {
-                    b.Navigation("Orders");
-
                     b.Navigation("Products");
                 });
 #pragma warning restore 612, 618

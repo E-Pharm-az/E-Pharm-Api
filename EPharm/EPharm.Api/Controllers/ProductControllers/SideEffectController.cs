@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.SideEffectDto;
+using EPharm.Domain.Dtos.SideEffectDto;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;

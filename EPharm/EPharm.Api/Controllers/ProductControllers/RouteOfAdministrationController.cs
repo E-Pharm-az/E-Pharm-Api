@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.RouteOfAdministrationDto;
+using EPharm.Domain.Dtos.RouteOfAdministrationDto;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;

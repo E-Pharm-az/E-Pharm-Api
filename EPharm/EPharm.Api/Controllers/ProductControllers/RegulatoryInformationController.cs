@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.RegulatoryInformationDto;
+using EPharm.Domain.Dtos.RegulatoryInformationDto;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;

@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.RouteOfAdministrationDto;
+using EPharm.Domain.Dtos.RouteOfAdministrationDto;
 
 namespace EPharm.Domain.Interfaces.Product;
 

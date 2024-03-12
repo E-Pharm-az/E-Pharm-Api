@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.SpecialRequirementsDto;
+using EPharm.Domain.Dtos.SpecialRequirementsDto;
 
 namespace EPharm.Domain.Interfaces.Product;
 

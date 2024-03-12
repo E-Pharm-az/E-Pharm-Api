@@ -1,5 +1,7 @@
 using AutoMapper;
+using EPharm.Domain.Dtos.ProductDtos;
 using EPharm.Domain.Dtos.ProductDtos.ProductDtos;
+using EPharm.Domain.Interfaces;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
@@ -10,8 +12,9 @@ namespace EPharm.Domain.Services.ProductServices;
 
 public class ProductService(
     IUnitOfWork unitOfWork,
-    IRegulatoryInformationService regulatoryInformationService,
     IProductRepository productRepository,
+    IProductImageService productImageService,
+    IRegulatoryInformationService regulatoryInformationService,
     IProductActiveIngredientRepository productActiveIngredientRepository,
     IProductAllergyRepository productAllergyRepository,
     IProductDosageFormRepository productDosageFormRepository,
@@ -23,7 +26,7 @@ public class ProductService(
 {
     public async Task<IEnumerable<GetProductDto>> GetAllProductsAsync()
     {
-        var products = await productRepository.GetAllAsync();
+        var products = await productRepository.GetAllProductsWithImages();
         return mapper.Map<IEnumerable<GetProductDto>>(products);
     }
 
@@ -35,7 +38,7 @@ public class ProductService(
 
     public async Task<GetProductDto?> GetProductByIdAsync(int productId)
     {
-        var product = await productRepository.GetByIdAsync(productId);
+        var product = await productRepository.GetProductWithImageById(productId);
         return mapper.Map<GetProductDto>(product);
     }
 
@@ -54,6 +57,19 @@ public class ProductService(
             var product = await productRepository.InsertAsync(productEntity);
 
             await unitOfWork.BeginTransactionAsync();
+            
+            // Length != 0 is more performant than Any()
+            // if (productDto.ProductImages.Length != 0)
+            // {
+            //     foreach (var image in productDto.ProductImages)
+            //     {
+            //         await productImageService.UploadProductImageAsync(new CreateProductImageDto
+            //         {
+            //             Image = image,
+            //             ProductId = product.Id
+            //         });
+            //     }
+            // }
 
             await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsIds);
             await productAllergyRepository.InsertProductAllergyAsync(product.Id, productDto.AllergiesIds);

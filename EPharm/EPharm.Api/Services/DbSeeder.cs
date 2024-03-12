@@ -34,7 +34,7 @@ public class DbSeeder(
                 };
 
                 var result = await userManager.CreateAsync(superAdmin, configuration["SuperAdmin:Password"]!);
-
+                   
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(superAdmin, IdentityData.SuperAdmin);

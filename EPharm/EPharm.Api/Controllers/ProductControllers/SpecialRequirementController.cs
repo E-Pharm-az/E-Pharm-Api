@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.ProductDtos.SpecialRequirementsDto;
+using EPharm.Domain.Dtos.SpecialRequirementsDto;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
