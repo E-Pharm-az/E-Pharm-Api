@@ -43,12 +43,12 @@ public class Startup(IConfiguration configuration)
         services.AddSwaggerGen();
         services.AddControllers();
 
-        // Log.Logger = new LoggerConfiguration()
-        //     .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
-        //     .ReadFrom.Configuration(configuration)
-        //     .CreateLogger();
-        //
-        // services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
+        Log.Logger = new LoggerConfiguration()
+            .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
+            .ReadFrom.Configuration(configuration)
+            .CreateLogger();
+        
+        services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
 
         services.AddSwaggerGen(ops =>
         {
@@ -193,7 +193,7 @@ public class Startup(IConfiguration configuration)
 
         dbSeeder.SeedSuperAdminAsync().Wait();
 
-        // app.UseSerilogRequestLogging();
+        app.UseSerilogRequestLogging();
         
         app.UseCors("AllowAnyOrigins");
         app.UseRouting();
