@@ -21,6 +21,7 @@ using EPharm.Infrastructure.Repositories.IdentityRepositories;
 using EPharm.Infrastructure.Repositories.JunctionsRepositories;
 using EPharm.Infrastructure.Repositories.PharmaRepositories;
 using EPharm.Infrastructure.Repositories.ProductRepositories;
+using EPharmApi.Health;
 using EPharmApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -42,6 +43,9 @@ public class Startup(IConfiguration configuration)
         services.AddEndpointsApiExplorer();
         services.AddSwaggerGen();
         services.AddControllers();
+
+        services.AddHealthChecks()
+            .AddCheck<DatabaseHealthCheck>("Database health check");
 
         Log.Logger = new LoggerConfiguration()
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
@@ -191,18 +195,23 @@ public class Startup(IConfiguration configuration)
             app.UseSwaggerUI();
         }
 
-        dbSeeder.SeedSuperAdminAsync().Wait();
-
-        app.UseSerilogRequestLogging();
+        app.UseHttpsRedirection();
         
-        app.UseCors("AllowAnyOrigins");
+        app.UseHealthChecks("/_health");
+    
         app.UseRouting();
-        
+    
+        app.UseCors("AllowAnyOrigins");
+    
         app.UseAuthentication();
         app.UseAuthorization();
-        
+    
         app.UseHsts();
-        app.UseHttpsRedirection();
+    
+        app.UseSerilogRequestLogging();
+    
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+
+        dbSeeder.SeedSuperAdminAsync().Wait();
     }
 }
