@@ -23,7 +23,9 @@ using EPharm.Infrastructure.Repositories.PharmaRepositories;
 using EPharm.Infrastructure.Repositories.ProductRepositories;
 using EPharmApi.Health;
 using EPharmApi.Services;
+using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -197,7 +199,10 @@ public class Startup(IConfiguration configuration)
 
         app.UseHttpsRedirection();
         
-        app.UseHealthChecks("/_health");
+        app.UseHealthChecks("/_health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
+        });
     
         app.UseRouting();
     
@@ -205,9 +210,7 @@ public class Startup(IConfiguration configuration)
     
         app.UseAuthentication();
         app.UseAuthorization();
-    
-        app.UseHsts();
-    
+        
         app.UseSerilogRequestLogging();
     
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });

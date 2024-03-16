@@ -16,7 +16,7 @@ public class DatabaseHealthCheck(AppDbContext appDbContext, AppIdentityDbContext
 
             await appDbConnection.OpenAsync(cancellationToken);
             await appIdentityDbConnection.OpenAsync(cancellationToken);
-
+            
             if (appDbConnection.State == ConnectionState.Open && appIdentityDbConnection.State == ConnectionState.Open)
             {
                 return HealthCheckResult.Healthy("Database is healthy.");
