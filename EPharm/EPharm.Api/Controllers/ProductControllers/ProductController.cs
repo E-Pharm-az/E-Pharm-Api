@@ -1,5 +1,4 @@
 using EPharm.Domain.Dtos.ProductDtos;
-using EPharm.Domain.Dtos.ProductDtos.ProductDtos;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Domain.Models.Identity;
@@ -22,29 +21,38 @@ public class ProductController(IProductService productService, IPharmaCompanySer
 
         return NotFound("Products not found.");
     }
-    
+
+    [HttpGet("search/{parameter}")]
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct(string parameter)
+    {
+        var result = await productService.SearchProduct(parameter);
+        if (result.Any()) return Ok(result);
+
+        return NotFound("Products not found.");
+    }
+
     [HttpGet("pharma-company/{pharmaCompanyId:int}/[controller]")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllPharmaCompanyProducts(int pharmaCompanyId)
     {
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
-        
+
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
-        
+
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
             if (company.PharmaCompanyOwnerId != userId.Value)
                 return Forbid();
         }
-        
+
         var result = await productService.GetAllPharmaCompanyProductsAsync(pharmaCompanyId);
         if (result.Any()) return Ok(result);
 
         return NotFound("Pharma company products not found.");
     }
-    
+
     [HttpGet("{id:int}", Name = "getProductById")]
     public async Task<ActionResult<GetProductDto>> GetProductById(int id)
     {
@@ -56,18 +64,19 @@ public class ProductController(IProductService productService, IPharmaCompanySer
 
     [HttpPost("pharma-company/{pharmaCompanyId:int}/[controller]")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager)]
-    public async Task<ActionResult<GetProductDto>> CreateProduct(int pharmaCompanyId, [FromBody] CreateProductDto productDto)
+    public async Task<ActionResult<GetProductDto>> CreateProduct(int pharmaCompanyId,
+        [FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
-        
+
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
-        
+
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
-        
+
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-        
+
         if (company.PharmaCompanyOwnerId != userId.Value)
             return Forbid();
 
@@ -89,12 +98,12 @@ public class ProductController(IProductService productService, IPharmaCompanySer
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
-        
+
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
-        
+
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
-        
+
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
@@ -115,21 +124,21 @@ public class ProductController(IProductService productService, IPharmaCompanySer
     public async Task<ActionResult> DeleteProduct(int pharmaCompanyId, int id)
     {
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
-        
+
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
-        
+
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
             if (company.PharmaCompanyOwnerId != userId.Value)
                 return Forbid();
         }
-        
+
         var result = await productService.DeleteProductAsync(id);
 
         if (result) return NoContent();
-        
+
         Log.Error("Error deleting product");
         return BadRequest($"Product with ID: {id} could not be deleted.");
     }
