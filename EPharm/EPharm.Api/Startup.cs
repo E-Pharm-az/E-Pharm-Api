@@ -104,6 +104,10 @@ public class Startup(IConfiguration configuration)
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
+            .AddCookie(cookieOptions =>
+            {
+                cookieOptions.Cookie.Name = "token";
+            })
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -117,10 +121,25 @@ public class Startup(IConfiguration configuration)
                     IssuerSigningKey =
                         new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["token"];
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddCors(ops =>
-            ops.AddPolicy("AllowAnyOrigins", builder => builder.AllowAnyOrigin()));
+            ops.AddPolicy("AllowAnyOrigins", builder => 
+                builder
+                    .WithOrigins("http://localhost:5173")
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    .AllowAnyMethod()
+                    .WithHeaders("Content-Type", "Authorization")
+            ));
         
         StripeConfiguration.ApiKey = configuration["StripeConfig:SecretKey"];
 
@@ -142,7 +161,6 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IIndicationRepository, IndicationRepository>();
         services.AddScoped<IManufacturerRepository, ManufacturerRepository>();
         services.AddScoped<IWarehouseRepository, WarehouseRepository>();
-        services.AddScoped<IProductImageRepository, ProductImageRepository>();
         services.AddScoped<IRegulatoryInformationRepository, RegulatoryInformationRepository>();
         services.AddScoped<IRouteOfAdministrationRepository, RouteOfAdministrationRepository>();
         services.AddScoped<ISideEffectRepository, SideEffectRepository>();
@@ -197,22 +215,19 @@ public class Startup(IConfiguration configuration)
             app.UseSwaggerUI();
         }
 
-        app.UseHttpsRedirection();
-        
         app.UseHealthChecks("/_health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
         });
+        
+        app.UseCors("AllowAnyOrigins");
     
         app.UseRouting();
-    
-        app.UseCors("AllowAnyOrigins");
     
         app.UseAuthentication();
         app.UseAuthorization();
         
         app.UseSerilogRequestLogging();
-    
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
         dbSeeder.SeedSuperAdminAsync().Wait();
