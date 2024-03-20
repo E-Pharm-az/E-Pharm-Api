@@ -3,10 +3,8 @@ using System.Security.Claims;
 using System.Text;
 using EPharm.Domain.Interfaces.Jwt;
 using EPharm.Domain.Models.Jwt;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
+using EPharm.Infrastructure.Context.Entities.Identity;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 
 namespace EPharm.Domain.Services.JwtServices;
@@ -16,7 +14,7 @@ public class TokenService(
     ITokenRefreshService tokenRefreshService,
     IConfiguration configuration) : ITokenService
 {
-    public AuthResponse CreateToken(IdentityUser user, List<string> roles)
+    public AuthResponse CreateToken(AppIdentityUser user, List<string> roles)
     {
         return tokenCreationService.CreateToken(user, roles);
     }

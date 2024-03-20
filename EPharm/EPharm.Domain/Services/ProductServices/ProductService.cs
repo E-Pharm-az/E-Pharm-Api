@@ -1,6 +1,5 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.ProductDtos;
-using EPharm.Domain.Dtos.ProductDtos.ProductDtos;
 using EPharm.Domain.Interfaces;
 using EPharm.Domain.Interfaces.Product;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
@@ -26,7 +25,7 @@ public class ProductService(
 {
     public async Task<IEnumerable<GetProductDto>> GetAllProductsAsync()
     {
-        var products = await productRepository.GetAllProductsWithImages();
+        var products = await productRepository.GetAllAsync();
         return mapper.Map<IEnumerable<GetProductDto>>(products);
     }
 
@@ -36,10 +35,22 @@ public class ProductService(
         return mapper.Map<IEnumerable<GetProductDto>>(products);
     }
 
-    public async Task<GetProductDto?> GetProductByIdAsync(int productId)
+    public async Task<GetFullProductDto?> GetProductByIdAsync(int productId)
     {
-        var product = await productRepository.GetProductWithImageById(productId);
-        return mapper.Map<GetProductDto>(product);
+        var product = await productRepository.GetByIdAsync(productId);
+        return mapper.Map<GetFullProductDto>(product);
+    }
+
+    public async Task<IEnumerable<GetProductDto>> SearchProduct(string parameter)
+    {
+        var allProducts = await productRepository.GetAllAsync();
+
+        var filteredProducts = allProducts.Where(p =>
+            p.ProductName.Contains(parameter, StringComparison.OrdinalIgnoreCase) ||
+            p.ProductDescription.Contains(parameter, StringComparison.OrdinalIgnoreCase)
+        );
+
+        return mapper.Map<IEnumerable<GetProductDto>>(filteredProducts);
     }
 
     public async Task<GetProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)
@@ -47,6 +58,10 @@ public class ProductService(
         try
         {
             var productEntity = mapper.Map<Product>(productDto);
+            
+            if (productDto.ProductImage is not null)
+                productEntity.ProductImageUrl =  await productImageService.UploadProductImageAsync(productDto.ProductImage);
+            
             productEntity.PharmaCompanyId = pharmaCompanyId;
 
             var regulatoryInformation = await regulatoryInformationService.GetRegulatoryInformationByIdAsync(productEntity.RegulatoryInformationId);
@@ -58,19 +73,6 @@ public class ProductService(
 
             await unitOfWork.BeginTransactionAsync();
             
-            // Length != 0 is more performant than Any()
-            // if (productDto.ProductImages.Length != 0)
-            // {
-            //     foreach (var image in productDto.ProductImages)
-            //     {
-            //         await productImageService.UploadProductImageAsync(new CreateProductImageDto
-            //         {
-            //             Image = image,
-            //             ProductId = product.Id
-            //         });
-            //     }
-            // }
-
             await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsIds);
             await productAllergyRepository.InsertProductAllergyAsync(product.Id, productDto.AllergiesIds);
             await productDosageFormRepository.InsertProductDosageFormAsync(product.Id, productDto.DosageFormsIds);

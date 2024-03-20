@@ -1,6 +1,14 @@
+using EPharm.Domain.Dtos.ActiveIngredientDto;
+using EPharm.Domain.Dtos.AllergyDto;
+using EPharm.Domain.Dtos.DosageFormDto;
+using EPharm.Domain.Dtos.IndicationDto;
+using EPharm.Domain.Dtos.RouteOfAdministrationDto;
+using EPharm.Domain.Dtos.SideEffectDto;
+using EPharm.Domain.Dtos.UsageWarningDto;
+
 namespace EPharm.Domain.Dtos.ProductDtos;
 
-public class GetProductDto
+public class GetFullProductDto
 {
     public int Id { get; set; }
     public int PharmaCompanyId { get; set; }
@@ -27,9 +35,17 @@ public class GetProductDto
 
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }
+    
+    public ICollection<GetActiveIngredientDto> ActiveIngredient { get; set; }
+    public ICollection<GetDosageFormDto> DosageForms { get; set; }
+    public ICollection<GetRouteOfAdministrationDto> RouteOfAdministrations { get; set; }
+    public ICollection<GetSideEffectDto> SideEffects { get; set; }
+    public ICollection<GetUsageWarningDto> UsageWarnings { get; set; }
+    public ICollection<GetAllergyDto> Allergies { get; set; }
+    public ICollection<GetIndicationDto> Indications { get; set; }
 
     public decimal PackagingWidth { get; set; }
     public decimal PackagingHeight { get; set; }
     public decimal PackagingLength { get; set; }
-    public decimal PackagingWeight { get; set; }
+    public decimal PackagingWeight { get; set; } 
 }

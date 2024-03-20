@@ -3,9 +3,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using EPharm.Domain.Interfaces.Jwt;
-using EPharm.Domain.Models.Identity;
 using EPharm.Domain.Models.Jwt;
-using Microsoft.AspNetCore.Identity;
+using EPharm.Infrastructure.Context.Entities.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
@@ -13,12 +12,13 @@ namespace EPharm.Domain.Services.JwtServices;
 
 public class TokenCreationService(IConfiguration configuration) : ITokenCreationService
 {
-    public AuthResponse CreateToken(IdentityUser user, IList<string> roles)
+    public AuthResponse CreateToken(AppIdentityUser user, IList<string> roles)
     {
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Jti, user.Id),
-            new(JwtRegisteredClaimNames.Email, user.Email)
+            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(JwtRegisteredClaimNames.Sub, user.FirstName),
         };
 
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
@@ -33,7 +33,7 @@ public class TokenCreationService(IConfiguration configuration) : ITokenCreation
                 SecurityAlgorithms.HmacSha256));
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-
+        
         return new AuthResponse
         {
             Token = tokenString,

@@ -1,9 +1,9 @@
-using EPharm.Domain.Dtos.ProductImageDto;
+using Microsoft.AspNetCore.Http;
 
 namespace EPharm.Domain.Interfaces;
 
 public interface IProductImageService
 {
-    public Task<bool> UploadProductImageAsync(CreateProductImageDto productImageDto);
-    public Task<bool> DeleteProductImageAsync(int id);
+    public Task<string> UploadProductImageAsync(IFormFile image);
+    public Task<bool> DeleteProductImageAsync(string imageUrl);
 }

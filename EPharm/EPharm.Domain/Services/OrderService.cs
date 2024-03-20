@@ -2,13 +2,12 @@ using AutoMapper;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Interfaces;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
-using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 namespace EPharm.Domain.Services;
 
-public class OrderService(IUnitOfWork unitOfWork, IOrderRepository orderRepository, IOrderProductRepository orderProductRepository,IMapper mapper) : IOrderService
+public class OrderService(IOrderRepository orderRepository, IOrderProductRepository orderProductRepository,IMapper mapper) : IOrderService
 {
     public async Task<IEnumerable<GetOrderDto>> GetAllOrders()
     {
