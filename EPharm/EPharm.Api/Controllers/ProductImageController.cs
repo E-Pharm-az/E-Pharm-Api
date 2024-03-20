@@ -8,12 +8,12 @@ using Microsoft.IdentityModel.JsonWebTokens;
 namespace EPharmApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]/pharma-company/{pharmaCompanyId:int}/image/{imageId:int}")]
+[Route("api/[controller]/pharma-company/{pharmaCompanyId:int}/image/{imageId}")]
 [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmaCompanyManager)]
 public class ProductImageController(IPharmaCompanyService pharmaCompanyService, IProductImageService productImageService) : ControllerBase
 {
     [HttpDelete]
-    public async Task<ActionResult> DeleteProductImage(int pharmaCompanyId, int imageId)
+    public async Task<ActionResult> DeleteProductImage(int pharmaCompanyId, string imageId)
     {
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
