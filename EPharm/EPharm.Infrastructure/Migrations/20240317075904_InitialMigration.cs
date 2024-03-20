@@ -329,7 +329,10 @@ namespace EPharm.Infrastructure.Migrations
                     WarehouseId = table.Column<int>(type: "integer", nullable: false),
                     ProductName = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     ProductDescription = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    ProductImageUrl = table.Column<string>(type: "text", nullable: true),
                     StrengthMg = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
+                    MaxDayFrequency = table.Column<int>(type: "integer", nullable: false),
+                    MaxSupplyInDaysDays = table.Column<int>(type: "integer", nullable: false),
                     ContraindicationsDescription = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     StorageConditionDescription = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     SpecialRequirementsId = table.Column<int>(type: "integer", nullable: false),
@@ -416,6 +419,8 @@ namespace EPharm.Infrastructure.Migrations
                     OrderId = table.Column<int>(type: "integer", nullable: false),
                     ProductId = table.Column<int>(type: "integer", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
+                    Frequency = table.Column<int>(type: "integer", nullable: false),
+                    SupplyDuration = table.Column<int>(type: "integer", nullable: false),
                     TotalPrice = table.Column<double>(type: "double precision", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -506,28 +511,6 @@ namespace EPharm.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProductDosageForms_Products_ProductId",
-                        column: x => x.ProductId,
-                        principalTable: "Products",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ProductImages",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ProductId = table.Column<int>(type: "integer", nullable: false),
-                    ImageUrl = table.Column<string>(type: "text", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ProductImages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ProductImages_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
                         principalColumn: "Id",
@@ -670,11 +653,6 @@ namespace EPharm.Infrastructure.Migrations
                 column: "DosageFormId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductImages_ProductId",
-                table: "ProductImages",
-                column: "ProductId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductRouteOfAdministrations_RouteOfAdministrationId",
                 table: "ProductRouteOfAdministrations",
                 column: "RouteOfAdministrationId");
@@ -766,9 +744,6 @@ namespace EPharm.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductDosageForms");
-
-            migrationBuilder.DropTable(
-                name: "ProductImages");
 
             migrationBuilder.DropTable(
                 name: "ProductRouteOfAdministrations");

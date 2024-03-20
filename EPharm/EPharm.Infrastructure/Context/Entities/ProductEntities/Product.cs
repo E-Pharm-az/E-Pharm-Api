@@ -14,7 +14,12 @@ public class Product : BaseEntity
     
     public string ProductName { get; set; }
     public string ProductDescription { get; set; }
+    public string? ProductImageUrl { get; set; }
     public decimal StrengthMg { get; set; }
+    
+    public int MaxDayFrequency { get; set; }
+    public int MaxSupplyInDaysDays { get; set; }
+    
     public string ContraindicationsDescription { get; set; }
     public string StorageConditionDescription { get; set; }
     
@@ -42,7 +47,6 @@ public class Product : BaseEntity
     public ICollection<ProductUsageWarning> UsageWarnings { get; set; }
     public ICollection<ProductAllergy> Allergies { get; set; }
     public ICollection<IndicationProduct> Indications { get; set; }
-    public ICollection<ProductImage> ProductImages { get; set; }
     public ICollection<OrderProduct> OrderProducts;
     
     public decimal PackagingWidth { get; set; }

@@ -51,6 +51,9 @@ namespace EPharm.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("Frequency")
+                        .HasColumnType("integer");
+
                     b.Property<int>("OrderId")
                         .HasColumnType("integer");
 
@@ -58,6 +61,9 @@ namespace EPharm.Infrastructure.Migrations
                         .HasColumnType("integer");
 
                     b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SupplyDuration")
                         .HasColumnType("integer");
 
                     b.Property<double>("TotalPrice")
@@ -540,6 +546,12 @@ namespace EPharm.Infrastructure.Migrations
                     b.Property<DateTime>("ManufacturingDate")
                         .HasColumnType("date");
 
+                    b.Property<int>("MaxDayFrequency")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxSupplyInDaysDays")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("PackagingHeight")
                         .HasColumnType("decimal(18,2)");
 
@@ -562,6 +574,9 @@ namespace EPharm.Infrastructure.Migrations
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
+
+                    b.Property<string>("ProductImageUrl")
+                        .HasColumnType("text");
 
                     b.Property<string>("ProductName")
                         .IsRequired()
@@ -602,36 +617,6 @@ namespace EPharm.Infrastructure.Migrations
                     b.HasIndex("WarehouseId");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.ProductImage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
-                        .HasDefaultValueSql("NOW()");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductImages");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.RegulatoryInformation", b =>
@@ -1084,17 +1069,6 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("Warehouse");
                 });
 
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.ProductImage", b =>
-                {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Product", "Product")
-                        .WithMany("ProductImages")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.RegulatoryInformation", b =>
                 {
                     b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
@@ -1219,8 +1193,6 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("Indications");
 
                     b.Navigation("OrderProducts");
-
-                    b.Navigation("ProductImages");
 
                     b.Navigation("RouteOfAdministrations");
 

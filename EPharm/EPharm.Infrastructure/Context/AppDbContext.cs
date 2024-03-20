@@ -17,7 +17,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Manufacturer> Manufacturers { get; set; }
     public DbSet<Order> Orders { get; set; }
     public DbSet<Product> Products { get; set; }
-    public DbSet<ProductImage> ProductImages { get; set; }
     public DbSet<RegulatoryInformation> RegulatoryInformations { get; set; }
     public DbSet<RouteOfAdministration> RouteOfAdministrations { get; set; }
     public DbSet<SideEffect> SideEffects { get; set; }

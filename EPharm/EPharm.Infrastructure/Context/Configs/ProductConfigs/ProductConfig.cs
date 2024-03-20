@@ -29,6 +29,12 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
         builder.Property(p => p.StrengthMg)
             .HasColumnType("decimal(18,2)");
 
+        builder.Property(p => p.MaxDayFrequency)
+            .IsRequired();
+
+        builder.Property(p => p.MaxSupplyInDaysDays)
+            .IsRequired();
+
         builder.Property(p => p.ContraindicationsDescription)
             .HasMaxLength(500);
 
@@ -90,10 +96,6 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
             .HasForeignKey(p => p.ProductId);
 
         builder.HasMany(p => p.Indications)
-            .WithOne(p => p.Product)
-            .HasForeignKey(p => p.ProductId);
-
-        builder.HasMany(p => p.ProductImages)
             .WithOne(p => p.Product)
             .HasForeignKey(p => p.ProductId);
 
