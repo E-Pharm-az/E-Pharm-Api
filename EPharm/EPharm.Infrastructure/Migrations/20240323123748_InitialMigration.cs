@@ -21,8 +21,10 @@ namespace EPharm.Infrastructure.Migrations
                     TrackingId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     OrderStatus = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
                     TotalPrice = table.Column<int>(type: "integer", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
                     ShippingAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    UserId = table.Column<string>(type: "text", nullable: false),
+                    UserId = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
@@ -680,8 +682,7 @@ namespace EPharm.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Products_RegulatoryInformationId",
                 table: "Products",
-                column: "RegulatoryInformationId",
-                unique: true);
+                column: "RegulatoryInformationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_SpecialRequirementsId",

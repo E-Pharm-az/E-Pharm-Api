@@ -142,7 +142,7 @@ public class Startup(IConfiguration configuration)
             ));
         
         StripeConfiguration.ApiKey = configuration["StripeConfig:SecretKey"];
-
+        
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         services.AddDbContext<AppDbContext>(

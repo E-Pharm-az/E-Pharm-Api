@@ -36,6 +36,10 @@ public class UserService(
     {
         try
         {
+            var existingUser = await userManager.FindByEmailAsync(createUserDto.Email);
+            if (existingUser is not null)
+                throw new InvalidOperationException("User with this email already exists.");
+            
             var user = await CreateUserAsync(createUserDto, [IdentityData.Customer]);
             return user;
         }

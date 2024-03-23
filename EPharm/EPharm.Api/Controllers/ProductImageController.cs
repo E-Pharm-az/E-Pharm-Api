@@ -1,9 +1,9 @@
+using System.Security.Claims;
 using EPharm.Domain.Interfaces;
 using EPharm.Domain.Interfaces.Pharma;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace EPharmApi.Controllers;
 
@@ -22,8 +22,9 @@ public class ProductImageController(IPharmaCompanyService pharmaCompanyService, 
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            
+            if (company.PharmaCompanyOwnerId != userId)
                 return Forbid();
         } 
         

@@ -1,6 +1,7 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Interfaces;
+using EPharm.Domain.Models.Product;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
@@ -39,6 +40,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderProductReposit
         {
             var orderEntity = mapper.Map<Order>(orderDto);
             orderEntity.TrackingId = Guid.NewGuid().ToString();
+            orderEntity.OrderStatus = OrderStatus.PendingPayment;
             orderEntity.UserId = userId;
 
             var order = await orderRepository.InsertAsync(orderEntity);

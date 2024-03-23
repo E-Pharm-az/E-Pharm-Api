@@ -12,12 +12,16 @@ public class RegulatoryInformationConfig : IEntityTypeConfiguration<RegulatoryIn
             .IsRequired()
             .HasMaxLength(255);
         
-        builder.HasOne(a => a.PharmaCompany)
-            .WithMany(a => a.RegulatoryInformations)
-            .HasForeignKey(a => a.PharmaCompanyId);
+        builder.HasOne(ri => ri.PharmaCompany)
+            .WithMany(ri => ri.RegulatoryInformations)
+            .HasForeignKey(ri => ri.PharmaCompanyId);
 
         builder.Property(ri => ri.ApprovalDate)
             .HasColumnType("date");
+        
+        builder.HasMany(ri => ri.Product)
+            .WithOne(ri => ri.RegulatoryInformation)
+            .HasForeignKey(ri => ri.RegulatoryInformationId);
 
         builder.Property(ri => ri.Certification)
             .HasMaxLength(255);

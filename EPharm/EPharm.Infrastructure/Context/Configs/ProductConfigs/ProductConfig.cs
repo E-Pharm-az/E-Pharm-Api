@@ -55,10 +55,6 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
         builder.Property(p => p.ExpiryDate)
             .HasColumnType("date");
         
-        builder.HasOne(p => p.RegulatoryInformation)
-            .WithOne(p => p.Product)
-            .HasForeignKey<Product>(p => p.RegulatoryInformationId);
-
         builder.Property(p => p.Stock)
             .IsRequired();
 

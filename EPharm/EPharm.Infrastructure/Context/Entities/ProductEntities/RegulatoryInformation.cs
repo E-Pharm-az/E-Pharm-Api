@@ -12,7 +12,7 @@ public class RegulatoryInformation : BaseEntity
     public DateTime ApprovalDate { get; set; }
     public string Certification { get; set; }
 
-    public Product Product { get; set; }
+    public ICollection<Product> Product { get; set; }
 
     public DateTime CreatedAt { get; set; }
 }

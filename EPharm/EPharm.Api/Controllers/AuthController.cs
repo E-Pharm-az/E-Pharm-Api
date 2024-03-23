@@ -14,7 +14,7 @@ namespace EPharmApi.Controllers;
 public class AuthController(IConfiguration configuration, UserManager<AppIdentityUser> userManager, ITokenService tokenService) : ControllerBase
 {
     [HttpPost]
-    [Route("login/")]
+    [Route("login")]
     public async Task<IActionResult> Login([FromBody] AuthRequest request)
     {
         return await ProcessLogin(request, IdentityData.PharmaCompanyManager);
@@ -89,9 +89,6 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
                 RefreshToken = HttpContext.Request.Cookies["refreshToken"]
             };
 
-            Log.Information($"Token: {request.Token}");
-            Log.Information($"RefreshToken: {request.RefreshToken}");
-
             if (string.IsNullOrEmpty(request.Token) || string.IsNullOrEmpty(request.RefreshToken))
             {
                 Log.Warning("Token or refreshToken is missing in the request");
@@ -131,12 +128,6 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
             {
                 HttpOnly = true,
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
-            });
-
-            HttpContext.Response.Cookies.Append("refreshToken", user.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = user.RefreshTokenExpiryTime
             });
 
             return Ok(response);

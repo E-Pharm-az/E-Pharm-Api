@@ -118,7 +118,7 @@ public class UserController(IUserService userService) : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!User.IsInRole(IdentityData.Admin) && currentUserId != id)
             return Forbid();
@@ -136,7 +136,7 @@ public class UserController(IUserService userService) : ControllerBase
     [Authorize]
     public async Task<ActionResult> DeleteUser(string userId)
     {
-        var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         if (!User.IsInRole(IdentityData.Admin) && currentUserId != userId)
             return Forbid();

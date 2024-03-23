@@ -18,6 +18,12 @@ public class OrderConfig : IEntityTypeConfiguration<Order>
         
         builder.Property(o => o.TotalPrice)
             .IsRequired();
+
+        builder.Property(o => o.Email)
+            .IsRequired();
+
+        builder.Property(o => o.PhoneNumber)
+            .IsRequired();
         
         builder.Property(o => o.ShippingAddress)
             .IsRequired()

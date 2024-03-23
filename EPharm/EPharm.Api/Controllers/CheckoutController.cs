@@ -1,29 +1,35 @@
+using System.Security.Claims;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Interfaces;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 using Stripe;
 
 namespace EPharmApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]/create-payment-intent")]
+[Route("api/[controller]")]
 [Authorize]
-public class CheckoutController(IUnitOfWork unitOfWork, IOrderService orderService) : ControllerBase
+public class CheckoutController(IConfiguration configuration, IUnitOfWork unitOfWork, IOrderService orderService) : ControllerBase
 {
-    [HttpPost]
+    [HttpGet("config")]
+    public async Task<IActionResult> GetConfig()
+    {
+        var publishableKey = configuration["StripeConfig:PublishableKey"];
+        return Ok(new { publishableKey });
+    }
+    
+    [HttpPost("create-payment-intent")]
     public async Task<IActionResult> CreatePaymentIntent([FromBody] CreateOrderDto orderDto)
     {
         try
         {
             await unitOfWork.BeginTransactionAsync();
-            
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            var order = await orderService.CreateOrderAsync(userId.Value, orderDto);
-            Console.WriteLine("Order total: " + order.TotalPrice);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var order = await orderService.CreateOrderAsync(userId, orderDto);
 
             var paymentIntentService = new PaymentIntentService();
             var paymentIntent = await paymentIntentService.CreateAsync(new PaymentIntentCreateOptions
@@ -35,7 +41,7 @@ public class CheckoutController(IUnitOfWork unitOfWork, IOrderService orderServi
                     Enabled = true
                 }
             });
-            
+
             await unitOfWork.CommitTransactionAsync();
 
             return Ok(new { clientSecret = paymentIntent.ClientSecret });

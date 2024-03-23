@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EPharm.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240317075904_InitialMigration")]
+    [Migration("20240323123748_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -485,10 +485,18 @@ namespace EPharm.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("OrderStatus")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
@@ -504,7 +512,6 @@ namespace EPharm.Infrastructure.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -612,8 +619,7 @@ namespace EPharm.Infrastructure.Migrations
 
                     b.HasIndex("PharmaCompanyId");
 
-                    b.HasIndex("RegulatoryInformationId")
-                        .IsUnique();
+                    b.HasIndex("RegulatoryInformationId");
 
                     b.HasIndex("SpecialRequirementsId");
 
@@ -1044,8 +1050,8 @@ namespace EPharm.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.RegulatoryInformation", "RegulatoryInformation")
-                        .WithOne("Product")
-                        .HasForeignKey("EPharm.Infrastructure.Context.Entities.ProductEntities.Product", "RegulatoryInformationId")
+                        .WithMany("Product")
+                        .HasForeignKey("RegulatoryInformationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1206,8 +1212,7 @@ namespace EPharm.Infrastructure.Migrations
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.RegulatoryInformation", b =>
                 {
-                    b.Navigation("Product")
-                        .IsRequired();
+                    b.Navigation("Product");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.RouteOfAdministration", b =>
