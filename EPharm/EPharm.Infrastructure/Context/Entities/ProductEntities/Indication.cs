@@ -5,8 +5,8 @@ namespace EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 public class Indication : BaseEntity
 { 
-    public string IndicationsName { get; set; }
-    public string IndicationsDescription { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
     
     public ICollection<IndicationProduct> Products { get; set; }
     

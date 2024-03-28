@@ -8,7 +8,7 @@ public class Manufacturer : BaseEntity
     public int PharmaCompanyId { get; set; }
     public PharmaCompany PharmaCompany { get; set; }
     
-    public string ManufacturerName { get; set; }
+    public string Name { get; set; }
     public string Country { get; set; }
     public string Website { get; set; }
     public string Email { get; set; }

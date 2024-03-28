@@ -8,7 +8,7 @@ public class ActiveIngredientConfig : IEntityTypeConfiguration<ActiveIngredient>
 {
     public void Configure(EntityTypeBuilder<ActiveIngredient> builder)
     {
-        builder.Property(ai => ai.IngredientName)
+        builder.Property(ai => ai.Name)
             .IsRequired()
             .HasMaxLength(255);
 
@@ -16,7 +16,7 @@ public class ActiveIngredientConfig : IEntityTypeConfiguration<ActiveIngredient>
             .WithMany(ai => ai.ActiveIngredients)
             .HasForeignKey(ai => ai.PharmaCompanyId);
         
-        builder.Property(ai => ai.IngredientDescription)
+        builder.Property(ai => ai.Description)
             .IsRequired()
             .HasMaxLength(500);
 

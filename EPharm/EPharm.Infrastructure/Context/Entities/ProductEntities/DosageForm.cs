@@ -5,7 +5,7 @@ namespace EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 public class DosageForm : BaseEntity
 {
-    public string DosageFormName { get; set; }
+    public string Name { get; set; }
     
     public ICollection<ProductDosageForm> Products { get; set; }
 }

@@ -27,7 +27,7 @@ public class PharmaCompanyService(IPharmaCompanyRepository pharmaCompanyReposito
         try
         {
             var pharmaCompanyEntity = mapper.Map<PharmaCompany>(pharmaCompanyDto);
-            pharmaCompanyEntity.PharmaCompanyOwnerId = pharmaAdminId;
+            pharmaCompanyEntity.OwnerId = pharmaAdminId;
             var pharmaCompany = await pharmaCompanyRepository.InsertAsync(pharmaCompanyEntity);
 
             return mapper.Map<GetPharmaCompanyDto>(pharmaCompany);

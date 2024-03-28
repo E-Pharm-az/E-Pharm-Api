@@ -5,9 +5,9 @@ namespace EPharm.Infrastructure.Context.Entities.PharmaEntities;
 
 public class PharmaCompany : BaseEntity
 {
-    public string PharmaCompanyOwnerId { get; set; } 
+    public string OwnerId { get; set; } 
     public string TIN { get; set; }
-    public string CompanyName { get; set; }
+    public string Name { get; set; }
     public string ContactEmail { get; set; }
     public string ContactPhone { get; set; }
     public string StreetAddress { get; set; }
@@ -19,7 +19,7 @@ public class PharmaCompany : BaseEntity
     public int Floor { get; set; }
     public int RoomNumber { get; set; }  
     
-    public ICollection<PharmaCompanyManager> PharmaCompanyManagers { get; set; }
+    public ICollection<PharmaCompanyManager> Managers { get; set; }
     public ICollection<Warehouse> Warehouses { get; set; }
     public ICollection<Product> Products { get; set; }
     public ICollection<ActiveIngredient> ActiveIngredients { get; set; }

@@ -6,7 +6,7 @@ namespace EPharm.Infrastructure.Context.Entities.ProductEntities;
 public class Order : BaseEntity
 {
     public string TrackingId { get; set; }
-    public string OrderStatus { get; set; }
+    public string Status { get; set; }
     public int TotalPrice { get; set; }
     public string Email { get; set; }
     public string PhoneNumber { get; set; }

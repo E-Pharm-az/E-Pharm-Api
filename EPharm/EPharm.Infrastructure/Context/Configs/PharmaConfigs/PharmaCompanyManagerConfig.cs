@@ -27,7 +27,7 @@ public class PharmaCompanyManagerConfig : IEntityTypeConfiguration<PharmaCompany
             .HasMaxLength(20);
 
         builder.HasOne(pcm => pcm.PharmaCompany)
-            .WithMany(pc => pc.PharmaCompanyManagers)
+            .WithMany(pc => pc.Managers)
             .HasForeignKey(pcm => pcm.PharmaCompanyId);
 
         builder.Property(pcm => pcm.CreatedAt)

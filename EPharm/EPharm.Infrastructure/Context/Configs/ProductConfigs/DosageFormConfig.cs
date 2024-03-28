@@ -14,7 +14,7 @@ public class DosageFormConfig : IEntityTypeConfiguration<DosageForm>
             .WithOne(df => df.DosageForm)
             .HasForeignKey(df => df.DosageFormId);
 
-        builder.Property(df => df.DosageFormName)
+        builder.Property(df => df.Name)
             .IsRequired()
             .HasMaxLength(255);
     }

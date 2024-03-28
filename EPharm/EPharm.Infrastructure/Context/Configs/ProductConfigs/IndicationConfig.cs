@@ -8,11 +8,11 @@ public class IndicationConfig : IEntityTypeConfiguration<Indication>
 {
     public void Configure(EntityTypeBuilder<Indication> builder)
     {
-        builder.Property(i => i.IndicationsName)
+        builder.Property(i => i.Name)
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(i => i.IndicationsDescription)
+        builder.Property(i => i.Description)
             .IsRequired()
             .HasMaxLength(500);
         

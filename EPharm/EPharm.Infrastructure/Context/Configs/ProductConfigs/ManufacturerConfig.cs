@@ -8,7 +8,7 @@ public class ManufacturerConfig : IEntityTypeConfiguration<Manufacturer>
 {
     public void Configure(EntityTypeBuilder<Manufacturer> builder)
     {
-        builder.Property(m => m.ManufacturerName)
+        builder.Property(m => m.Name)
             .IsRequired()
             .HasMaxLength(255);
         

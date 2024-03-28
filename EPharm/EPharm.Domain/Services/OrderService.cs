@@ -40,7 +40,7 @@ public class OrderService(IOrderRepository orderRepository, IOrderProductReposit
         {
             var orderEntity = mapper.Map<Order>(orderDto);
             orderEntity.TrackingId = Guid.NewGuid().ToString();
-            orderEntity.OrderStatus = OrderStatus.PendingPayment;
+            orderEntity.Status = OrderStatus.PendingPayment;
             orderEntity.UserId = userId;
 
             var order = await orderRepository.InsertAsync(orderEntity);

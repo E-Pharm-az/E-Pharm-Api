@@ -8,7 +8,7 @@ public class PharmaCompanyConfig : IEntityTypeConfiguration<PharmaCompany>
 {
     public void Configure(EntityTypeBuilder<PharmaCompany> builder)
     {
-        builder.Property(pc => pc.CompanyName)
+        builder.Property(pc => pc.Name)
             .IsRequired()
             .HasMaxLength(255);
 
@@ -42,7 +42,7 @@ public class PharmaCompanyConfig : IEntityTypeConfiguration<PharmaCompany>
             .IsRequired()
             .HasMaxLength(255);
         
-        builder.HasMany(pc => pc.PharmaCompanyManagers)
+        builder.HasMany(pc => pc.Managers)
             .WithOne(pcm => pcm.PharmaCompany)
             .HasForeignKey(pcm => pcm.PharmaCompanyId);
 

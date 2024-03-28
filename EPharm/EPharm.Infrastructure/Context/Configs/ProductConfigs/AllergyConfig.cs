@@ -8,7 +8,7 @@ public class AllergyConfig : IEntityTypeConfiguration<Allergy>
 {
     public void Configure(EntityTypeBuilder<Allergy> builder)
     {
-        builder.Property(a => a.Description)
+        builder.Property(a => a.Name)
             .IsRequired()
             .HasMaxLength(255);
         

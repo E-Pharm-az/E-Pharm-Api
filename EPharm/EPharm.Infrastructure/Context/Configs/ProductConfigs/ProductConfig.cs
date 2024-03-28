@@ -18,11 +18,11 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
             .HasForeignKey(p => p.WarehouseId)
             .IsRequired();
         
-        builder.Property(p => p.ProductName)
+        builder.Property(p => p.Name)
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(p => p.ProductDescription)
+        builder.Property(p => p.Description)
             .IsRequired()
             .HasMaxLength(500);
 
@@ -32,7 +32,7 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
         builder.Property(p => p.MaxDayFrequency)
             .IsRequired();
 
-        builder.Property(p => p.MaxSupplyInDaysDays)
+        builder.Property(p => p.MaxSupplyDaysPeriod)
             .IsRequired();
 
         builder.Property(p => p.ContraindicationsDescription)
@@ -48,9 +48,6 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
         builder.HasOne(p => p.Manufacturer)
             .WithMany(p => p.Products)
             .HasForeignKey(p => p.ManufacturerId);
-
-        builder.Property(p => p.ManufacturingDate)
-            .HasColumnType("date");
 
         builder.Property(p => p.ExpiryDate)
             .HasColumnType("date");
@@ -94,15 +91,6 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
         builder.HasMany(p => p.Indications)
             .WithOne(p => p.Product)
             .HasForeignKey(p => p.ProductId);
-
-        builder.Property(p => p.PackagingWidth)
-            .HasColumnType("decimal(18,2)");
-
-        builder.Property(p => p.PackagingHeight)
-            .HasColumnType("decimal(18,2)");
-
-        builder.Property(p => p.PackagingLength)
-            .HasColumnType("decimal(18,2)");
 
         builder.Property(p => p.PackagingWeight)
             .HasColumnType("decimal(18,2)");

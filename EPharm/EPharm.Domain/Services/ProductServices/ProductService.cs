@@ -46,8 +46,8 @@ public class ProductService(
         var allProducts = await productRepository.GetAllAsync();
 
         var filteredProducts = allProducts.Where(p =>
-            p.ProductName.Contains(parameter, StringComparison.OrdinalIgnoreCase) ||
-            p.ProductDescription.Contains(parameter, StringComparison.OrdinalIgnoreCase)
+            p.Name.Contains(parameter, StringComparison.OrdinalIgnoreCase) ||
+            p.Description.Contains(parameter, StringComparison.OrdinalIgnoreCase)
         );
 
         return mapper.Map<IEnumerable<GetProductDto>>(filteredProducts);
@@ -60,7 +60,7 @@ public class ProductService(
             var productEntity = mapper.Map<Product>(productDto);
             
             if (productDto.ProductImage is not null)
-                productEntity.ProductImageUrl =  await productImageService.UploadProductImageAsync(productDto.ProductImage);
+                productEntity.ImageUrl =  await productImageService.UploadProductImageAsync(productDto.ProductImage);
             
             productEntity.PharmaCompanyId = pharmaCompanyId;
 

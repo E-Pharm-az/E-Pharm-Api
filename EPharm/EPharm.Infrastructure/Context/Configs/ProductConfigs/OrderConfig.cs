@@ -12,7 +12,7 @@ public class OrderConfig : IEntityTypeConfiguration<Order>
             .HasMaxLength(255)
             .IsRequired();
         
-        builder.Property(o => o.OrderStatus)
+        builder.Property(o => o.Status)
             .IsRequired()
             .HasMaxLength(50);
         

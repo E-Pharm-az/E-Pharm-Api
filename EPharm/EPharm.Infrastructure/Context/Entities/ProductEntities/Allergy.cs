@@ -5,7 +5,7 @@ namespace EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 public class Allergy : BaseEntity
 {
-    public string Description { get; set; }
+    public string Name { get; set; }
     
     public ICollection<ProductAllergy> Products { get; set; }
     
