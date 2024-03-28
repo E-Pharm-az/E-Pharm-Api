@@ -14,17 +14,24 @@ namespace EPharmApi.Controllers;
 public class AuthController(IConfiguration configuration, UserManager<AppIdentityUser> userManager, ITokenService tokenService) : ControllerBase
 {
     [HttpPost]
-    [Route("login")]
-    public async Task<IActionResult> Login([FromBody] AuthRequest request)
-    {
-        return await ProcessLogin(request, IdentityData.PharmaCompanyManager);
-    }
-
-    [HttpPost]
     [Route("login/store")]
     public async Task<IActionResult> LoginStore([FromBody] AuthRequest request)
     {
         return await ProcessLogin(request, IdentityData.Customer);
+    }
+    
+    [HttpPost]
+    [Route("login/pharma")]
+    public async Task<IActionResult> LoginPharm([FromBody] AuthRequest request)
+    {
+        return await ProcessLogin(request, IdentityData.PharmaCompanyManager);
+    }
+    
+    [HttpPost]
+    [Route("login/admin")]
+    public async Task<IActionResult> LoginAdmin([FromBody] AuthRequest request)
+    {
+        return await ProcessLogin(request, IdentityData.Admin);
     }
 
     private async Task<IActionResult> ProcessLogin(AuthRequest request, string requiredRole)

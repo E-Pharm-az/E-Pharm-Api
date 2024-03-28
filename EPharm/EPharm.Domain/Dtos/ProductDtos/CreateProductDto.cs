@@ -28,6 +28,7 @@ public class CreateProductDto
     [Required] public DateTime ExpiryDate { get; set; }
     public int Stock { get; set; }
     public int Price { get; set; }
+    public int CostPerItem { get; set; }
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }
     public decimal PackagingWidth { get; set; }

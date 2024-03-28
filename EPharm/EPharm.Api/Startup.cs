@@ -104,10 +104,7 @@ public class Startup(IConfiguration configuration)
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddCookie(cookieOptions =>
-            {
-                cookieOptions.Cookie.Name = "token";
-            })
+            .AddCookie(cookieOptions => { cookieOptions.Cookie.Name = "token"; })
             .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
@@ -133,8 +130,7 @@ public class Startup(IConfiguration configuration)
 
         services.AddCors(ops =>
             ops.AddPolicy("AllowAnyOrigins", builder => 
-                builder
-                    .WithOrigins("http://localhost:5173")
+                builder.WithOrigins("http://localhost:5173")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
