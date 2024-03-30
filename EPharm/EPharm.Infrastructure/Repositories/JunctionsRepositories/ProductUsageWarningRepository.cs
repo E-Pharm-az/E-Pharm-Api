@@ -26,5 +26,7 @@ public class ProductUsageWarningRepository(AppDbContext context, IUsageWarningRe
                 }
             );
         }
+
+        await base.SaveChangesAsync();
     }
 }

@@ -26,5 +26,7 @@ public class ProductSideEffectRepository(AppDbContext context, ISideEffectReposi
                 }
             );
         }
+        
+        await base.SaveChangesAsync();
     }
 }

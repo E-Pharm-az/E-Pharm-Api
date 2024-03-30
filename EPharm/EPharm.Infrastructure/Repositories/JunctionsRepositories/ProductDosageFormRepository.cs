@@ -26,5 +26,7 @@ public class ProductDosageFormRepository(AppDbContext context, IDosageFormReposi
                 }
             );
         }
+        
+        await base.SaveChangesAsync();
     }
 }

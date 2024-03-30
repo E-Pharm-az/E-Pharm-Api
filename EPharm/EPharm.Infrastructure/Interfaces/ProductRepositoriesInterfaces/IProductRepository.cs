@@ -5,6 +5,7 @@ namespace EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 public interface IProductRepository : IRepository<Product>
 {
+    public Task<ICollection<Product>> GetAlLProductsAsync(int page, int pageSize);
     public Task<Product?> GetFullProductDetailAsync(int productId);
     public Task<IEnumerable<Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId);
 }

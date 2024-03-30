@@ -8,10 +8,6 @@ public class Product : BaseEntity
 {
     public int PharmaCompanyId { get; set; }
     public PharmaCompany PharmaCompany { get; set; }
-    
-    public int WarehouseId { get; set; }
-    public Warehouse Warehouse { get; set; }
-    
     public string Name { get; set; }
     public string Description { get; set; }
     public string? ImageUrl { get; set; }
@@ -33,12 +29,12 @@ public class Product : BaseEntity
     public RegulatoryInformation RegulatoryInformation { get; set; }
     
     public DateTime ExpiryDate { get; set; }
-    public int Stock { get; set; }
     public int Price { get; set; }
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }
     public decimal PackagingWeight { get; set; }
     
+    public ICollection<WarehouseProduct> WarehouseProducts { get; set; }
     public ICollection<ProductActiveIngredient> ActiveIngredients { get; set; }
     public ICollection<ProductDosageForm> DosageForms { get; set; }
     public ICollection<ProductRouteOfAdministration> RouteOfAdministrations { get; set; }

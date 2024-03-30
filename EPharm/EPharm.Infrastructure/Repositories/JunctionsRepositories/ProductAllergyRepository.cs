@@ -26,5 +26,7 @@ public class ProductAllergyRepository(AppDbContext context, IAllergyRepository a
                 }
             );
         }
+        
+        await base.SaveChangesAsync();
     }
 }

@@ -12,11 +12,6 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
             .WithMany(p => p.Products)
             .HasForeignKey(p => p.PharmaCompanyId)
             .IsRequired();
-
-        builder.HasOne(p => p.Warehouse)
-            .WithMany(p => p.Products)
-            .HasForeignKey(p => p.WarehouseId)
-            .IsRequired();
         
         builder.Property(p => p.Name)
             .IsRequired()
@@ -51,9 +46,6 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.ExpiryDate)
             .HasColumnType("date");
-        
-        builder.Property(p => p.Stock)
-            .IsRequired();
 
         builder.Property(p => p.Price)
             .IsRequired();

@@ -26,5 +26,7 @@ public class IndicationProductRepository(AppDbContext context, IIndicationReposi
                 }
             );
         }
+
+        await base.SaveChangesAsync();
     }
 }

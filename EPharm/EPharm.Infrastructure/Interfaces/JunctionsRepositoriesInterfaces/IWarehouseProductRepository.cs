@@ -3,7 +3,7 @@ using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 
 namespace EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 
-public interface IOrderProductRepository : IRepository<OrderProduct>
+public interface IWarehouseProductRepository : IRepository<WarehouseProduct>
 {
-    public Task<int> InsertOrderProductAsync(int orderId, int productId, int quantity);
+    public Task InsertWarehouseProductAsync(int warehouseId, int productId, int quantity);
 }

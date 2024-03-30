@@ -26,5 +26,7 @@ public class ProductActiveIngredientRepository(AppDbContext context, IActiveIngr
                 }
             );
         }
+        
+        await base.SaveChangesAsync();
     }
 }

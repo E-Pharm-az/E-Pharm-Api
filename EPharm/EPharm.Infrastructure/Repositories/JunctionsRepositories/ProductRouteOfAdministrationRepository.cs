@@ -26,5 +26,7 @@ public class ProductRouteOfAdministrationRepository(AppDbContext context, IRoute
                 }
             );
         }
+        
+        await base.SaveChangesAsync();
     }
 }
