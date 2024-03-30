@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.AllergyDto;
 
-namespace EPharm.Domain.Interfaces.Product;
+namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface IAllergyService
 {

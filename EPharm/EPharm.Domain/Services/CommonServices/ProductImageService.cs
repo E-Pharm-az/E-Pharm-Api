@@ -2,11 +2,11 @@ using System.Net;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
-using EPharm.Domain.Interfaces;
+using EPharm.Domain.Interfaces.CommonContracts;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
-namespace EPharm.Domain.Services;
+namespace EPharm.Domain.Services.CommonServices;
 
 public class ProductImageService : IProductImageService
 {

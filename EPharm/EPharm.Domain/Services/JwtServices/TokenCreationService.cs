@@ -2,7 +2,7 @@ using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using EPharm.Domain.Interfaces.Jwt;
+using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Jwt;
 using EPharm.Infrastructure.Context.Entities.Identity;
 using Microsoft.Extensions.Configuration;

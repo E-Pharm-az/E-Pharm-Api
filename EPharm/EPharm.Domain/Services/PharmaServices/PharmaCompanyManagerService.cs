@@ -1,6 +1,6 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
-using EPharm.Domain.Interfaces.Pharma;
+using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
 

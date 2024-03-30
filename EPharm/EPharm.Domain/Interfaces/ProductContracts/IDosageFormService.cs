@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.DosageFormDto;
 
-namespace EPharm.Domain.Interfaces.Product;
+namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface IDosageFormService
 {

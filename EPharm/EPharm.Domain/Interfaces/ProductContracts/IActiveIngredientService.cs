@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.ActiveIngredientDto;
 
-namespace EPharm.Domain.Interfaces.Product;
+namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface IActiveIngredientService
 {

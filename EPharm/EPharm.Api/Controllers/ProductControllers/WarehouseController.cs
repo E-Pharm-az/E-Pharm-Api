@@ -1,7 +1,7 @@
 using EPharm.Domain.Dtos.WarehouseDto;
 using EPharm.Domain.Interfaces;
-using EPharm.Domain.Interfaces.Pharma;
-using EPharm.Domain.Interfaces.Product;
+using EPharm.Domain.Interfaces.CommonContracts;
+using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

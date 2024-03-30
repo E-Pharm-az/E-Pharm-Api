@@ -1,14 +1,12 @@
 using System.Text;
-using EPharm.Domain.Interfaces;
-using EPharm.Domain.Interfaces.Jwt;
-using EPharm.Domain.Interfaces.Pharma;
-using EPharm.Domain.Interfaces.Product;
-using EPharm.Domain.Interfaces.User;
-using EPharm.Domain.Services;
+using EPharm.Domain.Interfaces.CommonContracts;
+using EPharm.Domain.Interfaces.JwtContracts;
+using EPharm.Domain.Interfaces.PharmaContracts;
+using EPharm.Domain.Interfaces.ProductContracts;
+using EPharm.Domain.Services.CommonServices;
 using EPharm.Domain.Services.JwtServices;
 using EPharm.Domain.Services.PharmaServices;
 using EPharm.Domain.Services.ProductServices;
-using EPharm.Domain.Services.UserServices;
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.Identity;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
@@ -32,7 +30,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Stripe;
-using OrderService = EPharm.Domain.Services.OrderService;
+using OrderService = EPharm.Domain.Services.CommonServices.OrderService;
 using ProductService = EPharm.Domain.Services.ProductServices.ProductService;
 using TokenService = EPharm.Domain.Services.JwtServices.TokenService;
 
@@ -164,8 +162,8 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IUsageWarningRepository, UsageWarningRepository>();
         services.AddScoped<IWarehouseRepository, WarehouseRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-
         services.AddScoped<IProductRepository, ProductRepository>();
+        
         services.AddScoped<IIndicationProductRepository, IndicationProductRepository>();
         services.AddScoped<IProductActiveIngredientRepository, ProductActiveIngredientRepository>();
         services.AddScoped<IProductAllergyRepository, ProductAllergyRepository>();
@@ -174,6 +172,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IProductSideEffectRepository, ProductSideEffectRepository>();
         services.AddScoped<IProductUsageWarningRepository, ProductUsageWarningRepository>();
         services.AddScoped<IOrderProductRepository, OrderProductRepository>();
+        services.AddScoped<IWarehouseProductRepository, WarehouseProductRepository>();
 
         services.AddScoped<IPharmaCompanyRepository, PharmaCompanyRepository>();
         services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();

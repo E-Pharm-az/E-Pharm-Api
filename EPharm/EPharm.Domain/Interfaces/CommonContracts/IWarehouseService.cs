@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.WarehouseDto;
 
-namespace EPharm.Domain.Interfaces;
+namespace EPharm.Domain.Interfaces.CommonContracts;
 
 public interface IWarehouseService
 {

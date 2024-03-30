@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.SpecialRequirementsDto;
 
-namespace EPharm.Domain.Interfaces.Product;
+namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface ISpecialRequirementService
 {

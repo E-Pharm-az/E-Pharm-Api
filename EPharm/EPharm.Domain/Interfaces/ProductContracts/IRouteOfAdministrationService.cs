@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.RouteOfAdministrationDto;
 
-namespace EPharm.Domain.Interfaces.Product;
+namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface IRouteOfAdministrationService
 {

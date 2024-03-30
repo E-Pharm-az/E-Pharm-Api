@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.ProductDtos;
 
-namespace EPharm.Domain.Interfaces.Product;
+namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface IProductService
 {

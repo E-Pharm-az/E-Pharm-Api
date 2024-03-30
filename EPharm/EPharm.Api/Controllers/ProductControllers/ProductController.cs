@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.ProductDtos;
-using EPharm.Domain.Interfaces.Pharma;
-using EPharm.Domain.Interfaces.Product;
+using EPharm.Domain.Interfaces.PharmaContracts;
+using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,8 +1,7 @@
 using EPharm.Domain.Models.Jwt;
 using EPharm.Infrastructure.Context.Entities.Identity;
-using Microsoft.AspNetCore.Identity;
 
-namespace EPharm.Domain.Interfaces.Jwt;
+namespace EPharm.Domain.Interfaces.JwtContracts;
 
 public interface ITokenCreationService
 {

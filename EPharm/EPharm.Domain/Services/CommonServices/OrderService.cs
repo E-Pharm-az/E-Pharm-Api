@@ -1,12 +1,12 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.OrderDto;
-using EPharm.Domain.Interfaces;
+using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Product;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
-namespace EPharm.Domain.Services;
+namespace EPharm.Domain.Services.CommonServices;
 
 public class OrderService(IOrderRepository orderRepository, IOrderProductRepository orderProductRepository,IMapper mapper) : IOrderService
 {

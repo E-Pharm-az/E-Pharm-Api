@@ -2,15 +2,15 @@ using AutoMapper;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 using EPharm.Domain.Dtos.UserDto;
-using EPharm.Domain.Interfaces.Pharma;
-using EPharm.Domain.Interfaces.User;
+using EPharm.Domain.Interfaces.CommonContracts;
+using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
 using EPharm.Infrastructure.Context.Entities.Identity;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace EPharm.Domain.Services.UserServices;
+namespace EPharm.Domain.Services.CommonServices;
 
 public class UserService(
     UserManager<AppIdentityUser> userManager,

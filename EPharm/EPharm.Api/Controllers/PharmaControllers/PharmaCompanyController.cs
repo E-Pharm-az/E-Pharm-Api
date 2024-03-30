@@ -1,5 +1,5 @@
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
-using EPharm.Domain.Interfaces.Pharma;
+using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

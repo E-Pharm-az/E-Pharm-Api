@@ -1,5 +1,5 @@
 using System.Security.Cryptography;
-using EPharm.Domain.Interfaces.Jwt;
+using EPharm.Domain.Interfaces.JwtContracts;
 
 namespace EPharm.Domain.Services.JwtServices;
 

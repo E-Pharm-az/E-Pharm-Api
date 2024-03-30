@@ -1,10 +1,10 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.WarehouseDto;
-using EPharm.Domain.Interfaces;
+using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
-namespace EPharm.Domain.Services;
+namespace EPharm.Domain.Services.CommonServices;
 
 public class WarehouseService(IWarehouseRepository warehouseRepository, IMapper mapper) : IWarehouseService
 {

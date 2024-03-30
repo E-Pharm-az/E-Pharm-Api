@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.OrderDto;
 
-namespace EPharm.Domain.Interfaces;
+namespace EPharm.Domain.Interfaces.CommonContracts;
 
 public interface IOrderService
 {

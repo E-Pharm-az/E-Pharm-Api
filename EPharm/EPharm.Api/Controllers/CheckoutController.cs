@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Interfaces;
+using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,4 @@
-namespace EPharm.Domain.Interfaces.Jwt;
+namespace EPharm.Domain.Interfaces.JwtContracts;
 
 public interface ITokenRefreshService
 {

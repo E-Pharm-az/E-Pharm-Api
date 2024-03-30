@@ -2,7 +2,7 @@ using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 using EPharm.Domain.Dtos.UserDto;
 
-namespace EPharm.Domain.Interfaces.User;
+namespace EPharm.Domain.Interfaces.CommonContracts;
 
 public interface IUserService
 {
