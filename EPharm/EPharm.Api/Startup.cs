@@ -127,13 +127,17 @@ public class Startup(IConfiguration configuration)
             });
 
         services.AddCors(ops =>
-            ops.AddPolicy("AllowAnyOrigins", builder => 
+        {
+            ops.AddPolicy("LocalhostPolicy", builder =>
                 builder.WithOrigins("http://localhost:5173")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
                     .WithHeaders("Content-Type", "Authorization")
-            ));
+            );
+
+            ops.AddPolicy("AllowAnyOrigins", builder => builder.AllowAnyOrigin());
+        });
         
         StripeConfiguration.ApiKey = configuration["StripeConfig:SecretKey"];
         
@@ -208,6 +212,11 @@ public class Startup(IConfiguration configuration)
         {
             app.UseSwagger();
             app.UseSwaggerUI();
+            app.UseCors("LocalhostPolicy");
+        }
+        else
+        {
+            app.UseCors("AllowAnyOrigins");
         }
 
         app.UseHealthChecks("/_health", new HealthCheckOptions
@@ -215,8 +224,6 @@ public class Startup(IConfiguration configuration)
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
         });
         
-        app.UseCors("AllowAnyOrigins");
-    
         app.UseRouting();
     
         app.UseAuthentication();
