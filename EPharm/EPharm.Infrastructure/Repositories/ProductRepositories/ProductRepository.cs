@@ -39,6 +39,14 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
             .AsNoTracking()
             .SingleOrDefaultAsync();
 
-    public async Task<IEnumerable<Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId) =>
-        await Entities.Where(product => product.PharmaCompanyId == pharmaCompanyId).AsNoTracking().ToListAsync();
+    public async Task<IEnumerable<Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page, int pageSize)
+    {
+        var skip = (page - 1) * pageSize;
+        
+        return await Entities.Where(product => product.PharmaCompanyId == pharmaCompanyId)
+            .OrderByDescending(product => product.Name)
+            .Skip(skip)
+            .Take(pageSize)
+            .AsNoTracking().ToListAsync();
+    }
 }

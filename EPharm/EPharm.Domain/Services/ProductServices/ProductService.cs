@@ -29,9 +29,9 @@ public class ProductService(
         return mapper.Map<IEnumerable<GetProductDto>>(products);
     }
 
-    public async Task<IEnumerable<GetProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId)
+    public async Task<IEnumerable<GetProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page)
     {
-        var products = await productRepository.GetAllPharmaCompanyProductsAsync(pharmaCompanyId);
+        var products = await productRepository.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page, pageSize: 30);
         return mapper.Map<IEnumerable<GetProductDto>>(products);
     }
 
@@ -41,9 +41,9 @@ public class ProductService(
         return mapper.Map<GetFullProductDto>(product);
     }
 
-    public async Task<IEnumerable<GetProductDto>> SearchProduct(string parameter)
+    public async Task<IEnumerable<GetProductDto>> SearchProduct(string parameter, int page)
     {
-        var allProducts = await productRepository.GetAllAsync();
+        var allProducts = await productRepository.GetAlLProductsAsync(page, pageSize: 30);
 
         var filteredProducts = allProducts.Where(p =>
             p.Name.Contains(parameter, StringComparison.OrdinalIgnoreCase) ||

@@ -21,8 +21,7 @@ public class PharmaCompanyService(IPharmaCompanyRepository pharmaCompanyReposito
         return mapper.Map<GetPharmaCompanyDto>(pharmaCompany);
     }
 
-    public async Task<GetPharmaCompanyDto> CreatePharmaCompanyAsync(CreatePharmaCompanyDto pharmaCompanyDto,
-        string pharmaAdminId)
+    public async Task<GetPharmaCompanyDto> CreatePharmaCompanyAsync(CreatePharmaCompanyDto pharmaCompanyDto, string pharmaAdminId)
     {
         try
         {

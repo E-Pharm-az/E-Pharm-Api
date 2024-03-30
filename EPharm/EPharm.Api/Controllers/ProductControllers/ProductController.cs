@@ -22,18 +22,18 @@ public class ProductController(IProductService productService, IPharmaCompanySer
         return NotFound("Products not found.");
     }
 
-    [HttpGet("search/{parameter}")]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct(string parameter)
+    [HttpGet("search/{parameter}/{page:int}")]
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct(string parameter, int page)
     {
-        var result = await productService.SearchProduct(parameter);
+        var result = await productService.SearchProduct(parameter, page);
         if (result.Any()) return Ok(result);
 
         return NotFound("Products not found.");
     }
 
-    [HttpGet("pharma-company/{pharmaCompanyId:int}/[controller]")]
+    [HttpGet("pharma-company/{pharmaCompanyId:int}/[controller]/{page:int}")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllPharmaCompanyProducts(int pharmaCompanyId)
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllPharmaCompanyProducts(int pharmaCompanyId, int page)
     {
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
@@ -47,7 +47,7 @@ public class ProductController(IProductService productService, IPharmaCompanySer
                 return Forbid();
         }
 
-        var result = await productService.GetAllPharmaCompanyProductsAsync(pharmaCompanyId);
+        var result = await productService.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page);
         if (result.Any()) return Ok(result);
 
         return NotFound("Pharma company products not found.");
