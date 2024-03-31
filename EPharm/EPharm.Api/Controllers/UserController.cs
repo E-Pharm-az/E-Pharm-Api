@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using EPharm.Domain.Dtos.UserDto;
-using EPharm.Domain.Interfaces;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;

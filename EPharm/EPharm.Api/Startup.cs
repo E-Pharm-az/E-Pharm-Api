@@ -86,7 +86,7 @@ public class Startup(IConfiguration configuration)
 
         services.AddIdentity<AppIdentityUser, IdentityRole>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedAccount = true; // Set this to false for development
                 options.User.RequireUniqueEmail = true;
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;
@@ -94,7 +94,8 @@ public class Startup(IConfiguration configuration)
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;
             })
-            .AddEntityFrameworkStores<AppIdentityDbContext>();
+            .AddEntityFrameworkStores<AppIdentityDbContext>()
+            .AddDefaultTokenProviders();
 
         services.AddAuthentication(options =>
             {
@@ -200,7 +201,9 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
         services.AddScoped<IUserService, UserService>();
-
+        
+        services.AddScoped<IEmailService, EmailService>();
+        
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<ITokenCreationService, TokenCreationService>();
         services.AddScoped<ITokenRefreshService, TokenRefreshService>();

@@ -34,53 +34,28 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
         return await ProcessLogin(request, IdentityData.Admin);
     }
 
-    private async Task<IActionResult> ProcessLogin(AuthRequest request, string requiredRole)
+    [HttpGet]
+    [Route("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        var user = await userManager.FindByEmailAsync(request.Email);
-
-        if (user == null)
-            return BadRequest("Bad credentials");
-
-        var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
-
-        if (!isPasswordValid)
-            return BadRequest("Bad credentials");
-
         try
         {
-            var roles = (await userManager.GetRolesAsync(user)).ToList();
-            if (!roles.Contains(requiredRole))
-                return BadRequest("Bad credentials");
+            var user = await userManager.FindByIdAsync(userId);
 
-            var auth = tokenService.CreateToken(user, roles);
-            
-            user.RefreshToken = tokenService.RefreshToken();
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-            auth.RefreshToken = user.RefreshToken;
-            
-            await userManager.UpdateAsync(user);
-            
-            HttpContext.Response.Cookies.Append("token", auth.Token, new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
-            });
-            
-            HttpContext.Response.Cookies.Append("refreshToken", user.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = user.RefreshTokenExpiryTime
-            });
+            if (user == null)
+                return BadRequest("User not found");
 
-            return Ok(auth);
+            var result = await userManager.ConfirmEmailAsync(user, token);
+
+            if (result.Succeeded)
+                return Ok("Email confirmed successfully");
+
+            return BadRequest("Email confirmation failed");
         }
         catch (Exception ex)
         {
-            Log.Error("Error logging in, User id: {UserId}, Error: {Error}", user.Id, ex.Message);
-            return BadRequest("An unexpected error occurred while logging in");
+            Log.Error(ex, "An error occurred while confirming email");
+            return StatusCode(500, "An unexpected error occurred");
         }
     }
 
@@ -143,6 +118,56 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
         {
             Log.Error(ex, "An error occurred while refreshing token");
             return StatusCode(500, "An unexpected error occurred");
+        }
+    }
+    
+    private async Task<IActionResult> ProcessLogin(AuthRequest request, string requiredRole)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        var user = await userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
+            return BadRequest("Bad credentials");
+
+        var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
+
+        if (!isPasswordValid)
+            return BadRequest("Bad credentials");
+
+        try
+        {
+            var roles = (await userManager.GetRolesAsync(user)).ToList();
+            if (!roles.Contains(requiredRole))
+                return BadRequest("Bad credentials");
+
+            var auth = tokenService.CreateToken(user, roles);
+            
+            user.RefreshToken = tokenService.RefreshToken();
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+            auth.RefreshToken = user.RefreshToken;
+            
+            await userManager.UpdateAsync(user);
+            
+            HttpContext.Response.Cookies.Append("token", auth.Token, new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
+            });
+            
+            HttpContext.Response.Cookies.Append("refreshToken", user.RefreshToken, new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = user.RefreshTokenExpiryTime
+            });
+
+            return Ok(auth);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error logging in, User id: {UserId}, Error: {Error}", user.Id, ex.Message);
+            return BadRequest("An unexpected error occurred while logging in");
         }
     }
 }

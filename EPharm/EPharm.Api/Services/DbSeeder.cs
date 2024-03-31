@@ -30,7 +30,8 @@ public class DbSeeder(
                     Email = configuration["SuperAdmin:Email"],
                     FirstName = configuration["SuperAdmin:FirstName"],
                     LastName = configuration["SuperAdmin:LastName"],
-                    Fin = configuration["SuperAdmin:Fin"]
+                    Fin = configuration["SuperAdmin:Fin"],
+                    EmailConfirmed = true
                 };
 
                 var result = await userManager.CreateAsync(superAdmin, configuration["SuperAdmin:Password"]!);
@@ -39,6 +40,8 @@ public class DbSeeder(
                 {
                     await userManager.AddToRoleAsync(superAdmin, IdentityData.SuperAdmin);
                     await userManager.AddToRoleAsync(superAdmin, IdentityData.Admin);
+
+                    
                     
                     Log.Information("SuperAdmin user created successfully.");
                 }
