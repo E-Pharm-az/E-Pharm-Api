@@ -1,3 +1,4 @@
+using System.Net;
 using AutoMapper;
 using EPharm.Domain.Dtos.EmailDto;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
@@ -44,7 +45,7 @@ public class UserService(
             if (existingUser is not null)
                 throw new InvalidOperationException("User with this email already exists.");
 
-            var user = await CreateUserAsync(createUserDto, [IdentityData.Customer], configuration["AppConfig:EpharmClient"]!);
+            var user = await CreateUserAsync(createUserDto, [IdentityData.Customer], configuration["AppUrls:EpharmClient"]!);
             return user;
         }
         catch (Exception ex)
@@ -57,7 +58,7 @@ public class UserService(
     {
         try
         {
-            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager], configuration["AppConfig:PharmaPortalClient"]!);
+            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager], configuration["AppUrls:PharmaPortalClient"]!);
 
             var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
             pharmaCompanyManagerEntity.ExternalId = user.Id;
@@ -76,7 +77,7 @@ public class UserService(
     {
         try
         {
-            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager], configuration["AppConfig:PharmaPortalClient"]!);
+            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager], configuration["AppUrls:PharmaPortalClient"]!);
 
             await unitOfWork.BeginTransactionAsync();
             var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
@@ -156,13 +157,14 @@ public class UserService(
                 await userManager.AddToRoleAsync(userEntity, role);
             }
 
-            var code = await userManager.GenerateEmailConfirmationTokenAsync(userEntity);
+            var token = await userManager.GenerateEmailConfirmationTokenAsync(userEntity);
+            var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
             
             await emailService.SendEmailAsync(new CreateEmailDto
             {
                 Email = userEntity.Email,
                 Subject = "Confirm your account",
-                Message = $"Please confirm your account by clicking this link: <a href='{url}/auth/confirm-email?userId=" + userEntity.Id + "&code=" + code + "'>link</a>"
+                Message = $"Please confirm your account by clicking this link: <a href='{url}/confirm-email?userId={userEntity.Id}&token={encodedToken}'>link</a>"
             });
 
             return mapper.Map<GetUserDto>(userEntity);

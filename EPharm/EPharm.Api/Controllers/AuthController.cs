@@ -1,3 +1,4 @@
+using System.Net;
 using System.Security.Claims;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
@@ -11,7 +12,10 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IConfiguration configuration, UserManager<AppIdentityUser> userManager, ITokenService tokenService) : ControllerBase
+public class AuthController(
+    IConfiguration configuration,
+    UserManager<AppIdentityUser> userManager,
+    ITokenService tokenService) : ControllerBase
 {
     [HttpPost]
     [Route("login/store")]
@@ -19,14 +23,14 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
     {
         return await ProcessLogin(request, IdentityData.Customer);
     }
-    
+
     [HttpPost]
     [Route("login/pharma")]
     public async Task<IActionResult> LoginPharm([FromBody] AuthRequest request)
     {
         return await ProcessLogin(request, IdentityData.PharmaCompanyManager);
     }
-    
+
     [HttpPost]
     [Route("login/admin")]
     public async Task<IActionResult> LoginAdmin([FromBody] AuthRequest request)
@@ -38,25 +42,21 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
     [Route("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
     {
-        try
-        {
-            var user = await userManager.FindByIdAsync(userId);
+        var decodedToken = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(token));
+        
+        var user = await userManager.FindByIdAsync(userId);
 
-            if (user == null)
-                return BadRequest("User not found");
+        if (user == null)
+            return BadRequest("User not found");
 
-            var result = await userManager.ConfirmEmailAsync(user, token);
+        var result = await userManager.ConfirmEmailAsync(user, decodedToken);
 
-            if (result.Succeeded)
-                return Ok("Email confirmed successfully");
+        if (result.Succeeded)
+            return Ok("Email confirmed successfully");
 
-            return BadRequest("Email confirmation failed");
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "An error occurred while confirming email");
-            return StatusCode(500, "An unexpected error occurred");
-        }
+        var errorMessage = string.Join(",", result.Errors);
+        Log.Error("Error confirming email, user id: {useId}, error details: {errorMessage}", userId, errorMessage);
+        return BadRequest($"Error confirming email, details: {errorMessage}");
     }
 
     [HttpGet]
@@ -95,14 +95,15 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
 
             var user = await userManager.FindByEmailAsync(emailClaim);
 
-            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            if (user == null || user.RefreshToken != request.RefreshToken ||
+                user.RefreshTokenExpiryTime <= DateTime.UtcNow)
             {
                 Log.Warning("Invalid access token or refresh token");
                 return BadRequest("Invalid access token or refresh token");
             }
 
             var roles = await userManager.GetRolesAsync(user);
-            
+
             var response = tokenService.CreateToken(user, roles.ToList());
             response.RefreshToken = user.RefreshToken;
 
@@ -120,7 +121,7 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
             return StatusCode(500, "An unexpected error occurred");
         }
     }
-    
+
     private async Task<IActionResult> ProcessLogin(AuthRequest request, string requiredRole)
     {
         if (!ModelState.IsValid)
@@ -136,6 +137,9 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
         if (!isPasswordValid)
             return BadRequest("Bad credentials");
 
+        if (!user.EmailConfirmed)
+            return BadRequest("Email not confirmed, please check your email for confirmation.");
+
         try
         {
             var roles = (await userManager.GetRolesAsync(user)).ToList();
@@ -143,19 +147,19 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
                 return BadRequest("Bad credentials");
 
             var auth = tokenService.CreateToken(user, roles);
-            
+
             user.RefreshToken = tokenService.RefreshToken();
             user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
             auth.RefreshToken = user.RefreshToken;
-            
+
             await userManager.UpdateAsync(user);
-            
+
             HttpContext.Response.Cookies.Append("token", auth.Token, new CookieOptions
             {
                 HttpOnly = true,
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
             });
-            
+
             HttpContext.Response.Cookies.Append("refreshToken", user.RefreshToken, new CookieOptions
             {
                 HttpOnly = true,
