@@ -4,12 +4,8 @@ namespace EPharm.Domain.Dtos.ManufacturerDto;
 
 public class CreateManufacturerDto
 {
-    [Required]
-    public string ManufacturerName { get; set; }
-    [Required]
+    public string Name { get; set; }
     public string Country { get; set; }
-    [Required]
     public string Website { get; set; }
-    [Required]
     public string Email { get; set; }
 }

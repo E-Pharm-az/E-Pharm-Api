@@ -4,7 +4,6 @@ namespace EPharm.Domain.Dtos.SideEffectDto;
 
 public class CreateSideEffectDto
 {
-    [Required]
     public string Name { get; set; }
-    public string Description { get; set; }
+    public string? Description { get; set; }
 }

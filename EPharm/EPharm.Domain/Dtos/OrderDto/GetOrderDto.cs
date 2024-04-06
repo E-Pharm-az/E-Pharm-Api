@@ -8,7 +8,7 @@ public class GetOrderDto
     public int TotalPrice { get; set; }
     public string ShippingAddress { get; set; }
     public int[] ProductIds { get; set; }
-    public string UserId { get; set; }
+    public string? UserId { get; set; }
     public int PharmaCompanyId { get; set; }
     public int WarehouseId { get; set; }
 }

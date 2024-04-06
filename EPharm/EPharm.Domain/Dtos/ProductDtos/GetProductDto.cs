@@ -4,10 +4,11 @@ public class GetProductDto
 {
     public int Id { get; set; }
     public int PharmaCompanyId { get; set; }
+    public int[] WarehouseIds { get; set; }
     
-    public string ProductName { get; set; }
-    public string ProductDescription { get; set; }
-    public string ProductImageUrl { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public string? ImageUrl { get; set; }
     public decimal StrengthMg { get; set; }
     public int MaxDayFrequency { get; set; }
     public int MaxSupplyInDaysDays { get; set; }
@@ -27,9 +28,5 @@ public class GetProductDto
 
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }
-
-    public decimal PackagingWidth { get; set; }
-    public decimal PackagingHeight { get; set; }
-    public decimal PackagingLength { get; set; }
     public decimal PackagingWeight { get; set; }
 }

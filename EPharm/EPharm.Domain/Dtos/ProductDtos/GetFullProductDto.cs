@@ -12,10 +12,11 @@ public class GetFullProductDto
 {
     public int Id { get; set; }
     public int PharmaCompanyId { get; set; }
+    public int[] WarehouseIds { get; set; }
     
-    public string ProductName { get; set; }
-    public string ProductDescription { get; set; }
-    public string ProductImageUrl { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public string? ImageUrl { get; set; }
     public decimal StrengthMg { get; set; }
     public int MaxDayFrequency { get; set; }
     public int MaxSupplyInDaysDays { get; set; }
@@ -26,15 +27,6 @@ public class GetFullProductDto
     public int SpecialRequirementsId { get; set; }
     public int ManufacturerId { get; set; }
     public int RegulatoryInformationId { get; set; }
-
-    public DateTime ManufacturingDate { get; set; }
-    public DateTime ExpiryDate { get; set; }
-
-    public int Stock { get; set; }
-    public int Price { get; set; }
-
-    public string BatchNumber { get; set; }
-    public string Barcode { get; set; }
     
     public ICollection<GetActiveIngredientDto> ActiveIngredient { get; set; }
     public ICollection<GetDosageFormDto> DosageForms { get; set; }
@@ -44,8 +36,15 @@ public class GetFullProductDto
     public ICollection<GetAllergyDto> Allergies { get; set; }
     public ICollection<GetIndicationDto> Indications { get; set; }
 
-    public decimal PackagingWidth { get; set; }
-    public decimal PackagingHeight { get; set; }
-    public decimal PackagingLength { get; set; }
+    public DateTime ManufacturingDate { get; set; }
+    public DateTime ExpiryDate { get; set; }
+
+    public int Stock { get; set; }
+    public int Price { get; set; }
+
+    public string BatchNumber { get; set; }
+    public string Barcode { get; set; }
     public decimal PackagingWeight { get; set; } 
+    
+
 }

@@ -1,4 +1,3 @@
-using System.Net;
 using AutoMapper;
 using EPharm.Domain.Dtos.EmailDto;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
@@ -39,45 +38,34 @@ public class UserService(
 
     public async Task<GetUserDto> CreateCustomerAsync(CreateUserDto createUserDto)
     {
-        try
-        {
-            var existingUser = await userManager.FindByEmailAsync(createUserDto.Email);
-            if (existingUser is not null)
-                throw new InvalidOperationException("User with this email already exists.");
+        var existingUser = await userManager.FindByEmailAsync(createUserDto.Email);
+        if (existingUser is not null)
+            throw new InvalidOperationException("User with this email already exists.");
 
-            var user = await CreateUserAsync(createUserDto, [IdentityData.Customer], configuration["AppUrls:EpharmClient"]!);
-            return user;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var user = await CreateUserAsync(createUserDto, [IdentityData.Customer], configuration["AppUrls:EpharmClient"]!);
+        return user;
     }
 
     public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, CreateUserDto createUserDto)
     {
-        try
-        {
-            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager], configuration["AppUrls:PharmaPortalClient"]!);
+        var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager],
+            configuration["AppUrls:PharmaPortalClient"]!);
 
-            var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
-            pharmaCompanyManagerEntity.ExternalId = user.Id;
-            pharmaCompanyManagerEntity.PharmaCompanyId = pharmaCompanyId;
+        var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
+        pharmaCompanyManagerEntity.ExternalId = user.Id;
+        pharmaCompanyManagerEntity.PharmaCompanyId = pharmaCompanyId;
 
-            var result = await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var result = await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
+        return result;
     }
 
     public async Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(CreateUserDto createUserDto, CreatePharmaCompanyDto createPharmaCompanyDto)
     {
         try
         {
-            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager], configuration["AppUrls:PharmaPortalClient"]!);
+            var user = await CreateUserAsync(createUserDto,
+                [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager],
+                configuration["AppUrls:PharmaPortalClient"]!);
 
             await unitOfWork.BeginTransactionAsync();
             var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
@@ -91,24 +79,17 @@ public class UserService(
 
             return result;
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             await unitOfWork.RollbackTransactionAsync();
-            throw new Exception(ex.Message);
+            throw;
         }
     }
 
     public async Task<GetUserDto> CreateAdminAsync(CreateUserDto createUserDto)
     {
-        try
-        {
-            var user = await CreateUserAsync(createUserDto, [IdentityData.Admin], configuration["AppConfig:AdminPortalClient"]!);
-            return user;
-        }
-        catch (Exception ex)
-        {
-            throw new Exception(ex.Message);
-        }
+        var user = await CreateUserAsync(createUserDto, [IdentityData.Admin], configuration["AppConfig:AdminPortalClient"]!);
+        return user;
     }
 
     public async Task<bool> UpdateUserAsync(string id, CreateUserDto createUserDto)
@@ -140,6 +121,10 @@ public class UserService(
     {
         var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
         userEntity.UserName = createUserDto.Email;
+
+        if (identityRole.Any(role => role != IdentityData.Customer))
+            userEntity.EmailConfirmed = true;
+
         var result = await userManager.CreateAsync(userEntity, createUserDto.Password);
 
         foreach (var role in identityRole)
@@ -150,26 +135,25 @@ public class UserService(
             }
         }
 
-        if (result.Succeeded)
+        if (!result.Succeeded)
+            throw new InvalidOperationException($"Failed to create user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
+
+        foreach (var role in identityRole)
         {
-            foreach (var role in identityRole)
-            {
-                await userManager.AddToRoleAsync(userEntity, role);
-            }
-
-            var token = await userManager.GenerateEmailConfirmationTokenAsync(userEntity);
-            var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
-            
-            await emailService.SendEmailAsync(new CreateEmailDto
-            {
-                Email = userEntity.Email,
-                Subject = "Confirm your account",
-                Message = $"Please confirm your account by clicking this link: <a href='{url}/confirm-email?userId={userEntity.Id}&token={encodedToken}'>link</a>"
-            });
-
-            return mapper.Map<GetUserDto>(userEntity);
+            await userManager.AddToRoleAsync(userEntity, role);
         }
 
-        throw new InvalidOperationException($"Failed to create user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(userEntity);
+        var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
+
+        await emailService.SendEmailAsync(new CreateEmailDto
+        {
+            Email = userEntity.Email,
+            Subject = "Confirm your account",
+            Message =
+                $"Please confirm your account by clicking this link: <a href='{url}/confirm-email?userId={userEntity.Id}&token={encodedToken}'>link</a>"
+        });
+
+        return mapper.Map<GetUserDto>(userEntity);
     }
 }

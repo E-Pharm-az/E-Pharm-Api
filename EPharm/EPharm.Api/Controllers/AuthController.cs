@@ -1,4 +1,3 @@
-using System.Net;
 using System.Security.Claims;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
