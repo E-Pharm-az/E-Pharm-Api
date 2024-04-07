@@ -3,7 +3,7 @@ namespace EPharm.Domain.Dtos.PharmaCompanyDtos;
 public class GetPharmaCompanyDto
 {
     public int Id { get; set; }
-    public string PharmaCompanyOwnerId { get; set; } 
+    public string OwnerId { get; set; } 
     public string TIN { get; set; }
     public string Name { get; set; }
     public string Location { get; set; }

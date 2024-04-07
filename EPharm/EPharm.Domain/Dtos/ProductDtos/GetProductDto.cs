@@ -4,7 +4,6 @@ public class GetProductDto
 {
     public int Id { get; set; }
     public int PharmaCompanyId { get; set; }
-    public int[] WarehouseIds { get; set; }
     
     public string Name { get; set; }
     public string Description { get; set; }
@@ -25,6 +24,7 @@ public class GetProductDto
 
     public int Stock { get; set; }
     public int Price { get; set; }
+    // TODO: Add stock info here
 
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }

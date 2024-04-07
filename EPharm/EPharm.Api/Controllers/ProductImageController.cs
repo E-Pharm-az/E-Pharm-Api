@@ -25,7 +25,7 @@ public class ProductImageController(IPharmaCompanyService pharmaCompanyService, 
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             
-            if (company.PharmaCompanyOwnerId != userId)
+            if (company.OwnerId != userId)
                 return Forbid();
         } 
         

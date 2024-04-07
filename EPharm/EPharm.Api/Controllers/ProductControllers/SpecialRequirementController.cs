@@ -11,9 +11,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]/{pharmaCompanyId:int}/[controller]")]
-public class SpecialRequirementController(
-    ISpecialRequirementService specialRequirementService,
-    IPharmaCompanyService pharmaCompanyService) : ControllerBase
+public class SpecialRequirementController(ISpecialRequirementService specialRequirementService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
@@ -27,8 +25,9 @@ public class SpecialRequirementController(
 
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
 
@@ -49,8 +48,9 @@ public class SpecialRequirementController(
 
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
 
@@ -62,8 +62,7 @@ public class SpecialRequirementController(
 
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmaCompanyManager)]
-    public async Task<ActionResult<GetSpecialRequirementDto>> CreateSpecialRequirement(int pharmaCompanyId,
-        [FromBody] CreateSpecialRequirementDto specialRequirementDto)
+    public async Task<ActionResult<GetSpecialRequirementDto>> CreateSpecialRequirement(int pharmaCompanyId, [FromBody] CreateSpecialRequirementDto specialRequirementDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
@@ -72,12 +71,15 @@ public class SpecialRequirementController(
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
+        
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+        
+        if (company.OwnerId != userId)
+            return Forbid();
 
         try
         {
-            var result =
-                await specialRequirementService.AddCompanySpecialRequirementAsync(pharmaCompanyId,
-                    specialRequirementDto);
+            var result = await specialRequirementService.AddCompanySpecialRequirementAsync(pharmaCompanyId, specialRequirementDto);
             return Ok(result);
         }
         catch (Exception ex)
@@ -101,8 +103,9 @@ public class SpecialRequirementController(
 
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
 
@@ -123,8 +126,9 @@ public class SpecialRequirementController(
 
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         

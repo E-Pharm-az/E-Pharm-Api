@@ -1,5 +1,4 @@
 using EPharm.Domain.Dtos.WarehouseDto;
-using EPharm.Domain.Interfaces;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
@@ -25,12 +24,14 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         
         var result = await warehouseService.GetAllCompanyWarehousesAsync(pharmaCompanyId);
+        
         if (result.Any()) return Ok(result);
 
         return NotFound("Warehouses not found.");
@@ -47,8 +48,9 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         
@@ -70,8 +72,9 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
         
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-        if (company.PharmaCompanyOwnerId != userId.Value)
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+        
+        if (company.OwnerId != userId)
             return Forbid();
 
         try
@@ -98,8 +101,9 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
         
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-        if (company.PharmaCompanyOwnerId != userId.Value)
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+        
+        if (company.OwnerId != userId)
             return Forbid();
         
         var result = await warehouseService.UpdateWarehouseAsync(id, warehouseDto);
@@ -117,8 +121,9 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
         
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-        if (company.PharmaCompanyOwnerId != userId.Value)
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+         
+        if (company.OwnerId != userId)
             return Forbid();
         
         var result = await warehouseService.DeleteWarehouseAsync(id);

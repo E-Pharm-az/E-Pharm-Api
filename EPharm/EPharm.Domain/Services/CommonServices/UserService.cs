@@ -63,11 +63,9 @@ public class UserService(
     {
         try
         {
-            var user = await CreateUserAsync(createUserDto,
-                [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager],
-                configuration["AppUrls:PharmaPortalClient"]!);
-
             await unitOfWork.BeginTransactionAsync();
+            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager], configuration["AppUrls:PharmaPortalClient"]!);
+
             var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
 
             var pharmaCompanyAdminEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);

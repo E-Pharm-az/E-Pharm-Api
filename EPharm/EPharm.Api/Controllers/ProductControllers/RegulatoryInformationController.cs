@@ -23,8 +23,9 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         
@@ -45,8 +46,9 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         
@@ -68,6 +70,11 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
+        
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+    
+        if (company.OwnerId != userId)
+            return Forbid(); 
 
         try
         {
@@ -91,8 +98,9 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         
@@ -113,8 +121,9 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         

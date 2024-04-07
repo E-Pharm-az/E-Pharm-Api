@@ -36,7 +36,7 @@ public class OrderController(IOrderService orderService, IPharmaCompanyService p
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (company.PharmaCompanyOwnerId != userId)
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         

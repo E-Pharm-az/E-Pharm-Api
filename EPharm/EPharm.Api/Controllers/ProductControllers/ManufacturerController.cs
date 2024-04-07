@@ -24,13 +24,16 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         
         var result = await manufacturerService.GetAllCompanyManufacturersAsync(pharmaCompanyId);
-        if (result.Any()) return Ok(result);
+        
+        if (result.Any())
+            return Ok(result);
 
         return NotFound("Manufacturers not found.");
     }
@@ -46,8 +49,8 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            if (company.OwnerId != userId)
                 return Forbid();
         }
         
@@ -69,9 +72,9 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
         
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
         
-        if (company.PharmaCompanyOwnerId != userId.Value)
+        if (company.OwnerId != userId)
             return Forbid();
 
         try
@@ -100,8 +103,8 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            if (company.OwnerId != userId)
                 return Forbid();
         }
 
@@ -124,8 +127,9 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         } 
         

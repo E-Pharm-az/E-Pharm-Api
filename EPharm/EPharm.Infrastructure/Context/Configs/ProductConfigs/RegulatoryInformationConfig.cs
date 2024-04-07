@@ -8,7 +8,7 @@ public class RegulatoryInformationConfig : IEntityTypeConfiguration<RegulatoryIn
 {
     public void Configure(EntityTypeBuilder<RegulatoryInformation> builder)
     {
-        builder.Property(ri => ri.RegulatoryStandards)
+        builder.Property(ri => ri.Name)
             .IsRequired()
             .HasMaxLength(255);
         

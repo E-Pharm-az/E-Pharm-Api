@@ -15,7 +15,7 @@ public class IndicationController(IIndicationService indicationService) : Contro
     public async Task<ActionResult<IEnumerable<GetIndicationDto>>> GetAllIndications()
     {
         var result = await indicationService.GetAllIndicationsAsync();
-        if (result.Any()) return Ok(result);
+        if (result.Count != 0) return Ok(result);
 
         return NotFound("Indications not found.");
     }

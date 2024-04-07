@@ -1,4 +1,4 @@
-using System.ComponentModel.DataAnnotations;
+using EPharm.Domain.Dtos.WarehouseDto;
 using Microsoft.AspNetCore.Http;
 
 namespace EPharm.Domain.Dtos.ProductDtos;
@@ -7,7 +7,6 @@ public class CreateProductDto
 {
     public string Name { get; set; }
     public string Description { get; set; }
-    public int[] WarehouseId { get; set; }
     
     public IFormFile? Image { get; set; }
     public decimal StrengthMg { get; set; }
@@ -29,7 +28,7 @@ public class CreateProductDto
     public int[] UsageWarningsIds { get; set; }
     
     public DateTime ExpiryDate { get; set; }
-    public int Stock { get; set; }
+    public IEnumerable<Stock> Stocks { get; set; }
     public int Price { get; set; }
     public int CostPerItem { get; set; }
     public string BatchNumber { get; set; }

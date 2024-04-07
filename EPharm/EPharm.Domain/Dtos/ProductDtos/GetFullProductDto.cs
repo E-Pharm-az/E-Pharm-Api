@@ -8,6 +8,8 @@ using EPharm.Domain.Dtos.UsageWarningDto;
 
 namespace EPharm.Domain.Dtos.ProductDtos;
 
+// TODO: Change fields into correlated object models
+
 public class GetFullProductDto
 {
     public int Id { get; set; }
@@ -45,6 +47,4 @@ public class GetFullProductDto
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }
     public decimal PackagingWeight { get; set; } 
-    
-
 }

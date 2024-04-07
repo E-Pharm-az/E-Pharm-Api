@@ -8,7 +8,7 @@ public class UsageWarningConfig : IEntityTypeConfiguration<UsageWarning>
 {
     public void Configure(EntityTypeBuilder<UsageWarning> builder)
     {
-        builder.Property(uw => uw.Description)
+        builder.Property(uw => uw.Name)
             .IsRequired()
             .HasMaxLength(500);
         

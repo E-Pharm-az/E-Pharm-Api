@@ -22,17 +22,10 @@ public class PharmaCompanyManagerService(IPharmaCompanyManagerRepository pharmaC
 
     public async Task<GetPharmaCompanyManagerDto> CreatePharmaCompanyManagerAsync(CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
     {
-        try
-        {
-            var pharmaCompanyManagerEntity = mapper.Map<PharmaCompanyManager>(pharmaCompanyManagerDto);
-            var pharmaCompanyManger = await pharmaCompanyManagerRepository.InsertAsync(pharmaCompanyManagerEntity);
+        var pharmaCompanyManagerEntity = mapper.Map<PharmaCompanyManager>(pharmaCompanyManagerDto);
+        var pharmaCompanyManger = await pharmaCompanyManagerRepository.InsertAsync(pharmaCompanyManagerEntity);
 
-            return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManger);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Failed to create pharmaceutical company manager. Details: {ex.Message}");
-        }
+        return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManger);
     }
 
     public async Task<bool> UpdatePharmaCompanyManagerAsync(int id, CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)

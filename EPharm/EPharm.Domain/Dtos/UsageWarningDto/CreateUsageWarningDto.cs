@@ -2,5 +2,5 @@ namespace EPharm.Domain.Dtos.UsageWarningDto;
 
 public class CreateUsageWarningDto
 {
-    public string Description { get; set; }
+    public string Name { get; set; }
 }

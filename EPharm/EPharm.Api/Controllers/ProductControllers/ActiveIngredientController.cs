@@ -11,9 +11,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/active-ingredient")]
-public class ActiveIngredientController(
-    IActiveIngredientService activeIngredientService,
-    IPharmaCompanyService pharmaCompanyService) : ControllerBase
+public class ActiveIngredientController(IActiveIngredientService activeIngredientService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetActiveIngredientDto>>> GetAllActiveIngredients()
@@ -33,12 +31,13 @@ public class ActiveIngredientController(
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
 
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
         
-        if (company.PharmaCompanyOwnerId != userId.Value)
+        if (company.OwnerId != userId)
             return Forbid(); 
         
         var result = await activeIngredientService.GetAllCompanyActiveIngredientsAsync(pharmaCompanyId);
+        
         if (result.Any()) return Ok(result);
 
         return NotFound("Active ingredients not found.");
@@ -66,9 +65,9 @@ public class ActiveIngredientController(
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
 
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
     
-        if (company.PharmaCompanyOwnerId != userId.Value)
+        if (company.OwnerId != userId)
             return Forbid();
 
         try
@@ -97,8 +96,9 @@ public class ActiveIngredientController(
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         } 
         
@@ -121,8 +121,9 @@ public class ActiveIngredientController(
         
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }  
         

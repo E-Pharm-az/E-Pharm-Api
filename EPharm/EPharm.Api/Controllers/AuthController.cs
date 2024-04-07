@@ -11,31 +11,22 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(
-    IConfiguration configuration,
-    UserManager<AppIdentityUser> userManager,
-    ITokenService tokenService) : ControllerBase
+public class AuthController(IConfiguration configuration, UserManager<AppIdentityUser> userManager, ITokenService tokenService) : ControllerBase
 {
     [HttpPost]
     [Route("login/store")]
-    public async Task<IActionResult> LoginStore([FromBody] AuthRequest request)
-    {
-        return await ProcessLogin(request, IdentityData.Customer);
-    }
+    public async Task<IActionResult> LoginStore([FromBody] AuthRequest request) =>
+         await ProcessLogin(request, IdentityData.Customer);
 
     [HttpPost]
     [Route("login/pharma")]
-    public async Task<IActionResult> LoginPharm([FromBody] AuthRequest request)
-    {
-        return await ProcessLogin(request, IdentityData.PharmaCompanyManager);
-    }
+    public async Task<IActionResult> LoginPharm([FromBody] AuthRequest request) =>
+        await ProcessLogin(request, IdentityData.PharmaCompanyManager);
 
     [HttpPost]
     [Route("login/admin")]
-    public async Task<IActionResult> LoginAdmin([FromBody] AuthRequest request)
-    {
-        return await ProcessLogin(request, IdentityData.Admin);
-    }
+    public async Task<IActionResult> LoginAdmin([FromBody] AuthRequest request) =>
+        await ProcessLogin(request, IdentityData.Admin);
 
     [HttpGet]
     [Route("confirm-email")]
@@ -119,6 +110,16 @@ public class AuthController(
             Log.Error(ex, "An error occurred while refreshing token");
             return StatusCode(500, "An unexpected error occurred");
         }
+    }
+
+    [HttpGet]
+    [Route("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        HttpContext.Response.Cookies.Delete("token");
+        HttpContext.Response.Cookies.Delete("refreshToken");
+
+        return Ok();
     }
 
     private async Task<IActionResult> ProcessLogin(AuthRequest request, string requiredRole)

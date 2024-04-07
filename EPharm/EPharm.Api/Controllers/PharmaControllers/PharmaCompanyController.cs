@@ -35,7 +35,7 @@ public class PharmaCompanyController(IPharmaCompanyService pharmaCompanyService)
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            if (company.OwnerId != userId.Value)
                 return Forbid();
         }
         

@@ -5,7 +5,7 @@ namespace EPharm.Infrastructure.Context.Entities.ProductEntities;
 
 public class RouteOfAdministration : BaseEntity
 {
-    public string Description { get; set; }
+    public string Name { get; set; }
     
     public ICollection<ProductRouteOfAdministration> Products { get; set; }
     public DateTime CreatedAt { get; set; }

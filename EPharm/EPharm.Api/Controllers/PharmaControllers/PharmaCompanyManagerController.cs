@@ -23,7 +23,7 @@ public class PharmaCompanyManagerController(IPharmaCompanyManagerService pharmaC
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            if (company.OwnerId != userId.Value)
                 return Forbid();
         }
 
@@ -45,7 +45,7 @@ public class PharmaCompanyManagerController(IPharmaCompanyManagerService pharmaC
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            if (company.OwnerId != userId.Value)
                 return Forbid();
         }
 

@@ -5,5 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 
 public interface IWarehouseProductRepository : IRepository<WarehouseProduct>
 {
-    public Task InsertWarehouseProductAsync(int warehouseId, int productId, int quantity);
+    public Task InsertWarehouseProductAsync(int productId, int warehouseIds, int quantity);
 }

@@ -42,8 +42,9 @@ public class ProductController(IProductService productService, IPharmaCompanySer
 
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
 
@@ -64,8 +65,7 @@ public class ProductController(IProductService productService, IPharmaCompanySer
 
     [HttpPost("pharma-company/{pharmaCompanyId:int}/[controller]")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager)]
-    public async Task<ActionResult<GetProductDto>> CreateProduct(int pharmaCompanyId,
-        [FromBody] CreateProductDto productDto)
+    public async Task<ActionResult<GetProductDto>> CreateProduct(int pharmaCompanyId, [FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
@@ -75,9 +75,9 @@ public class ProductController(IProductService productService, IPharmaCompanySer
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
 
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
 
-        if (company.PharmaCompanyOwnerId != userId.Value)
+        if (company.OwnerId != userId)
             return Forbid();
 
         try
@@ -88,7 +88,7 @@ public class ProductController(IProductService productService, IPharmaCompanySer
         catch (Exception ex)
         {
             Log.Error("Error creating product, {Error}", ex.Message);
-            return BadRequest(ex.Message);
+            return BadRequest("Error creating a product.");
         }
     }
 
@@ -106,8 +106,9 @@ public class ProductController(IProductService productService, IPharmaCompanySer
 
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
 
@@ -130,8 +131,9 @@ public class ProductController(IProductService productService, IPharmaCompanySer
 
         if (!User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti);
-            if (company.PharmaCompanyOwnerId != userId.Value)
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.OwnerId != userId)
                 return Forbid();
         }
 

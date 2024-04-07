@@ -221,7 +221,7 @@ public class Startup(IConfiguration configuration)
         {
             app.UseCors("AllowAnyOrigins");
         }
-
+            
         app.UseHealthChecks("/_health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,

@@ -1,5 +1,6 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.ProductDtos;
+using EPharm.Domain.Dtos.WarehouseDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
@@ -13,6 +14,7 @@ public class ProductService(
     IUnitOfWork unitOfWork,
     IProductRepository productRepository,
     IProductImageService productImageService,
+    IWarehouseProductRepository warehouseProductRepository,
     IRegulatoryInformationService regulatoryInformationService,
     IProductActiveIngredientRepository productActiveIngredientRepository,
     IProductAllergyRepository productAllergyRepository,
@@ -69,9 +71,12 @@ public class ProductService(
             if (regulatoryInformation is null)
                 throw new ArgumentException("Regulatory information not found");
             
+            await unitOfWork.BeginTransactionAsync();
+            
             var product = await productRepository.InsertAsync(productEntity);
 
-            await unitOfWork.BeginTransactionAsync();
+            foreach (var stock in productDto.Stocks)
+                await warehouseProductRepository.InsertWarehouseProductAsync(product.Id, stock.WarehouseId, stock.Quantity);
             
             await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsIds);
             await productAllergyRepository.InsertProductAllergyAsync(product.Id, productDto.AllergiesIds);

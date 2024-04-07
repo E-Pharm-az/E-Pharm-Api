@@ -8,7 +8,7 @@ public class RouteOfAdministrationConfig : IEntityTypeConfiguration<RouteOfAdmin
 {
     public void Configure(EntityTypeBuilder<RouteOfAdministration> builder)
     {
-        builder.Property(ra => ra.Description)
+        builder.Property(ra => ra.Name)
             .IsRequired()
             .HasMaxLength(255);
  

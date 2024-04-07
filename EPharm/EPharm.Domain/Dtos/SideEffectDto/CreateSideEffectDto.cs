@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace EPharm.Domain.Dtos.SideEffectDto;
 
 public class CreateSideEffectDto
