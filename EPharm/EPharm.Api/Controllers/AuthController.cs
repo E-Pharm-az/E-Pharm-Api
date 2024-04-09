@@ -32,7 +32,7 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
     [Route("confirm-email")]
     public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
     {
-        var decodedToken = System.Text.Encoding.UTF8.GetString(System.Convert.FromBase64String(token));
+        var decodedToken = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
         
         var user = await userManager.FindByIdAsync(userId);
 

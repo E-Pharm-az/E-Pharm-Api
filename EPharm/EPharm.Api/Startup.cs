@@ -29,7 +29,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using Stripe;
 using OrderService = EPharm.Domain.Services.CommonServices.OrderService;
 using ProductService = EPharm.Domain.Services.ProductServices.ProductService;
 using TokenService = EPharm.Domain.Services.JwtServices.TokenService;
@@ -139,8 +138,6 @@ public class Startup(IConfiguration configuration)
 
             ops.AddPolicy("AllowAnyOrigins", builder => builder.AllowAnyOrigin());
         });
-        
-        StripeConfiguration.ApiKey = configuration["StripeConfig:SecretKey"];
         
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

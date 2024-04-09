@@ -3,12 +3,17 @@ using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Product;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 
 namespace EPharm.Domain.Services.CommonServices;
 
-public class OrderService(IOrderRepository orderRepository, IOrderProductRepository orderProductRepository,IMapper mapper) : IOrderService
+public class OrderService(
+    IUnitOfWork unitOfWork,
+    IOrderRepository orderRepository,
+    IOrderProductRepository orderProductRepository,
+    IMapper mapper) : IOrderService
 {
     public async Task<IEnumerable<GetOrderDto>> GetAllOrders()
     {
@@ -43,6 +48,8 @@ public class OrderService(IOrderRepository orderRepository, IOrderProductReposit
             orderEntity.Status = OrderStatus.PendingPayment;
             orderEntity.UserId = userId;
 
+            await unitOfWork.BeginTransactionAsync();
+            
             var order = await orderRepository.InsertAsync(orderEntity);
             
             var orders = orderDto.ProductIds.GroupBy(x => x)
@@ -53,12 +60,16 @@ public class OrderService(IOrderRepository orderRepository, IOrderProductReposit
                 var price = await orderProductRepository.InsertOrderProductAsync(order.Id, orderPair.Key, orderPair.Value);
                 order.TotalPrice += price * orderPair.Value;
             }
+
+            await unitOfWork.CommitTransactionAsync();
+            await unitOfWork.SaveChangesAsync();
             
             return mapper.Map<GetOrderDto>(order);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            throw new InvalidOperationException($"Failed to create order. Details: {ex.Message}");
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
         }
     }
 
