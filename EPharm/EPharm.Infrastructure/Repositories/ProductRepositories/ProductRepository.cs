@@ -14,6 +14,7 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
 
         return await Entities
             .OrderByDescending(product => product.Name)
+            .Include(product => product.Stock).ThenInclude( product => product.Warehouse)
             .Skip(skip)
             .Take(pageSize)
             .AsNoTracking()
@@ -27,7 +28,7 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
             .Include(product => product.SpecialRequirement)
             .Include(product => product.Manufacturer)
             .Include(product => product.RegulatoryInformation)
-            .Include(product => product.WarehouseProducts).ThenInclude(product => product.Warehouse)
+            .Include(product => product.Stock).ThenInclude(product => product.Warehouse)
             .Include(product => product.ActiveIngredients).ThenInclude(product => product.ActiveIngredient)
             .Include(product => product.DosageForms).ThenInclude(product => product.DosageForm)
             .Include(product => product.RouteOfAdministrations).ThenInclude(product => product.RouteOfAdministration)

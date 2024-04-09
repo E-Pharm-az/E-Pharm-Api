@@ -25,6 +25,18 @@ public class ProductService(
     IProductUsageWarningRepository productUsageWarningRepository,
     IMapper mapper) : IProductService
 {
+    public async Task<IEnumerable<GetProductDto>> SearchProduct(string parameter, int page)
+    {
+        var allProducts = await productRepository.GetAlLProductsAsync(page, pageSize: 30);
+
+        var filteredProducts = allProducts.Where(product =>
+            product.Name.Contains(parameter, StringComparison.OrdinalIgnoreCase) ||
+            product.Description.Contains(parameter, StringComparison.OrdinalIgnoreCase)
+        );
+
+        return mapper.Map<IEnumerable<GetProductDto>>(filteredProducts);
+    }
+    
     public async Task<IEnumerable<GetProductDto>> GetAllProductsAsync()
     {
         var products = await productRepository.GetAllAsync();
@@ -39,20 +51,8 @@ public class ProductService(
 
     public async Task<GetFullProductDto?> GetProductByIdAsync(int productId)
     {
-        var product = await productRepository.GetByIdAsync(productId);
+        var product = await productRepository.GetFullProductDetailAsync(productId);
         return mapper.Map<GetFullProductDto>(product);
-    }
-
-    public async Task<IEnumerable<GetProductDto>> SearchProduct(string parameter, int page)
-    {
-        var allProducts = await productRepository.GetAlLProductsAsync(page, pageSize: 30);
-
-        var filteredProducts = allProducts.Where(p =>
-            p.Name.Contains(parameter, StringComparison.OrdinalIgnoreCase) ||
-            p.Description.Contains(parameter, StringComparison.OrdinalIgnoreCase)
-        );
-
-        return mapper.Map<IEnumerable<GetProductDto>>(filteredProducts);
     }
 
     public async Task<GetProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)

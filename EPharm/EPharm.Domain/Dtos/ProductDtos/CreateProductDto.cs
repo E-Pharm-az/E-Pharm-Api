@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.WarehouseDto;
+using EPharm.Domain.Dtos.StockDto;
 using Microsoft.AspNetCore.Http;
 
 namespace EPharm.Domain.Dtos.ProductDtos;
@@ -17,7 +17,6 @@ public class CreateProductDto
     public int SpecialRequirementsId { get; set; }
     public int ManufacturerId { get; set; }
     public int RegulatoryInformationId { get; set; }
-    public DateTime ManufacturingDate { get; set; }
     
     public int[] ActiveIngredientsIds { get; set; }
     public int[] AllergiesIds { get; set; }
@@ -27,10 +26,13 @@ public class CreateProductDto
     public int[] SideEffectsIds { get; set; }
     public int[] UsageWarningsIds { get; set; }
     
+    public DateTime ManufacturingDate { get; set; }
     public DateTime ExpiryDate { get; set; }
-    public IEnumerable<Stock> Stocks { get; set; }
+    
     public int Price { get; set; }
     public int CostPerItem { get; set; }
+    public IEnumerable<CreateStockDto> Stocks { get; set; }
+    
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }
     public decimal PackagingWeight { get; set; }

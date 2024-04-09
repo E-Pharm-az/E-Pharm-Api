@@ -1,6 +1,6 @@
-namespace EPharm.Domain.Dtos.WarehouseDto;
+namespace EPharm.Domain.Dtos.StockDto;
 
-public class Stock
+public class CreateStockDto
 {
     public int WarehouseId { get; set; }
     public int Quantity { get; set; }

@@ -14,7 +14,7 @@ public class WarehouseProductConfig : IEntityTypeConfiguration<WarehouseProduct>
             .IsRequired();
 
         builder.HasOne(wp => wp.Product)
-            .WithMany(p => p.WarehouseProducts)
+            .WithMany(p => p.Stock)
             .HasForeignKey(wp => wp.ProductId)
             .IsRequired();
 

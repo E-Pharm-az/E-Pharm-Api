@@ -12,12 +12,12 @@ public class Product : BaseEntity
     public string Description { get; set; }
     public string? ImageUrl { get; set; }
     public decimal StrengthMg { get; set; }
-    
     public int MaxDayFrequency { get; set; }
     public int MaxSupplyDaysPeriod { get; set; }
-    
     public string ContraindicationsDescription { get; set; }
     public string StorageConditionDescription { get; set; }
+    public DateTime ManufacturingDate { get; set; }
+    public DateTime ExpiryDate { get; set; }
     
     public int SpecialRequirementsId { get; set; }
     public SpecialRequirement SpecialRequirement { get; set; }
@@ -28,13 +28,13 @@ public class Product : BaseEntity
     public int RegulatoryInformationId { get; set; }
     public RegulatoryInformation RegulatoryInformation { get; set; }
     
-    public DateTime ExpiryDate { get; set; }
     public int Price { get; set; }
+    public int CostPerItem { get; set; }
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }
     public decimal PackagingWeight { get; set; }
     
-    public ICollection<WarehouseProduct> WarehouseProducts { get; set; }
+    public ICollection<WarehouseProduct> Stock { get; set; }
     public ICollection<ProductActiveIngredient> ActiveIngredients { get; set; }
     public ICollection<ProductDosageForm> DosageForms { get; set; }
     public ICollection<ProductRouteOfAdministration> RouteOfAdministrations { get; set; }
