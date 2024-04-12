@@ -14,7 +14,7 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
 
         return await Entities
             .OrderByDescending(product => product.Name)
-            .Include(product => product.Stock).ThenInclude( product => product.Warehouse)
+            .Include(product => product.Stock).ThenInclude(product => product.Warehouse)
             .Skip(skip)
             .Take(pageSize)
             .AsNoTracking()

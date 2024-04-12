@@ -21,7 +21,8 @@ public class RegulatoryInformationConfig : IEntityTypeConfiguration<RegulatoryIn
         
         builder.HasMany(ri => ri.Product)
             .WithOne(ri => ri.RegulatoryInformation)
-            .HasForeignKey(ri => ri.RegulatoryInformationId);
+            .HasForeignKey(ri => ri.RegulatoryInformationId)
+            .IsRequired();
 
         builder.Property(ri => ri.Certification)
             .HasMaxLength(255);

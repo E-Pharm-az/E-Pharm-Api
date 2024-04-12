@@ -7,17 +7,9 @@ namespace EPharm.Infrastructure.Repositories.JunctionsRepositories;
 
 public class WarehouseProductRepository(AppDbContext context) : Repository<WarehouseProduct>(context), IWarehouseProductRepository
 {
-    public async Task InsertWarehouseProductAsync(int productId, int warehouseId, int quantity)
+    public async Task InsertWarehouseProductAsync(WarehouseProduct warehouseProduct)
     {
-        await Entities.AddAsync(
-            new WarehouseProduct
-            {
-                WarehouseId = warehouseId,
-                ProductId = productId,
-                Quantity = quantity
-            }
-        );
-
+        await Entities.AddAsync(warehouseProduct);
         await base.SaveChangesAsync();
     }
 }

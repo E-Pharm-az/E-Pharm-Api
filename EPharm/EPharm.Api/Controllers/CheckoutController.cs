@@ -38,7 +38,7 @@ public class CheckoutController(IConfiguration configuration, IOrderService orde
             var accessToken = await GenerateAccessTokenAsync();
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
     
-            var order = await orderService.CreateOrderAsync(userId, orderDto);
+            var order = await orderService.InitializeOrderAsync(userId, orderDto);
             
             var client = new RestClient(configuration["PayPalConfig:Base"]!);
             var request = new RestRequest("/v2/checkout/orders", Method.Post);

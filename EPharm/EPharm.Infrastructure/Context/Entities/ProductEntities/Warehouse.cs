@@ -11,6 +11,7 @@ public class Warehouse : BaseEntity
     public int PharmaCompanyId { get; set; }
     public PharmaCompany PharmaCompany { get; set; }
     public ICollection<WarehouseProduct> WarehouseProducts { get; set; }
+    public ICollection<OrderProduct> OrderProducts;
     
     public DateTime CreatedAt { get; set; }
 }

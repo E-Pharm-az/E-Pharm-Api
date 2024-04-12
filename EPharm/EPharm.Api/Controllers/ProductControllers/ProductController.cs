@@ -14,74 +14,106 @@ namespace EPharmApi.Controllers.ProductControllers;
 public class ProductController(IProductService productService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllProducts()
+    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllProducts()
     {
-        var result = await productService.GetAllProductsAsync();
-        if (result.Any()) return Ok(result);
+        try
+        {
+            var result = await productService.GetAllProductsAsync();
+            if (result.Any()) return Ok(result);
 
-        return NotFound("Products not found.");
+            return NotFound("Products not found.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Internal server error occured. Detail: {error}", ex);
+            return StatusCode(500, "Internal server error occured.");
+        }
     }
 
     [HttpGet("search/{parameter}/{page:int}")]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct(string parameter, int page)
+    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> SearchProduct(string parameter, int page)
     {
-        var result = await productService.SearchProduct(parameter, page);
-        if (result.Any()) return Ok(result);
+        try
+        {
+            var result = await productService.SearchProduct(parameter, page);
+            if (result.Any()) return Ok(result);
 
-        return NotFound("Products not found.");
+            return NotFound("Products not found.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Internal server error occurred. Detail: {error}", ex);
+            return StatusCode(500, "Internal server error occurred.");
+        }
     }
 
     [HttpGet("pharma-company/{pharmaCompanyId:int}/[controller]/{page:int}")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllPharmaCompanyProducts(int pharmaCompanyId, int page)
+    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllPharmaCompanyProducts(int pharmaCompanyId, int page)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
-
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-
-        if (!User.IsInRole(IdentityData.Admin))
+        try
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            
-            if (company.OwnerId != userId)
-                return Forbid();
+            var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+
+            if (company is null)
+                return NotFound("Pharmaceutical company not found.");
+
+            if (!User.IsInRole(IdentityData.Admin))
+            {
+                var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+
+                if (company.OwnerId != userId)
+                    return Forbid();
+            }
+
+            var result = await productService.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page);
+            if (result.Any()) return Ok(result);
+
+            return NotFound("Pharma company products not found.");
         }
-
-        var result = await productService.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page);
-        if (result.Any()) return Ok(result);
-
-        return NotFound("Pharma company products not found.");
+        catch (Exception ex)
+        {
+            Log.Error("Internal server error occurred. Detail: {error}", ex);
+            return StatusCode(500, "Internal server error occurred.");
+        }
     }
 
     [HttpGet("{id:int}", Name = "getProductById")]
-    public async Task<ActionResult<GetProductDto>> GetProductById(int id)
+    public async Task<ActionResult<GetMinimalProductDto>> GetProductById(int id)
     {
-        var result = await productService.GetProductByIdAsync(id);
-        if (result is not null) return Ok(result);
+        try
+        {
+            var result = await productService.GetProductByIdAsync(id);
+            if (result is not null) return Ok(result);
 
-        return NotFound($"Product with ID: {id} not found.");
+            return NotFound($"Product with ID: {id} not found.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Internal server error occurred. Detail: {error}", ex);
+            return StatusCode(500, "Internal server error occurred.");
+        }
     }
-
+    
     [HttpPost("pharma-company/{pharmaCompanyId:int}/[controller]")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager)]
-    public async Task<ActionResult<GetProductDto>> CreateProduct(int pharmaCompanyId, [FromBody] CreateProductDto productDto)
+    public async Task<ActionResult<GetMinimalProductDto>> CreateProduct(int pharmaCompanyId, [FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
-
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-
-        if (company.OwnerId != userId)
-            return Forbid();
-
         try
         {
+            var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+
+            if (company is null)
+                return NotFound("Pharmaceutical company not found.");
+
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+
+            if (company.OwnerId != userId)
+                return Forbid();
+
             var result = await productService.CreateProductAsync(pharmaCompanyId, productDto);
             return Ok(result);
         }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EPharm.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240409191239_InitialMigration")]
+    [Migration("20240410124310_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />
@@ -72,11 +72,16 @@ namespace EPharm.Infrastructure.Migrations
                     b.Property<double>("TotalPrice")
                         .HasColumnType("double precision");
 
+                    b.Property<int>("WarehouseId")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrderId");
 
                     b.HasIndex("ProductId");
+
+                    b.HasIndex("WarehouseId");
 
                     b.ToTable("OrderProducts");
                 });
@@ -514,14 +519,17 @@ namespace EPharm.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("NOW()");
 
                     b.Property<string>("Email")
-                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("FullName")
                         .HasColumnType("text");
 
                     b.Property<string>("PhoneNumber")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ShippingAddress")
@@ -883,9 +891,17 @@ namespace EPharm.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", "Warehouse")
+                        .WithMany("OrderProducts")
+                        .HasForeignKey("WarehouseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+
+                    b.Navigation("Warehouse");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.Junctions.ProductActiveIngredient", b =>
@@ -1271,6 +1287,8 @@ namespace EPharm.Infrastructure.Migrations
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", b =>
                 {
+                    b.Navigation("OrderProducts");
+
                     b.Navigation("WarehouseProducts");
                 });
 #pragma warning restore 612, 618

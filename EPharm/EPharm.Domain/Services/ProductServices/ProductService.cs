@@ -3,6 +3,7 @@ using EPharm.Domain.Dtos.ProductDtos;
 using EPharm.Domain.Dtos.WarehouseDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
+using EPharm.Infrastructure.Context.Entities.Junctions;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
@@ -12,20 +13,19 @@ namespace EPharm.Domain.Services.ProductServices;
 
 public class ProductService(
     IUnitOfWork unitOfWork,
+    IIndicationProductRepository indicationProductRepository,
     IProductRepository productRepository,
     IProductImageService productImageService,
-    IWarehouseProductRepository warehouseProductRepository,
-    IRegulatoryInformationService regulatoryInformationService,
     IProductActiveIngredientRepository productActiveIngredientRepository,
     IProductAllergyRepository productAllergyRepository,
     IProductDosageFormRepository productDosageFormRepository,
-    IIndicationProductRepository indicationProductRepository,
     IProductRouteOfAdministrationRepository productRouteOfAdministrationRepository,
     IProductSideEffectRepository productSideEffectRepository,
     IProductUsageWarningRepository productUsageWarningRepository,
+    IWarehouseProductRepository warehouseProductRepository,
     IMapper mapper) : IProductService
 {
-    public async Task<IEnumerable<GetProductDto>> SearchProduct(string parameter, int page)
+    public async Task<IEnumerable<GetMinimalProductDto>> SearchProduct(string parameter, int page)
     {
         var allProducts = await productRepository.GetAlLProductsAsync(page, pageSize: 30);
 
@@ -34,19 +34,19 @@ public class ProductService(
             product.Description.Contains(parameter, StringComparison.OrdinalIgnoreCase)
         );
 
-        return mapper.Map<IEnumerable<GetProductDto>>(filteredProducts);
+        return mapper.Map<IEnumerable<GetMinimalProductDto>>(filteredProducts);
     }
     
-    public async Task<IEnumerable<GetProductDto>> GetAllProductsAsync()
+    public async Task<IEnumerable<GetMinimalProductDto>> GetAllProductsAsync()
     {
         var products = await productRepository.GetAllAsync();
-        return mapper.Map<IEnumerable<GetProductDto>>(products);
+        return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
     }
 
-    public async Task<IEnumerable<GetProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page)
+    public async Task<IEnumerable<GetMinimalProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page)
     {
         var products = await productRepository.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page, pageSize: 30);
-        return mapper.Map<IEnumerable<GetProductDto>>(products);
+        return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
     }
 
     public async Task<GetFullProductDto?> GetProductByIdAsync(int productId)
@@ -55,28 +55,29 @@ public class ProductService(
         return mapper.Map<GetFullProductDto>(product);
     }
 
-    public async Task<GetProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)
+    public async Task<GetMinimalProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)
     {
         try
         {
             var productEntity = mapper.Map<Product>(productDto);
+            productEntity.PharmaCompanyId = pharmaCompanyId;
             
             if (productDto.Image is not null)
                 productEntity.ImageUrl =  await productImageService.UploadProductImageAsync(productDto.Image);
-            
-            productEntity.PharmaCompanyId = pharmaCompanyId;
-
-            var regulatoryInformation = await regulatoryInformationService.GetRegulatoryInformationByIdAsync(productEntity.RegulatoryInformationId);
-
-            if (regulatoryInformation is null)
-                throw new ArgumentException("Regulatory information not found");
             
             await unitOfWork.BeginTransactionAsync();
             
             var product = await productRepository.InsertAsync(productEntity);
 
             foreach (var stock in productDto.Stocks)
-                await warehouseProductRepository.InsertWarehouseProductAsync(product.Id, stock.WarehouseId, stock.Quantity);
+            {
+                await warehouseProductRepository.InsertWarehouseProductAsync(new WarehouseProduct
+                    {
+                        ProductId = product.Id,
+                        WarehouseId = stock.WarehouseId,
+                        Quantity = stock.Quantity
+                    });
+            }
             
             await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsIds);
             await productAllergyRepository.InsertProductAllergyAsync(product.Id, productDto.AllergiesIds);
@@ -89,16 +90,12 @@ public class ProductService(
             await unitOfWork.CommitTransactionAsync();
             await unitOfWork.SaveChangesAsync();
 
-            return mapper.Map<GetProductDto>(product);
+            return mapper.Map<GetMinimalProductDto>(product);
         }
-        catch (ArgumentException ex)
+        catch (Exception)
         {
             await unitOfWork.RollbackTransactionAsync();
-            throw new ArgumentException($"Failed to create product, detail: {ex}");
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Failed to create product, detail: {ex}");
+            throw;
         }
     }
 

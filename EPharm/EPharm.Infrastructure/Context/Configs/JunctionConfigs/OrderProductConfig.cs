@@ -12,18 +12,23 @@ public class OrderProductConfig : IEntityTypeConfiguration<OrderProduct>
             .WithMany(o => o.OrderProducts)
             .HasForeignKey(op => op.OrderId)
             .IsRequired();
-        
+
         builder.HasOne(op => op.Product)
             .WithMany(p => p.OrderProducts)
             .HasForeignKey(op => op.ProductId)
             .IsRequired();
-        
+
+        builder.HasOne(op => op.Warehouse)
+            .WithMany(o => o.OrderProducts)
+            .HasForeignKey(op => op.WarehouseId)
+            .IsRequired();
+
         builder.Property(op => op.Quantity)
             .IsRequired();
-        
+
         builder.Property(op => op.TotalPrice)
             .IsRequired();
-        
+
         builder.Property(op => op.CreatedAt)
             .IsRequired();
     }

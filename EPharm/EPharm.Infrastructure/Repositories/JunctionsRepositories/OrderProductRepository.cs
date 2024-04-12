@@ -1,5 +1,6 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.Junctions;
+using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 using EPharm.Infrastructure.Repositories.BaseRepositories;
@@ -9,21 +10,14 @@ namespace EPharm.Infrastructure.Repositories.JunctionsRepositories;
 public class OrderProductRepository(AppDbContext context, IProductRepository productRepository)
     : Repository<OrderProduct>(context), IOrderProductRepository
 {
-    public async Task<int> InsertOrderProductAsync(int orderId, int productId, int quantity)
+    public async Task<Product> InsertOrderProductAsync(OrderProduct orderProduct) 
     {
-        var product = await productRepository.GetByIdAsync(productId);
+        var product = await productRepository.GetByIdAsync(orderProduct.ProductId);
 
         if (product is null)
-            throw new InvalidOperationException($"Product with id {productId} does not exist.");
-
-        var orderProduct = new OrderProduct
-        {
-            OrderId = orderId,
-            ProductId = productId,
-            Quantity = quantity
-        };
+            throw new InvalidOperationException($"Product with id {orderProduct.Id} does not exist.");
 
         await InsertAsync(orderProduct);
-        return product.Price;
+        return product;
     }
 }

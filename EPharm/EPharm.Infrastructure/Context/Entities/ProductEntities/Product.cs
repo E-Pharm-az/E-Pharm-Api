@@ -34,7 +34,6 @@ public class Product : BaseEntity
     public string Barcode { get; set; }
     public decimal PackagingWeight { get; set; }
     
-    public ICollection<WarehouseProduct> Stock { get; set; }
     public ICollection<ProductActiveIngredient> ActiveIngredients { get; set; }
     public ICollection<ProductDosageForm> DosageForms { get; set; }
     public ICollection<ProductRouteOfAdministration> RouteOfAdministrations { get; set; }
@@ -43,6 +42,7 @@ public class Product : BaseEntity
     public ICollection<ProductAllergy> Allergies { get; set; }
     public ICollection<IndicationProduct> Indications { get; set; }
     public ICollection<OrderProduct> OrderProducts;
-
+    public ICollection<WarehouseProduct> Stock { get; set; }
+    
     public DateTime CreatedAt { get; set; }
 }

@@ -2,6 +2,7 @@ using AutoMapper;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Product;
+using EPharm.Infrastructure.Context.Entities.Junctions;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
@@ -32,17 +33,22 @@ public class OrderService(
         var order = await orderRepository.GetOrderByTrackingNumberAsync(trackingNumber);
         return mapper.Map<GetOrderDto?>(order);
     }
-
+    
     public async Task<GetOrderDto?> GetOrderByIdAsync(int orderId)
     {
         var order = await orderRepository.GetOrderByIdAsync(orderId);
         return mapper.Map<GetOrderDto?>(order);
     }
 
-    public async Task<GetOrderDto> CreateOrderAsync(string userId, CreateOrderDto orderDto)
+    public async Task<GetOrderDto> InitializeOrderAsync(string? userId, CreateOrderDto orderDto)
     {
         try 
         {
+            // User should either be authenticated, or provide enough user info to handle shipment
+            // TODO: Move this logic to fluent validation
+            if (userId is null && ((orderDto.Email is null && orderDto.PhoneNumber is null) || orderDto.FullName is null))
+                throw new ArgumentException("One or more required fields are null.");
+            
             var orderEntity = mapper.Map<Order>(orderDto);
             orderEntity.TrackingId = Guid.NewGuid().ToString();
             orderEntity.Status = OrderStatus.PendingPayment;
@@ -51,14 +57,12 @@ public class OrderService(
             await unitOfWork.BeginTransactionAsync();
             
             var order = await orderRepository.InsertAsync(orderEntity);
+            var orderProductEntity = mapper.Map<OrderProduct>(order);
             
-            var orders = orderDto.ProductIds.GroupBy(x => x)
-                .ToDictionary(g => g.Key, g => g.Count());
-
-            foreach (var orderPair in orders)
+            foreach (var op in orderDto.Products)
             {
-                var price = await orderProductRepository.InsertOrderProductAsync(order.Id, orderPair.Key, orderPair.Value);
-                order.TotalPrice += price * orderPair.Value;
+                var orderProduct = await orderProductRepository.InsertOrderProductAsync(orderProductEntity);
+                order.TotalPrice += orderProduct.Price * op.Quantity;
             }
 
             await unitOfWork.CommitTransactionAsync();
@@ -71,6 +75,12 @@ public class OrderService(
             await unitOfWork.RollbackTransactionAsync();
             throw;
         }
+    }
+
+    public async Task<bool> CaptureOrderAsync(int orderId)
+    {
+        // TODO: Implement the stock logic, where on order the stock should go down, and if there is not stock, the order should not go through
+        throw new NotImplementedException();
     }
 
     public async Task<bool> UpdateOrderAsync(int id, CreateOrderDto orderDto)
