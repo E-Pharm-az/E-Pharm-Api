@@ -5,6 +5,7 @@ using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
+using Serilog;
 
 namespace EPharmApi.Controllers.ProductControllers;
 
@@ -83,7 +84,9 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         }
         catch (Exception ex)
         {
-            return BadRequest(ex.Message);
+            
+            Log.Error("Error creating pharma company manger, {Error}", ex.Message);
+            return BadRequest("Error creating pharma company manger.");
         }
     }
 

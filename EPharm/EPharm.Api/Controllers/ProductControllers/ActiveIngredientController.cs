@@ -78,7 +78,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
         catch (Exception ex)
         {
             Log.Error("Error creating active ingredient, {Error}", ex.Message);
-            return BadRequest(ex.Message);
+            return BadRequest("Error creating active ingredient.");
         }
     }
 

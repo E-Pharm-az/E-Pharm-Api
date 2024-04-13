@@ -44,7 +44,7 @@ public class AllergyController(IAllergyService allergyService) : ControllerBase
         catch (Exception e)
         {
             Log.Error("Error creating allergy, {Error}", e.Message);
-            return BadRequest($"Error creating allergy, {e.Message}");
+            return BadRequest("Error creating allergy.");
         }
     }
 

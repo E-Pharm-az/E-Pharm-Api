@@ -85,7 +85,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         catch (Exception ex)
         {
             Log.Error("Error creating special requirement, {Error}", ex.Message);
-            return BadRequest(ex.Message);
+            return BadRequest("Error creating special requirement.");
         }
     }
 

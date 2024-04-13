@@ -85,7 +85,7 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         catch(Exception ex)
         {
             Log.Error("Error creating manufacturer, {Error}", ex.Message);
-            return BadRequest(ex.Message);
+            return BadRequest("Error creating manufacturer.");
         }
     }
 

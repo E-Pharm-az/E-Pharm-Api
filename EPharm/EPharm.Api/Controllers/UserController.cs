@@ -47,7 +47,7 @@ public class UserController(IUserService userService) : ControllerBase
         catch (Exception ex)
         {
             Log.Error("Error creating user, {Error}", ex.Message);
-            return BadRequest(ex.Message);
+            return BadRequest("Error creating user.");
         }
     }
 
@@ -67,7 +67,7 @@ public class UserController(IUserService userService) : ControllerBase
         catch (Exception ex)
         {
             Log.Error("Error creating admin, {Error}", ex.Message);
-            return BadRequest(ex.Message);
+            return BadRequest("Error creating admin.");
         }
     }
 
@@ -87,7 +87,7 @@ public class UserController(IUserService userService) : ControllerBase
         catch (Exception ex)
         {
             Log.Error("Error creating pharma admin, {Error}", ex.Message);
-            return BadRequest(ex.Message);
+            return BadRequest("Error creating admin.");
         }
     }
 
@@ -107,7 +107,7 @@ public class UserController(IUserService userService) : ControllerBase
         catch (Exception ex)
         {
             Log.Error("Error creating pharma manager, {Error}", ex.Message);
-            return BadRequest(ex.Message);
+            return BadRequest("Error creating pharma manager");
         }
     }
 

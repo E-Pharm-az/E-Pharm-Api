@@ -44,7 +44,7 @@ public class IndicationController(IIndicationService indicationService) : Contro
         catch (Exception e)
         {
             Log.Error("Error creating indication, {Error}", e.Message);
-            return BadRequest($"Error creating indication, {e.Message}");
+            return BadRequest("Error creating indication.");
         }
     }
 

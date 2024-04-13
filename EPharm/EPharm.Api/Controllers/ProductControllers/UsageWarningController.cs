@@ -41,10 +41,10 @@ public class UsageWarningController(IUsageWarningService usageWarningService) : 
             var result = await usageWarningService.CreateUsageWarningAsync(usageWarningDto);
             return Ok(result);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error("Error creating usage warning, {Error}", e.Message);
-            return BadRequest($"Error creating usage warning, {e.Message}");
+            Log.Error("Error creating usage warning, {Error}", ex.Message);
+            return BadRequest("Error creating usage warning.");
         }
     }
 

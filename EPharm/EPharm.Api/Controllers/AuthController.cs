@@ -15,18 +15,59 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
 {
     [HttpPost]
     [Route("login/store")]
-    public async Task<IActionResult> LoginStore([FromBody] AuthRequest request) =>
-         await ProcessLogin(request, IdentityData.Customer);
+    public async Task<IActionResult> LoginStore([FromBody] AuthRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            var response = await ProcessLogin(request, IdentityData.Customer);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error logging in, Error: {Error}", ex.Message);
+            return BadRequest("An unexpected error occurred while logging in");
+        }
+    }
 
     [HttpPost]
     [Route("login/pharma")]
-    public async Task<IActionResult> LoginPharm([FromBody] AuthRequest request) =>
-        await ProcessLogin(request, IdentityData.PharmaCompanyManager);
+    public async Task<IActionResult> LoginPharm([FromBody] AuthRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        try
+        {
+            var response = await ProcessLogin(request, IdentityData.PharmaCompanyManager);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error logging in, Error: {Error}", ex.Message);
+            return BadRequest("An unexpected error occurred while logging in");
+        }
+    }
 
     [HttpPost]
     [Route("login/admin")]
-    public async Task<IActionResult> LoginAdmin([FromBody] AuthRequest request) =>
-        await ProcessLogin(request, IdentityData.Admin);
+    public async Task<IActionResult> LoginAdmin([FromBody] AuthRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        try
+        {
+            var response =  await ProcessLogin(request, IdentityData.Admin);
+            return Ok(response);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error logging in, Error: {Error}", ex.Message);
+            return BadRequest("An unexpected error occurred while logging in");
+        }
+    }
 
     [HttpGet]
     [Route("confirm-email")]
@@ -46,7 +87,7 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
 
         var errorMessage = string.Join(",", result.Errors);
         Log.Error("Error confirming email, user id: {useId}, error details: {errorMessage}", userId, errorMessage);
-        return BadRequest($"Error confirming email, details: {errorMessage}");
+        return BadRequest("Error confirming email.");
     }
 
     [HttpGet]
@@ -122,56 +163,45 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
         return Ok();
     }
 
-    private async Task<IActionResult> ProcessLogin(AuthRequest request, string requiredRole)
+    private async Task<AuthResponse> ProcessLogin(AuthRequest request, string requiredRole)
     {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
         var user = await userManager.FindByEmailAsync(request.Email);
 
         if (user == null)
-            return BadRequest("Bad credentials");
+            throw new ArgumentException("Bad credentials");
 
         var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
 
         if (!isPasswordValid)
-            return BadRequest("Bad credentials");
+            throw new ArgumentException("Bad credentials");
 
         if (!user.EmailConfirmed)
-            return BadRequest("Email not confirmed, please check your email for confirmation.");
+            throw new ArgumentException("Email not confirmed, please check your email for confirmation.");
 
-        try
+        var roles = (await userManager.GetRolesAsync(user)).ToList();
+        if (!roles.Contains(requiredRole))
+            throw new ArgumentException("Bad credentials");
+
+        var auth = tokenService.CreateToken(user, roles);
+
+        user.RefreshToken = tokenService.RefreshToken();
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        auth.RefreshToken = user.RefreshToken;
+
+        await userManager.UpdateAsync(user);
+
+        HttpContext.Response.Cookies.Append("token", auth.Token, new CookieOptions
         {
-            var roles = (await userManager.GetRolesAsync(user)).ToList();
-            if (!roles.Contains(requiredRole))
-                return BadRequest("Bad credentials");
+            HttpOnly = true,
+            Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
+        });
 
-            var auth = tokenService.CreateToken(user, roles);
-
-            user.RefreshToken = tokenService.RefreshToken();
-            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
-            auth.RefreshToken = user.RefreshToken;
-
-            await userManager.UpdateAsync(user);
-
-            HttpContext.Response.Cookies.Append("token", auth.Token, new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
-            });
-
-            HttpContext.Response.Cookies.Append("refreshToken", user.RefreshToken, new CookieOptions
-            {
-                HttpOnly = true,
-                Expires = user.RefreshTokenExpiryTime
-            });
-
-            return Ok(auth);
-        }
-        catch (Exception ex)
+        HttpContext.Response.Cookies.Append("refreshToken", user.RefreshToken, new CookieOptions
         {
-            Log.Error("Error logging in, User id: {UserId}, Error: {Error}", user.Id, ex.Message);
-            return BadRequest("An unexpected error occurred while logging in");
-        }
+            HttpOnly = true,
+            Expires = user.RefreshTokenExpiryTime
+        });
+
+        return auth;
     }
 }

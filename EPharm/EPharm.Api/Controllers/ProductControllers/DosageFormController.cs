@@ -44,7 +44,7 @@ public class DosageFormController(IDosageFormService dosageFormService) : Contro
         catch (Exception e)
         {
             Log.Error("Error creating dosage form, {Error}", e.Message);
-            return BadRequest($"Error creating dosage form, {e.Message}");
+            return BadRequest("Error creating dosage form.");
         }
     }
 

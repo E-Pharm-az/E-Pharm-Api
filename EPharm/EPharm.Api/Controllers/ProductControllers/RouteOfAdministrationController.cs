@@ -41,10 +41,10 @@ public class RouteOfAdministrationController(IRouteOfAdministrationService route
             var result = await routeOfAdministrationService.CreateRouteOfAdministrationAsync(routeOfAdministrationDto);
             return Ok(result);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error("Error creating route of administration, {Error}", e.Message);
-            return BadRequest($"Error creating route of administration, {e.Message}");
+            Log.Error("Error creating route of administration, {Error}", ex.Message);
+            return BadRequest("Error creating route of administration.");
         }
     }
 

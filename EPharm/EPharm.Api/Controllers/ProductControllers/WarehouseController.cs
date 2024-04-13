@@ -82,10 +82,10 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
             var result = await warehouseService.CreateWarehouseAsync(pharmaCompanyId, warehouseDto);
             return Ok(result);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error("Error creating warehouse, {Error}", e.Message);
-            return BadRequest($"Error creating warehouse, {e.Message}");
+            Log.Error("Error creating warehouse, {Error}", ex.Message);
+            return BadRequest("Error creating warehouse.");
         }
     }
     

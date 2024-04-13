@@ -41,10 +41,10 @@ public class SideEffectController(ISideEffectService sideEffectService) : Contro
             var result = await sideEffectService.CreateSideEffectAsync(sideEffectDto);
             return Ok(result);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error("Error creating side effect, {Error}", e.Message);
-            return BadRequest($"Error creating side effect, {e.Message}");
+            Log.Error("Error creating side effect, {Error}", ex.Message);
+            return BadRequest("Error creating side effect.");
         }
     }
 
