@@ -22,6 +22,6 @@ public class WarehouseConfig : IEntityTypeConfiguration<Warehouse>
             .IsRequired();
         
         builder.Property(w => w.CreatedAt)
-            .IsRequired();
+            .HasDefaultValueSql("NOW()");
     }
 }

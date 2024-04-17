@@ -11,18 +11,14 @@ public class SpecialRequirementsConfig : IEntityTypeConfiguration<SpecialRequire
         builder.HasOne(a => a.PharmaCompany)
             .WithMany(a => a.SpecialRequirements)
             .HasForeignKey(a => a.PharmaCompanyId);
-        
-        builder.Property(sr => sr.MinimumAgeInMonthsRequirement)
-            .IsRequired();
 
-        builder.Property(sr => sr.MaximumAgeInMonthsRequirement)
-            .IsRequired();
+        builder.Property(sr => sr.MinimumAgeInMonthsRequirement);
 
-        builder.Property(sr => sr.MinimumWeighInKgRequirement)
-            .IsRequired();
+        builder.Property(sr => sr.MaximumAgeInMonthsRequirement);
 
-        builder.Property(sr => sr.MaximumWeighInKgRequirement)
-            .IsRequired();
+        builder.Property(sr => sr.MinimumWeighInKgRequirement);
+
+        builder.Property(sr => sr.MaximumWeighInKgRequirement);
 
         builder.Property(sr => sr.MedicalConditionsDescription)
             .HasMaxLength(500);

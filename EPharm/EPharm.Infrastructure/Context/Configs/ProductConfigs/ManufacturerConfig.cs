@@ -17,15 +17,12 @@ public class ManufacturerConfig : IEntityTypeConfiguration<Manufacturer>
             .HasForeignKey(a => a.PharmaCompanyId);
 
         builder.Property(m => m.Country)
-            .IsRequired()
             .HasMaxLength(255);
         
         builder.Property(m => m.Website)
-            .IsRequired()
             .HasMaxLength(255);
         
         builder.Property(m => m.Email)
-            .IsRequired()
             .HasMaxLength(255);
 
         builder.Property(m => m.CreatedAt)

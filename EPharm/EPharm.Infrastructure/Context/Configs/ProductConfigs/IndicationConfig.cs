@@ -13,7 +13,6 @@ public class IndicationConfig : IEntityTypeConfiguration<Indication>
             .HasMaxLength(255);
 
         builder.Property(i => i.Description)
-            .IsRequired()
             .HasMaxLength(500);
         
         builder.HasMany(i => i.Products)

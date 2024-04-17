@@ -23,23 +23,18 @@ public class PharmaCompanyConfig : IEntityTypeConfiguration<PharmaCompany>
             .HasMaxLength(20);
         
         builder.Property(pc => pc.StreetAddress)
-            .IsRequired()
             .HasMaxLength(255);
         
         builder.Property(pc => pc.PostalCode)
-            .IsRequired()
             .HasMaxLength(20);
         
         builder.Property(pc => pc.City)
-            .IsRequired()
             .HasMaxLength(255);
         
         builder.Property(pc => pc.Country)
-            .IsRequired()
             .HasMaxLength(255);
         
         builder.Property(pc => pc.Region)
-            .IsRequired()
             .HasMaxLength(255);
         
         builder.HasMany(pc => pc.Managers)

@@ -18,17 +18,14 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
             .HasMaxLength(255);
 
         builder.Property(p => p.Description)
-            .IsRequired()
             .HasMaxLength(500);
 
         builder.Property(p => p.StrengthMg)
             .HasColumnType("decimal(18,2)");
 
-        builder.Property(p => p.MaxDayFrequency)
-            .IsRequired();
+        builder.Property(p => p.MaxDayFrequency);
 
-        builder.Property(p => p.MaxSupplyDaysPeriod)
-            .IsRequired();
+        builder.Property(p => p.MaxSupplyDaysPeriod);
 
         builder.Property(p => p.ContraindicationsDescription)
             .HasMaxLength(500);

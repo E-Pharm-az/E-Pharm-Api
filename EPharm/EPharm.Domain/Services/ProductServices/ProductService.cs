@@ -8,6 +8,7 @@ using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
+using Microsoft.AspNetCore.Http.Metadata;
 
 namespace EPharm.Domain.Services.ProductServices;
 
@@ -61,9 +62,11 @@ public class ProductService(
         {
             var productEntity = mapper.Map<Product>(productDto);
             productEntity.PharmaCompanyId = pharmaCompanyId;
-            
+
             if (productDto.Image is not null)
                 productEntity.ImageUrl =  await productImageService.UploadProductImageAsync(productDto.Image);
+
+            productEntity.ImageUrl = productDto.ImageURL;
             
             await unitOfWork.BeginTransactionAsync();
             
@@ -72,11 +75,11 @@ public class ProductService(
             foreach (var stock in productDto.Stocks)
             {
                 await warehouseProductRepository.InsertWarehouseProductAsync(new WarehouseProduct
-                    {
-                        ProductId = product.Id,
-                        WarehouseId = stock.WarehouseId,
-                        Quantity = stock.Quantity
-                    });
+                {
+                    ProductId = product.Id,
+                    WarehouseId = stock.WarehouseId,
+                    Quantity = stock.Quantity
+                });
             }
             
             await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsIds);
