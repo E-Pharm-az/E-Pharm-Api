@@ -136,7 +136,12 @@ public class Startup(IConfiguration configuration)
                     .WithHeaders("Content-Type", "Authorization")
             );
 
-            ops.AddPolicy("AllowAnyOrigins", builder => builder.AllowAnyOrigin());
+            ops.AddPolicy("AllowALB", builder =>
+                builder.WithHeaders(configuration["AppUrls:ALB"])
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                );
         });
         
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -216,7 +221,7 @@ public class Startup(IConfiguration configuration)
         }
         else
         {
-            app.UseCors("AllowAnyOrigins");
+            app.UseCors("AllowALB");
         }
             
         app.UseHealthChecks("/_health", new HealthCheckOptions
