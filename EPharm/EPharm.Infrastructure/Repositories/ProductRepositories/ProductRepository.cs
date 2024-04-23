@@ -20,10 +20,25 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
             .AsNoTracking()
             .ToListAsync();
     }
+    
+    public async Task<ICollection<Product>> GetAlLApprovedProductsAsync(int page, int pageSize)
+    {
+        var skip = (page - 1) * pageSize;
 
-    public async Task<Product?> GetFullProductDetailAsync(int productId) =>
+        return await Entities
+            .Where(product => product.IsApproved)
+            .OrderByDescending(product => product.Name)
+            .Include(product => product.Stock).ThenInclude(product => product.Warehouse)
+            .Skip(skip)
+            .Take(pageSize)
+            .AsNoTracking()
+            .ToListAsync();
+    }
+
+    public async Task<Product?> GetApprovedProductDetailAsync(int productId) =>
         await Entities
             .Where(product => product.Id == productId)
+            .Where(product => product.IsApproved)
             .Include(product => product.PharmaCompany)
             .Include(product => product.SpecialRequirement)
             .Include(product => product.Manufacturer)
@@ -40,6 +55,18 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
             .AsNoTracking()
             .SingleOrDefaultAsync();
 
+    public async Task<IEnumerable<Product>> GetApprovedAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page, int pageSize)
+    {
+        var skip = (page - 1) * pageSize;
+        
+        return await Entities.Where(product => product.PharmaCompanyId == pharmaCompanyId)
+            .Where(product => product.IsApproved)
+            .OrderByDescending(product => product.Name)
+            .Skip(skip)
+            .Take(pageSize)
+            .AsNoTracking().ToListAsync();
+    }
+    
     public async Task<IEnumerable<Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page, int pageSize)
     {
         var skip = (page - 1) * pageSize;
@@ -50,4 +77,5 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
             .Take(pageSize)
             .AsNoTracking().ToListAsync();
     }
+
 }

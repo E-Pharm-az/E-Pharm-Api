@@ -21,6 +21,7 @@ public class GetFullProductDto
     public string Name { get; set; }
     public string Description { get; set; }
     public string? ImageUrl { get; set; }
+    public bool IsApproved { get; set; }
     public decimal StrengthMg { get; set; }
     public int MaxDayFrequency { get; set; }
     public int MaxSupplyInDaysDays { get; set; }

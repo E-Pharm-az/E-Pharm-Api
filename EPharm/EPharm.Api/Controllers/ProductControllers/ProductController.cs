@@ -13,12 +13,13 @@ namespace EPharmApi.Controllers.ProductControllers;
 [Route("api/[controller]")]
 public class ProductController(IProductService productService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
 {
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllProducts()
+    [HttpGet("all/{page:int}")]
+    [Authorize(Roles = IdentityData.Admin)]
+    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllProducts(int page)
     {
         try
         {
-            var result = await productService.GetAllProductsAsync();
+            var result = await productService.GetAllProductsAsync(page);
             if (result.Any()) return Ok(result);
 
             return NotFound("Products not found.");

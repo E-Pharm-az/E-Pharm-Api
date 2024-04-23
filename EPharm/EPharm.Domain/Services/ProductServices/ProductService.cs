@@ -3,17 +3,20 @@ using EPharm.Domain.Dtos.ProductDtos;
 using EPharm.Domain.Dtos.WarehouseDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
+using EPharm.Infrastructure.Context.Entities.Identity;
 using EPharm.Infrastructure.Context.Entities.Junctions;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
 using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.Identity;
 
 namespace EPharm.Domain.Services.ProductServices;
 
 public class ProductService(
     IUnitOfWork unitOfWork,
+    UserManager<AppIdentityUser> userManager,
     IIndicationProductRepository indicationProductRepository,
     IProductRepository productRepository,
     IProductImageService productImageService,
@@ -26,9 +29,15 @@ public class ProductService(
     IWarehouseProductRepository warehouseProductRepository,
     IMapper mapper) : IProductService
 {
+    public async Task<IEnumerable<GetMinimalProductDto>> GetAllProductsAsync(int page)
+    {
+        var products = await productRepository.GetAlLProductsAsync(page, pageSize: 30);
+        return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
+    }
+    
     public async Task<IEnumerable<GetMinimalProductDto>> SearchProduct(string parameter, int page)
     {
-        var allProducts = await productRepository.GetAlLProductsAsync(page, pageSize: 30);
+        var allProducts = await productRepository.GetAlLApprovedProductsAsync(page, pageSize: 30);
 
         var filteredProducts = allProducts.Where(product =>
             product.Name.Contains(parameter, StringComparison.OrdinalIgnoreCase) ||
@@ -37,23 +46,30 @@ public class ProductService(
 
         return mapper.Map<IEnumerable<GetMinimalProductDto>>(filteredProducts);
     }
-    
-    public async Task<IEnumerable<GetMinimalProductDto>> GetAllProductsAsync()
-    {
-        var products = await productRepository.GetAllAsync();
-        return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
-    }
 
     public async Task<IEnumerable<GetMinimalProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page)
     {
-        var products = await productRepository.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page, pageSize: 30);
+        var products = await productRepository.GetApprovedAllPharmaCompanyProductsAsync(pharmaCompanyId, page, pageSize: 30);
         return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
     }
 
     public async Task<GetFullProductDto?> GetProductByIdAsync(int productId)
     {
-        var product = await productRepository.GetFullProductDetailAsync(productId);
+        var product = await productRepository.GetApprovedProductDetailAsync(productId);
         return mapper.Map<GetFullProductDto>(product);
+    }
+
+    public async Task ApproveProductAsync(string adminId, int productId)
+    {
+        var user = await userManager.FindByIdAsync(adminId);
+        ArgumentNullException.ThrowIfNull(user);
+        
+        var product = await GetProductByIdAsync(productId);
+        ArgumentNullException.ThrowIfNull(product);
+        
+        var productEntity = mapper.Map<Product>(product);
+        productEntity.IsApproved = true;
+        productEntity.ApprovedByAdminId = adminId;
     }
 
     public async Task<GetMinimalProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)
