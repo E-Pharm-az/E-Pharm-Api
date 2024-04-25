@@ -137,10 +137,11 @@ public class Startup(IConfiguration configuration)
             );
 
             ops.AddPolicy("AllowALB", builder =>
-                builder.WithHeaders(configuration["AppUrls:ALB"])
+                builder.WithOrigins(configuration["AppUrls:ALB"])
                     .AllowAnyHeader()
-                    .AllowAnyMethod()
                     .AllowCredentials()
+                    .AllowAnyMethod()
+                    .WithHeaders("Content-Type", "Authorization")
                 );
         });
         
@@ -151,7 +152,7 @@ public class Startup(IConfiguration configuration)
         
         services.AddDbContext<AppIdentityDbContext>(
             options => options.UseNpgsql(configuration.GetConnectionString("UserDefaultConnection")));
-        
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         
         services.AddScoped<DbSeeder>();
@@ -204,20 +205,22 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
         services.AddScoped<IUserService, UserService>();
         
-        services.AddScoped<IEmailService, EmailService>();
+        services.AddScoped<IEmailSender, EmailSender>();
+        services.AddSingleton<IEmailService, EmailService>();
         
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<ITokenCreationService, TokenCreationService>();
         services.AddScoped<ITokenRefreshService, TokenRefreshService>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder, IEmailService emailService)
     {
         if (env.IsDevelopment())
         {
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseCors("LocalhostPolicy");
+            Console.WriteLine("dev");
         }
         else
         {
@@ -238,5 +241,6 @@ public class Startup(IConfiguration configuration)
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
         dbSeeder.SeedSuperAdminAsync().Wait();
+        emailService.CompileEmail("confirmation-email", "Emails/confirmation-email.html").Wait();
     }
 }
