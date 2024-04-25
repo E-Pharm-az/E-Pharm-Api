@@ -5,7 +5,7 @@ using RestSharp;
 
 namespace EPharm.Domain.Services.CommonServices;
 
-public class EmailService(IConfiguration configuration) : IEmailService
+public class EmailSender(IConfiguration configuration) : IEmailSender
 {
     public async Task SendEmailAsync(CreateEmailDto emailDto)
     {

@@ -19,6 +19,7 @@ public class UserService(
     RoleManager<IdentityRole> roleManager,
     IPharmaCompanyManagerService pharmaCompanyManagerService,
     IPharmaCompanyService pharmaCompanyService,
+    IEmailSender emailSender,
     IEmailService emailService,
     IUnitOfWork unitOfWork,
     IConfiguration configuration,
@@ -128,28 +129,28 @@ public class UserService(
         foreach (var role in identityRole)
         {
             if (!await roleManager.RoleExistsAsync(role))
-            {
                 await roleManager.CreateAsync(new IdentityRole(role));
-            }
         }
 
         if (!result.Succeeded)
             throw new InvalidOperationException($"Failed to create user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
 
         foreach (var role in identityRole)
-        {
             await userManager.AddToRoleAsync(userEntity, role);
-        }
 
         var token = await userManager.GenerateEmailConfirmationTokenAsync(userEntity);
         var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
 
-        await emailService.SendEmailAsync(new CreateEmailDto
+        var emailTemplate = emailService.GetEmail("confirmation-email");
+        ArgumentNullException.ThrowIfNull(emailTemplate);
+        
+        emailTemplate = emailTemplate.Replace("{url}", $"{url}/confirm-email?userId={userEntity.Id}&token={encodedToken}");
+
+        await emailSender.SendEmailAsync(new CreateEmailDto
         {
             Email = userEntity.Email,
             Subject = "Confirm your account",
-            Message =
-                $"Please confirm your account by clicking this link: <a href='{url}/confirm-email?userId={userEntity.Id}&token={encodedToken}'>link</a>"
+            Message = emailTemplate
         });
 
         return mapper.Map<GetUserDto>(userEntity);
