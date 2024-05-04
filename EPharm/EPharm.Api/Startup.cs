@@ -128,16 +128,16 @@ public class Startup(IConfiguration configuration)
 
         services.AddCors(ops =>
         {
-            ops.AddPolicy("LocalhostPolicy", builder =>
-                builder.WithOrigins("http://localhost:5173", "http://localhost:5270")
+            ops.AddPolicy("LocalhostPolicy", policy =>
+                policy.WithOrigins("http://localhost:5173", "http://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
                     .WithHeaders("Content-Type", "Authorization")
             );
 
-            ops.AddPolicy("AllowALB", builder =>
-                builder.WithOrigins("https://www.e-pharm.co/", "https://www.pharma.e-pharm.co/", "https://www.admin.pharma.e-pharm.co/", "http://localhost:5270")
+            ops.AddPolicy("ApiCorsPolicy", policy =>
+                policy.WithOrigins("https://www.e-pharm.co/", "https://www.pharma.e-pharm.co/", "https://www.admin.pharma.e-pharm.co/", "http://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
@@ -221,11 +221,10 @@ public class Startup(IConfiguration configuration)
             app.UseSwagger();
             app.UseSwaggerUI();
             app.UseCors("LocalhostPolicy");
-            Console.WriteLine("dev");
         }
         else
         {
-            app.UseCors("AllowALB");
+            app.UseCors("ApiCorsPolicy");
         }
 
         app.UseHealthChecks("/_health", new HealthCheckOptions
