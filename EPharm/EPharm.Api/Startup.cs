@@ -137,7 +137,7 @@ public class Startup(IConfiguration configuration)
             );
 
             ops.AddPolicy("ApiCorsPolicy", policy =>
-                policy.WithOrigins("https://www.e-pharm.co/", "https://www.pharma.e-pharm.co/", "https://www.admin.pharma.e-pharm.co/", "http://localhost:5270")
+                policy.WithOrigins("https://www.e-pharm.co", "https://www.pharma.e-pharm.co", "https://www.admin.pharma.e-pharm.co", "http://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
