@@ -50,7 +50,7 @@ public class Startup(IConfiguration configuration)
             .WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
             .ReadFrom.Configuration(configuration)
             .CreateLogger();
-        
+
         services.AddLogging(loggingBuilder => loggingBuilder.AddSerilog());
 
         services.AddSwaggerGen(ops =>
@@ -129,7 +129,7 @@ public class Startup(IConfiguration configuration)
         services.AddCors(ops =>
         {
             ops.AddPolicy("LocalhostPolicy", builder =>
-                builder.WithOrigins("http://localhost:5173")
+                builder.WithOrigins("http://localhost:5173", "http://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
@@ -137,24 +137,24 @@ public class Startup(IConfiguration configuration)
             );
 
             ops.AddPolicy("AllowALB", builder =>
-                builder.WithOrigins(configuration["AppUrls:ALB"])
+                builder.WithOrigins("https://www.e-pharm.co/", "https://www.pharma.e-pharm.co/", "https://www.admin.pharma.e-pharm.co/", "http://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
                     .WithHeaders("Content-Type", "Authorization")
-                );
+            );
         });
-        
+
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         services.AddDbContext<AppDbContext>(
             options => options.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
-        
+
         services.AddDbContext<AppIdentityDbContext>(
             options => options.UseNpgsql(configuration.GetConnectionString("UserDefaultConnection")));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
-        
+
         services.AddScoped<DbSeeder>();
 
         services.AddScoped<IActiveIngredientRepository, ActiveIngredientRepository>();
@@ -171,7 +171,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IWarehouseRepository, WarehouseRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
         services.AddScoped<IProductRepository, ProductRepository>();
-        
+
         services.AddScoped<IIndicationProductRepository, IndicationProductRepository>();
         services.AddScoped<IProductActiveIngredientRepository, ProductActiveIngredientRepository>();
         services.AddScoped<IProductAllergyRepository, ProductAllergyRepository>();
@@ -204,16 +204,17 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
         services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
         services.AddScoped<IUserService, UserService>();
-        
+
         services.AddScoped<IEmailSender, EmailSender>();
         services.AddSingleton<IEmailService, EmailService>();
-        
+
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<ITokenCreationService, TokenCreationService>();
         services.AddScoped<ITokenRefreshService, TokenRefreshService>();
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder, IEmailService emailService)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder,
+        IEmailService emailService)
     {
         if (env.IsDevelopment())
         {
@@ -226,17 +227,17 @@ public class Startup(IConfiguration configuration)
         {
             app.UseCors("AllowALB");
         }
-            
+
         app.UseHealthChecks("/_health", new HealthCheckOptions
         {
             ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse,
         });
-        
+
         app.UseRouting();
-    
+
         app.UseAuthentication();
         app.UseAuthorization();
-        
+
         app.UseSerilogRequestLogging();
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
