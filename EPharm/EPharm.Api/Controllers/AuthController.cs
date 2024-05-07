@@ -141,11 +141,9 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
             HttpContext.Response.Cookies.Append("token", response.Token, new CookieOptions
             {
                 HttpOnly = true,
-                IsEssential = true,
                 Secure = true,
-                SameSite = SameSiteMode.Strict,
-                Domain = "localhost",
-                Path = "/",
+                IsEssential = true,
+                SameSite = SameSiteMode.None,
                 Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
             });
 
@@ -198,22 +196,18 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
         HttpContext.Response.Cookies.Append("token", auth.Token, new CookieOptions
         {
             HttpOnly = true,
-            IsEssential = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Domain = "localhost",
-            Path = "/",
+            IsEssential = true,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
         });
 
         HttpContext.Response.Cookies.Append("refreshToken", user.RefreshToken, new CookieOptions
         {
             HttpOnly = true,
-            IsEssential = true,
             Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Domain = "localhost",
-            Path = "/",
+            IsEssential = true,
+            SameSite = SameSiteMode.None,
             Expires = user.RefreshTokenExpiryTime
         });
 
