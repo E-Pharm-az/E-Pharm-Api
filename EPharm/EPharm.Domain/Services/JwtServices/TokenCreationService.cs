@@ -28,9 +28,7 @@ public class TokenCreationService(IConfiguration configuration) : ITokenCreation
             audience: configuration["JwtSettings:Audience"]!,
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])),
-            signingCredentials: new SigningCredentials(
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!)),
-                SecurityAlgorithms.HmacSha256));
+            signingCredentials: new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!)), SecurityAlgorithms.HmacSha256));
 
         var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
         
