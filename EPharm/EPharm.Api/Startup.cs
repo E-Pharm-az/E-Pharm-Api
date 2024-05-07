@@ -113,8 +113,7 @@ public class Startup(IConfiguration configuration)
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidAudience = configuration["JwtSettings:Audience"],
-                    IssuerSigningKey =
-                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
                 };
                 options.Events = new JwtBearerEvents
                 {
@@ -129,7 +128,7 @@ public class Startup(IConfiguration configuration)
         services.AddCors(ops =>
         {
             ops.AddPolicy("LocalhostPolicy", policy =>
-                policy.WithOrigins("http://localhost:5173", "http://localhost:5270")
+                policy.WithOrigins("http://localhost:5173", "http://localhost:5270", "https://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
