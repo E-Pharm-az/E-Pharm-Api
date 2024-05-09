@@ -128,7 +128,7 @@ public class Startup(IConfiguration configuration)
         services.AddCors(ops =>
         {
             ops.AddPolicy("LocalhostPolicy", policy =>
-                policy.WithOrigins("http://localhost:5173", "http://localhost:5270", "https://localhost:5270")
+                policy.WithOrigins("http://localhost:5270", "https://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
@@ -136,7 +136,7 @@ public class Startup(IConfiguration configuration)
             );
 
             ops.AddPolicy("ApiCorsPolicy", policy =>
-                policy.WithOrigins("https://www.e-pharm.co", "https://www.pharma.e-pharm.co", "https://www.admin.pharma.e-pharm.co", "http://localhost:5270")
+                policy.WithOrigins("https://www.e-pharm.co", "https://www.pharma.e-pharm.co", "https://www.admin.pharma.e-pharm.co", "https://localhost:5270", "http://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()

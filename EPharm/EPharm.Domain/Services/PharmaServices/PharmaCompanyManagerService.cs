@@ -13,7 +13,13 @@ public class PharmaCompanyManagerService(IPharmaCompanyManagerRepository pharmaC
         var pharmaCompanyManagers = await pharmaCompanyManagerRepository.GetAllPharmaCompanyManagersAsync(companyId);
         return mapper.Map<IEnumerable<GetPharmaCompanyManagerDto>>(pharmaCompanyManagers);
     }
-
+    
+    public async Task<GetPharmaCompanyManagerDto?> GetPharmaCompanyManagerByExternalIdAsync(string externalId)
+    {
+        var pharmaCompanyManager = await pharmaCompanyManagerRepository.GetPharmaCompanyManagerByExternalIdAsync(externalId);
+        return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManager);
+    }
+ 
     public async Task<GetPharmaCompanyManagerDto?> GetPharmaCompanyManagerByIdAsync(int pharmaCompanyManagerId)
     {
         var pharmaCompanyManager = await pharmaCompanyManagerRepository.GetByIdAsync(pharmaCompanyManagerId);

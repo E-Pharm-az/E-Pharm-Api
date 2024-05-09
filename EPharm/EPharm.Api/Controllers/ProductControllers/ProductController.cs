@@ -11,7 +11,10 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductController(IProductService productService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
+public class ProductController(
+    IProductService productService,
+    IPharmaCompanyService pharmaCompanyService,
+    IPharmaCompanyManagerService pharmaCompanyManagerService) : ControllerBase
 {
     [HttpGet("all/{page:int}")]
     [Authorize(Roles = IdentityData.Admin)]
@@ -58,12 +61,15 @@ public class ProductController(IProductService productService, IPharmaCompanySer
 
             if (company is null)
                 return NotFound("Pharmaceutical company not found.");
-
+            
             if (!User.IsInRole(IdentityData.Admin))
             {
                 var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+                var companyUser = await pharmaCompanyManagerService.GetPharmaCompanyManagerByExternalIdAsync(userId);
+                
+                ArgumentNullException.ThrowIfNull(companyUser);
 
-                if (company.OwnerId != userId)
+                if (company.Id != companyUser.PharmaCompanyId)
                     return Forbid();
             }
 

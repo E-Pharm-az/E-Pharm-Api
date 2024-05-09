@@ -10,5 +10,9 @@ public class PharmaCompanyManagerRepository(AppDbContext context)
     : Repository<PharmaCompanyManager>(context), IPharmaCompanyManagerRepository
 {
     public async Task<IEnumerable<PharmaCompanyManager>> GetAllPharmaCompanyManagersAsync(int companyId) =>
-        await Entities.Where(x => x.PharmaCompanyId == companyId).ToListAsync();
+        await Entities.Where(x => x.PharmaCompanyId == companyId).AsNoTracking().ToListAsync();
+
+
+    public async Task<PharmaCompanyManager?> GetPharmaCompanyManagerByExternalIdAsync(string externalId) =>
+        await Entities.AsNoTracking().SingleOrDefaultAsync(x => x.ExternalId == externalId);
 }

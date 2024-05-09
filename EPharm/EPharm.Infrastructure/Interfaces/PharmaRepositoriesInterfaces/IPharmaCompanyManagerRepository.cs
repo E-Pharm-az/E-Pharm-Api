@@ -6,4 +6,5 @@ namespace EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
 public interface IPharmaCompanyManagerRepository : IRepository<PharmaCompanyManager>
 {
     public Task<IEnumerable<PharmaCompanyManager>> GetAllPharmaCompanyManagersAsync(int companyId);
+    public Task<PharmaCompanyManager?> GetPharmaCompanyManagerByExternalIdAsync(string externalId);
 }
