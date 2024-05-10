@@ -101,6 +101,24 @@ public class ProductController(
             return StatusCode(500, "Internal server error occurred.");
         }
     }
+
+    [HttpPost("approve/{productId:int}")]
+    [Authorize(Roles = IdentityData.Admin)]
+    public async Task<ActionResult> ApproveProduct(int productId)
+    {
+        var adminId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+        
+        try
+        {
+            await productService.ApproveProductAsync(adminId, productId);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error approving product with id: {id}, by admin with id: {adminId}. Details: {ex}", productId, adminId, ex.Message);
+            return BadRequest("Error approving product.");
+        }
+    }
     
     [HttpPost("pharma-company/{pharmaCompanyId:int}/[controller]")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager)]
@@ -159,9 +177,9 @@ public class ProductController(
         return BadRequest("Error updating product.");
     }
 
-    [HttpDelete("pharma-company/{pharmaCompanyId:int}/[Controller]/{id:int}")]
+    [HttpDelete("pharma-company/{pharmaCompanyId:int}/[Controller]/{productId:int}")]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
-    public async Task<ActionResult> DeleteProduct(int pharmaCompanyId, int id)
+    public async Task<ActionResult> DeleteProduct(int pharmaCompanyId, int productId)
     {
         var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
@@ -176,11 +194,11 @@ public class ProductController(
                 return Forbid();
         }
 
-        var result = await productService.DeleteProductAsync(id);
+        var result = await productService.DeleteProductAsync(productId);
 
         if (result) return NoContent();
 
-        Log.Error("Error deleting product");
-        return BadRequest($"Product with ID: {id} could not be deleted.");
+        Log.Error("Error deleting product ID: {productId}", productId);
+        return BadRequest($"Product with ID: {productId} could not be deleted.");
     }
 }

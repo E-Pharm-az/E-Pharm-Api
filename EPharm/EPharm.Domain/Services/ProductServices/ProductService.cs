@@ -49,7 +49,7 @@ public class ProductService(
 
     public async Task<IEnumerable<GetMinimalProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page)
     {
-        var products = await productRepository.GetApprovedAllPharmaCompanyProductsAsync(pharmaCompanyId, page, pageSize: 30);
+        var products = await productRepository.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page, pageSize: 30);
         return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
     }
 
