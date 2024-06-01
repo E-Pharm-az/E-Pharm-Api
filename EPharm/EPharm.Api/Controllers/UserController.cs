@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using EPharm.Domain.Dtos.PasswordChangeDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Identity;
@@ -10,7 +11,7 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService) : ControllerBase
+public class UserController(IUserService userService, IConfiguration configuration) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -147,5 +148,43 @@ public class UserController(IUserService userService) : ControllerBase
 
         Log.Error("Error updating user");
         return BadRequest($"User with ID: {userId} could not be deleted.");
+    }
+
+    [HttpPost]
+    [Route("initiate-password-change")]
+    public async Task<IActionResult> InitiatePasswordChange([FromBody] InitiatePasswordChangeRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            await userService.InitiatePasswordChange(request, configuration["AppUrls:EpharmClient"]!);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error initiating password change. Details: {Error}", ex);
+            return BadRequest("Error initiating password change.");
+        }
+    }
+
+    [HttpPost]
+    [Route("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordWithTokenRequest request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            await userService.ChangePassword(request);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error changing password. Details: {Error}", ex);
+            return BadRequest("Error changing password.");
+        }
     }
 }

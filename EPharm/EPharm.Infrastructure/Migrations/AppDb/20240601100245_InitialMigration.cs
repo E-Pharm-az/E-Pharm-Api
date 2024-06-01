@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EPharm.Infrastructure.Migrations
+namespace EPharm.Infrastructure.Migrations.AppDb
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration
@@ -333,6 +333,8 @@ namespace EPharm.Infrastructure.Migrations
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Description = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
                     ImageUrl = table.Column<string>(type: "text", nullable: true),
+                    IsApproved = table.Column<bool>(type: "boolean", nullable: false),
+                    ApprovedByAdminId = table.Column<string>(type: "text", nullable: true),
                     StrengthMg = table.Column<decimal>(type: "numeric(18,2)", nullable: false),
                     MaxDayFrequency = table.Column<int>(type: "integer", nullable: false),
                     MaxSupplyDaysPeriod = table.Column<int>(type: "integer", nullable: false),

@@ -17,7 +17,7 @@ namespace EPharm.Infrastructure.Migrations.AppIdentityDb
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.2")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -40,10 +40,6 @@ namespace EPharm.Infrastructure.Migrations.AppIdentityDb
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("Fin")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("FirstName")
                         .IsRequired()

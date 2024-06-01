@@ -30,7 +30,6 @@ public class DbSeeder(
                     Email = configuration["SuperAdmin:Email"],
                     FirstName = configuration["SuperAdmin:FirstName"],
                     LastName = configuration["SuperAdmin:LastName"],
-                    Fin = configuration["SuperAdmin:Fin"],
                     EmailConfirmed = true
                 };
 

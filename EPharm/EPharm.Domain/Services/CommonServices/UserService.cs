@@ -1,5 +1,6 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.EmailDto;
+using EPharm.Domain.Dtos.PasswordChangeDto;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 using EPharm.Domain.Dtos.UserDto;
@@ -115,6 +116,36 @@ public class UserService(
         var result = await userManager.DeleteAsync(user);
         return result.Succeeded;
     }
+
+    public async Task InitiatePasswordChange(InitiatePasswordChangeRequest passwordChangeRequest, string url)
+    {
+        var user = await userManager.FindByEmailAsync(passwordChangeRequest.Email);
+        ArgumentNullException.ThrowIfNull(user);
+
+        var token = await userManager.GeneratePasswordResetTokenAsync(user);
+        var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
+        
+        var emailTemplate = emailService.GetEmail("change-password");
+        ArgumentNullException.ThrowIfNull(emailTemplate);
+        
+        emailTemplate = emailTemplate.Replace("{url}", $"{url}/change-password?userId={user.Id}&token={encodedToken}");
+
+        await emailSender.SendEmailAsync(new CreateEmailDto
+        {
+            Email = user.Email!,
+            Subject = "Confirm your account",
+            Message = emailTemplate
+        });
+    }
+    
+    public async Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest)
+    {
+        var user = await userManager.FindByIdAsync(passwordWithTokenRequest.UserId);
+        ArgumentNullException.ThrowIfNull(user);
+
+        var decodedToken = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(passwordWithTokenRequest.Token));
+        await userManager.ResetPasswordAsync(user, decodedToken, passwordWithTokenRequest.NewPassword);
+    } 
 
     private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string[] identityRole, string url)
     {

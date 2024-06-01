@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EPharm.Infrastructure.Migrations
+namespace EPharm.Infrastructure.Migrations.AppDb
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240509175636_ProductChanges")]
-    partial class ProductChanges
+    [Migration("20240601100245_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

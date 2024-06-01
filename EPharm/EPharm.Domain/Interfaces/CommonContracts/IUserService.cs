@@ -1,3 +1,4 @@
+using EPharm.Domain.Dtos.PasswordChangeDto;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 using EPharm.Domain.Dtos.UserDto;
@@ -14,5 +15,7 @@ public interface IUserService
         CreatePharmaCompanyDto createPharmaCompanyDto);
     public Task<GetUserDto> CreateAdminAsync(CreateUserDto createUserDto);
     public Task<bool> UpdateUserAsync(string id, CreateUserDto createUserDto);
+    public Task InitiatePasswordChange(InitiatePasswordChangeRequest passwordChangeRequest, string url);
+    public Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest);
     public Task<bool> DeleteUserAsync(string userId);
 }
