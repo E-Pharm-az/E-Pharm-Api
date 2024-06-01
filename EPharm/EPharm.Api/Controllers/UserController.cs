@@ -162,6 +162,15 @@ public class UserController(IUserService userService, IConfiguration configurati
             await userService.InitiatePasswordChange(request, configuration["AppUrls:EpharmClient"]!);
             return Ok();
         }
+        catch (ArgumentNullException)
+        {
+            return Ok();
+        }
+        catch (KeyNotFoundException ex)
+        {
+            Log.Warning("Warning creating email template, details: {Error}", ex);
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred. Please try again later." });
+        }
         catch (Exception ex)
         {
             Log.Error("Error initiating password change. Details: {Error}", ex);

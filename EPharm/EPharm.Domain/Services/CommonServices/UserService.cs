@@ -126,7 +126,10 @@ public class UserService(
         var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
         
         var emailTemplate = emailService.GetEmail("change-password");
-        ArgumentNullException.ThrowIfNull(emailTemplate);
+        if (emailTemplate is null)
+        {
+            throw new KeyNotFoundException("The email template for 'change-password' was not found.");
+        }
         
         emailTemplate = emailTemplate.Replace("{url}", $"{url}/change-password?userId={user.Id}&token={encodedToken}");
 
