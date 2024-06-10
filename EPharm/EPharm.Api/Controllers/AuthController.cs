@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using EPharm.Domain.Dtos.AuthDto;
-using EPharm.Domain.Dtos.EmailDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
@@ -18,12 +17,11 @@ public class AuthController(
     IConfiguration configuration,
     UserManager<AppIdentityUser> userManager,
     ITokenService tokenService,
-    IEmailSender emailSender,
-    IEmailService emailService
+    IUserService userService
 ) : ControllerBase
 {
-    public const int MaxFailedLoginAttempts = 5;
-    public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
+    private const int MaxFailedLoginAttempts = 5;
+    private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
     
     [HttpGet]
     [Route("lookup/store/{email}")]
@@ -35,7 +33,7 @@ public class AuthController(
         try
         {
             var user = await userManager.FindByEmailAsync(email);
-            if (user is null)
+            if (user is null || !user.EmailConfirmed)
                 return NotFound();
             
             return Ok();
@@ -111,21 +109,9 @@ public class AuthController(
         if (user == null)
             return BadRequest("User not found");
 
-        var emailTemplate = emailService.GetEmail("confirmation-email");
-        if (emailTemplate is null)
-            return StatusCode(500, "An unexpected error occurred");
-
-        emailTemplate = emailTemplate.Replace("{code}", user.Code.ToString());
-
         try
         {
-            await emailSender.SendEmailAsync(new CreateEmailDto
-            {
-                Email = user.Email,
-                Subject = "Confirm your account",
-                Message = emailTemplate
-            });
-            
+            await userService.SendEmailConfirmationAsync(user);
             return Ok();
         }
         catch (Exception ex)

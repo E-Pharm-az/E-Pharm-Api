@@ -9,10 +9,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EPharm.Infrastructure.Migrations.AppDb
+namespace EPharm.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240601100245_InitialMigration")]
+    [Migration("20240610150828_InitialMigration")]
     partial class InitialMigration
     {
         /// <inheritdoc />

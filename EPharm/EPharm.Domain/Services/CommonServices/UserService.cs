@@ -11,6 +11,7 @@ using EPharm.Infrastructure.Context.Entities.Identity;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace EPharm.Domain.Services.CommonServices;
 
@@ -22,6 +23,7 @@ public class UserService(
     IEmailSender emailSender,
     IEmailService emailService,
     IUnitOfWork unitOfWork,
+    IConfiguration configuration,
     IMapper mapper) : IUserService
 {
     public async Task<IEnumerable<GetUserDto>> GetAllUsersAsync()
@@ -36,21 +38,15 @@ public class UserService(
         return mapper.Map<GetUserDto>(user);
     }
 
-    public async Task<GetUserDto> CreateCustomerAsync(CreateUserDto createUserDto)
-    {
-        var existingUser = await userManager.FindByEmailAsync(createUserDto.Email);
-        if (existingUser is not null)
-            throw new InvalidOperationException("User with this email already exists.");
-        
-        return await CreateUserAsync(createUserDto, [IdentityData.Customer]);
-    }
+    public async Task<GetUserDto> CreateCustomerAsync(CreateUserDto createUserDto) =>
+        await CreateUserAsync(createUserDto, [IdentityData.Customer]);
 
     public async Task InitializeUserAsync(InitializeUserDto initializeUserDto)
     {
         var user = await userManager.FindByEmailAsync(initializeUserDto.Email);
         if (user is null)
             throw new InvalidOperationException("User with this email does not exist.");
-        
+
         if (user.Code != initializeUserDto.Code)
             throw new InvalidOperationException("The code provided is not valid.");
 
@@ -62,10 +58,12 @@ public class UserService(
         var result = await userManager.UpdateAsync(user);
 
         if (!result.Succeeded)
-            throw new InvalidOperationException($"Failed to update user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException(
+                $"Failed to update user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
     }
 
-    public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, CreateUserDto createUserDto)
+    public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId,
+        CreateUserDto createUserDto)
     {
         var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager]);
 
@@ -170,13 +168,23 @@ public class UserService(
 
     private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string[] identityRole)
     {
+        var existingUser = await userManager.FindByEmailAsync(createUserDto.Email);
+        if (existingUser is not null)
+        {
+            if (existingUser.EmailConfirmed)
+                throw new InvalidOperationException("User with this email already exists.");
+
+            await SendEmailConfirmationAsync(existingUser);
+            return mapper.Map<GetUserDto>(existingUser);
+        }
+
         var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
         userEntity.UserName = createUserDto.Email;
 
         if (identityRole.Any(role => role != IdentityData.Customer))
             userEntity.EmailConfirmed = true;
 
-        var result = await userManager.CreateAsync(userEntity, Guid.NewGuid().ToString());
+        var result = await userManager.CreateAsync(userEntity, configuration["UniqueKey"]!);
 
         foreach (var role in identityRole)
         {
@@ -191,9 +199,16 @@ public class UserService(
         foreach (var role in identityRole)
             await userManager.AddToRoleAsync(userEntity, role);
 
+        await SendEmailConfirmationAsync(userEntity);
+
+        return mapper.Map<GetUserDto>(userEntity);
+    }
+
+    public async Task SendEmailConfirmationAsync(AppIdentityUser user)
+    {
         var code = RandomCodeGenerator.GenerateCode();
-        userEntity.Code = code;
-        userEntity.CodeExpiryTime = DateTime.UtcNow.AddHours(1);
+        user.Code = code;
+        user.CodeExpiryTime = DateTime.UtcNow.AddHours(1);
 
         var emailTemplate = emailService.GetEmail("confirmation-email");
         ArgumentNullException.ThrowIfNull(emailTemplate);
@@ -202,11 +217,9 @@ public class UserService(
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {
-            Email = userEntity.Email,
+            Email = user.Email,
             Subject = "Confirm your account",
             Message = emailTemplate
         });
-
-        return mapper.Map<GetUserDto>(userEntity);
     }
 }

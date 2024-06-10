@@ -4,7 +4,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace EPharm.Infrastructure.Migrations.AppDb
+namespace EPharm.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialMigration : Migration

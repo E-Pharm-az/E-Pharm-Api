@@ -85,14 +85,13 @@ public class Startup(IConfiguration configuration)
 
         services.AddIdentity<AppIdentityUser, IdentityRole>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = true; // Set this to false for development
+                options.SignIn.RequireConfirmedAccount = true;
                 options.User.RequireUniqueEmail = true;
-                options.Password.RequireDigit = true;
+                options.Password.RequireDigit = false;
                 options.Password.RequiredLength = 8;
-                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;
-                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
             })
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
