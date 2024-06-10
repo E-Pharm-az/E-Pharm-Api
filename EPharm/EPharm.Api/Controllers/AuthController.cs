@@ -1,5 +1,7 @@
 using System.Security.Claims;
 using EPharm.Domain.Dtos.AuthDto;
+using EPharm.Domain.Dtos.EmailDto;
+using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
 using EPharm.Domain.Models.Jwt;
@@ -12,7 +14,13 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(IConfiguration configuration, UserManager<AppIdentityUser> userManager, ITokenService tokenService) : ControllerBase
+public class AuthController(
+    IConfiguration configuration,
+    UserManager<AppIdentityUser> userManager,
+    ITokenService tokenService,
+    IEmailSender emailSender,
+    IEmailService emailService
+) : ControllerBase
 {
     public const int MaxFailedLoginAttempts = 5;
     public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
@@ -94,6 +102,39 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
             return BadRequest("An unexpected error occurred while logging in");
         }
     }
+
+    [HttpPost]
+    [Route("resend-confirmation-email")]
+    public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendEmailDto request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+        if (user == null)
+            return BadRequest("User not found");
+
+        var emailTemplate = emailService.GetEmail("confirmation-email");
+        if (emailTemplate is null)
+            return StatusCode(500, "An unexpected error occurred");
+
+        emailTemplate = emailTemplate.Replace("{code}", user.Code.ToString());
+
+        try
+        {
+            await emailSender.SendEmailAsync(new CreateEmailDto
+            {
+                Email = user.Email,
+                Subject = "Confirm your account",
+                Message = emailTemplate
+            });
+            
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error sending email, Error: {Error}", ex.Message);
+            return StatusCode(500, "An unexpected error occurred");
+        }
+    }
+    
 
     [HttpPost]
     [Route("confirm-email")]
