@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using EPharm.Domain.Dtos.PasswordChangeDto;
+using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Identity;

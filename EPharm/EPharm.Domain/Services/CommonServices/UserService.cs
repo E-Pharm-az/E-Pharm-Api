@@ -1,6 +1,6 @@
 using AutoMapper;
+using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Dtos.EmailDto;
-using EPharm.Domain.Dtos.PasswordChangeDto;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 using EPharm.Domain.Dtos.UserDto;
@@ -11,7 +11,6 @@ using EPharm.Infrastructure.Context.Entities.Identity;
 using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 
 namespace EPharm.Domain.Services.CommonServices;
 
@@ -23,7 +22,6 @@ public class UserService(
     IEmailSender emailSender,
     IEmailService emailService,
     IUnitOfWork unitOfWork,
-    IConfiguration configuration,
     IMapper mapper) : IUserService
 {
     public async Task<IEnumerable<GetUserDto>> GetAllUsersAsync()
@@ -44,14 +42,13 @@ public class UserService(
         if (existingUser is not null)
             throw new InvalidOperationException("User with this email already exists.");
 
-        var user = await CreateUserAsync(createUserDto, [IdentityData.Customer], configuration["AppUrls:EpharmClient"]!);
+        var user = await CreateUserAsync(createUserDto, [IdentityData.Customer]);
         return user;
     }
 
     public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, CreateUserDto createUserDto)
     {
-        var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager],
-            configuration["AppUrls:PharmaPortalClient"]!);
+        var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager]);
 
         var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
         pharmaCompanyManagerEntity.ExternalId = user.Id;
@@ -66,7 +63,7 @@ public class UserService(
         try
         {
             await unitOfWork.BeginTransactionAsync();
-            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager], configuration["AppUrls:PharmaPortalClient"]!);
+            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager]);
 
             var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
 
@@ -88,7 +85,7 @@ public class UserService(
 
     public async Task<GetUserDto> CreateAdminAsync(CreateUserDto createUserDto)
     {
-        var user = await CreateUserAsync(createUserDto, [IdentityData.Admin], configuration["AppConfig:AdminPortalClient"]!);
+        var user = await CreateUserAsync(createUserDto, [IdentityData.Admin]);
         return user;
     }
 
@@ -136,7 +133,7 @@ public class UserService(
         await emailSender.SendEmailAsync(new CreateEmailDto
         {
             Email = user.Email!,
-            Subject = "Confirm your account",
+            Subject = "Change your password",
             Message = emailTemplate
         });
     }
@@ -150,7 +147,7 @@ public class UserService(
         await userManager.ResetPasswordAsync(user, decodedToken, passwordWithTokenRequest.NewPassword);
     } 
 
-    private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string[] identityRole, string url)
+    private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string[] identityRole)
     {
         var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
         userEntity.UserName = createUserDto.Email;
@@ -172,13 +169,14 @@ public class UserService(
         foreach (var role in identityRole)
             await userManager.AddToRoleAsync(userEntity, role);
 
-        var token = await userManager.GenerateEmailConfirmationTokenAsync(userEntity);
-        var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
+        var code = RandomCodeGenerator.GenerateCode();
+        userEntity.Code = code;
+        userEntity.CodeExpiryTime = DateTime.UtcNow.AddHours(1);
 
         var emailTemplate = emailService.GetEmail("confirmation-email");
         ArgumentNullException.ThrowIfNull(emailTemplate);
-        
-        emailTemplate = emailTemplate.Replace("{url}", $"{url}/confirm-email?userId={userEntity.Id}&token={encodedToken}");
+
+        emailTemplate = emailTemplate.Replace("{code}", code);
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {

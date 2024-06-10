@@ -92,6 +92,7 @@ public class Startup(IConfiguration configuration)
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
                 options.Password.RequireLowercase = true;
+                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
             })
             .AddEntityFrameworkStores<AppIdentityDbContext>()
             .AddDefaultTokenProviders();
@@ -113,7 +114,8 @@ public class Startup(IConfiguration configuration)
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = configuration["JwtSettings:Issuer"],
                     ValidAudience = configuration["JwtSettings:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
+                    IssuerSigningKey =
+                        new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!))
                 };
                 options.Events = new JwtBearerEvents
                 {
@@ -136,7 +138,8 @@ public class Startup(IConfiguration configuration)
             );
 
             ops.AddPolicy("ApiCorsPolicy", policy =>
-                policy.WithOrigins("https://www.e-pharm.co", "https://www.pharma.e-pharm.co", "https://www.admin.pharma.e-pharm.co", "https://localhost:5270", "http://localhost:5270")
+                policy.WithOrigins("https://www.e-pharm.co", "https://www.pharma.e-pharm.co",
+                        "https://www.admin.pharma.e-pharm.co", "https://localhost:5270", "http://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()

@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
 using EPharm.Domain.Models.Jwt;
@@ -13,6 +14,31 @@ namespace EPharmApi.Controllers;
 [Route("api/[controller]")]
 public class AuthController(IConfiguration configuration, UserManager<AppIdentityUser> userManager, ITokenService tokenService) : ControllerBase
 {
+    public const int MaxFailedLoginAttempts = 5;
+    public static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
+    
+    [HttpGet]
+    [Route("lookup/store/{email}")]
+    public async Task<IActionResult> LookupStore(string email)
+    {
+        if (string.IsNullOrEmpty(email))
+            return BadRequest("Email cannot be empty.");
+        
+        try
+        {
+            var user = await userManager.FindByEmailAsync(email);
+            if (user is null)
+                return NotFound();
+            
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error looking up email: {Email}, Error: {Error}", email, ex.Message);
+            return BadRequest("An unexpected error occurred while looking up email.");
+        }
+    }
+    
     [HttpPost]
     [Route("login/store")]
     public async Task<IActionResult> LoginStore([FromBody] AuthRequest request)
@@ -69,25 +95,49 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
         }
     }
 
-    [HttpGet]
+    [HttpPost]
     [Route("confirm-email")]
-    public async Task<IActionResult> ConfirmEmail([FromQuery] string userId, [FromQuery] string token)
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto request)
     {
-        var decodedToken = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(token));
+        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Code))
+            return BadRequest("Invalid request parameters");
         
-        var user = await userManager.FindByIdAsync(userId);
+        var user = await userManager.FindByEmailAsync(request.Email);
 
         if (user == null)
             return BadRequest("User not found");
 
-        var result = await userManager.ConfirmEmailAsync(user, decodedToken);
+        // Checks if lockout duration ended
+        if (user.LockoutEnd < DateTime.UtcNow)
+            return BadRequest("Too many attempts, please try again later.");
 
-        if (result.Succeeded)
-            return Ok("Email confirmed successfully");
+        if (user.CodeVerificationFailedAttempts >= MaxFailedLoginAttempts)
+        {
+            // If failed attempts count is larger than max count, then if the lockout end expired, reset the count to 0. Else lock the user.
+            if (user.LockoutEnd < DateTime.UtcNow)
+            {
+                user.CodeVerificationFailedAttempts = 0;
+            }
+            else
+            {
+                user.LockoutEnd = DateTime.UtcNow.Add(LockoutDuration);
+                return BadRequest("To many tries, please try again later.");
+            }
+        }
 
-        var errorMessage = string.Join(",", result.Errors);
-        Log.Error("Error confirming email, user id: {useId}, error details: {errorMessage}", userId, errorMessage);
-        return BadRequest("Error confirming email.");
+        if (user.Code == request.Code)
+        {
+            if (user.CodeExpiryTime > DateTime.UtcNow)
+            {
+                user.EmailConfirmed = true;
+                return Ok("Email confirmed successfully");
+            }
+
+            return BadRequest("Code expired. Please generate a new one.");
+        }
+
+        user.CodeVerificationFailedAttempts++;
+        return BadRequest("Invalid code.");
     }
 
     [HttpGet]

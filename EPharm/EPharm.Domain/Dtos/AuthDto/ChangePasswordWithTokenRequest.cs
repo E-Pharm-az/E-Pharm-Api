@@ -1,4 +1,4 @@
-namespace EPharm.Domain.Dtos.PasswordChangeDto;
+namespace EPharm.Domain.Dtos.AuthDto;
 
 public class ChangePasswordWithTokenRequest
 {

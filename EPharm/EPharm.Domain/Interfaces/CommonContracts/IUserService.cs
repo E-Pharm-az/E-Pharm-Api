@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.PasswordChangeDto;
+using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 using EPharm.Domain.Dtos.UserDto;
