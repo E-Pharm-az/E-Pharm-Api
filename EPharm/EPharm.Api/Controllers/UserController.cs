@@ -53,6 +53,25 @@ public class UserController(IUserService userService, IConfiguration configurati
     }
 
     [HttpPost]
+    [Route("initialize-user")]
+    public async Task<IActionResult> InitializeUser([FromBody] InitializeUserDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            await userService.InitializeUserAsync(request);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Error initializing user, {Error}", ex.Message);
+            return BadRequest("Error initializing user.");
+        }
+    }
+
+    [HttpPost]
     [Route("register/admin")]
     [Authorize(Roles = IdentityData.SuperAdmin)]
     public async Task<IActionResult> RegisterAdmin([FromBody] CreateUserDto request)

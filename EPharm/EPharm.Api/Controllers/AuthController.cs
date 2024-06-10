@@ -99,7 +99,7 @@ public class AuthController(IConfiguration configuration, UserManager<AppIdentit
     [Route("confirm-email")]
     public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto request)
     {
-        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Code))
+        if (string.IsNullOrEmpty(request.Email))
             return BadRequest("Invalid request parameters");
         
         var user = await userManager.FindByEmailAsync(request.Email);

@@ -41,9 +41,28 @@ public class UserService(
         var existingUser = await userManager.FindByEmailAsync(createUserDto.Email);
         if (existingUser is not null)
             throw new InvalidOperationException("User with this email already exists.");
+        
+        return await CreateUserAsync(createUserDto, [IdentityData.Customer]);
+    }
 
-        var user = await CreateUserAsync(createUserDto, [IdentityData.Customer]);
-        return user;
+    public async Task InitializeUserAsync(InitializeUserDto initializeUserDto)
+    {
+        var user = await userManager.FindByEmailAsync(initializeUserDto.Email);
+        if (user is null)
+            throw new InvalidOperationException("User with this email does not exist.");
+        
+        if (user.Code != initializeUserDto.Code)
+            throw new InvalidOperationException("The code provided is not valid.");
+
+        mapper.Map(initializeUserDto, user);
+
+        var passwordHasher = new PasswordHasher<AppIdentityUser>();
+        user.PasswordHash = passwordHasher.HashPassword(user, initializeUserDto.Password);
+
+        var result = await userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+            throw new InvalidOperationException($"Failed to update user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
     }
 
     public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, CreateUserDto createUserDto)
@@ -54,16 +73,17 @@ public class UserService(
         pharmaCompanyManagerEntity.ExternalId = user.Id;
         pharmaCompanyManagerEntity.PharmaCompanyId = pharmaCompanyId;
 
-        var result = await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
-        return result;
+        return await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
     }
 
-    public async Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(CreateUserDto createUserDto, CreatePharmaCompanyDto createPharmaCompanyDto)
+    public async Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(CreateUserDto createUserDto,
+        CreatePharmaCompanyDto createPharmaCompanyDto)
     {
         try
         {
             await unitOfWork.BeginTransactionAsync();
-            var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager]);
+            var user = await CreateUserAsync(createUserDto,
+                [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager]);
 
             var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
 
@@ -121,13 +141,13 @@ public class UserService(
 
         var token = await userManager.GeneratePasswordResetTokenAsync(user);
         var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
-        
+
         var emailTemplate = emailService.GetEmail("change-password");
         if (emailTemplate is null)
         {
             throw new KeyNotFoundException("The email template for 'change-password' was not found.");
         }
-        
+
         emailTemplate = emailTemplate.Replace("{url}", $"{url}/change-password?userId={user.Id}&token={encodedToken}");
 
         await emailSender.SendEmailAsync(new CreateEmailDto
@@ -137,15 +157,16 @@ public class UserService(
             Message = emailTemplate
         });
     }
-    
+
     public async Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest)
     {
         var user = await userManager.FindByIdAsync(passwordWithTokenRequest.UserId);
         ArgumentNullException.ThrowIfNull(user);
 
-        var decodedToken = System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(passwordWithTokenRequest.Token));
+        var decodedToken =
+            System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(passwordWithTokenRequest.Token));
         await userManager.ResetPasswordAsync(user, decodedToken, passwordWithTokenRequest.NewPassword);
-    } 
+    }
 
     private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string[] identityRole)
     {
@@ -155,7 +176,7 @@ public class UserService(
         if (identityRole.Any(role => role != IdentityData.Customer))
             userEntity.EmailConfirmed = true;
 
-        var result = await userManager.CreateAsync(userEntity, createUserDto.Password);
+        var result = await userManager.CreateAsync(userEntity, Guid.NewGuid().ToString());
 
         foreach (var role in identityRole)
         {
@@ -164,7 +185,8 @@ public class UserService(
         }
 
         if (!result.Succeeded)
-            throw new InvalidOperationException($"Failed to create user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
+            throw new InvalidOperationException(
+                $"Failed to create user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
 
         foreach (var role in identityRole)
             await userManager.AddToRoleAsync(userEntity, role);
@@ -176,7 +198,7 @@ public class UserService(
         var emailTemplate = emailService.GetEmail("confirmation-email");
         ArgumentNullException.ThrowIfNull(emailTemplate);
 
-        emailTemplate = emailTemplate.Replace("{code}", code);
+        emailTemplate = emailTemplate.Replace("{code}", code.ToString());
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {

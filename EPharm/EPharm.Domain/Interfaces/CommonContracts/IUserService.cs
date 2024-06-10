@@ -9,6 +9,7 @@ public interface IUserService
 {
     public Task<IEnumerable<GetUserDto>> GetAllUsersAsync();
     public Task<GetUserDto?> GetUserByIdAsync(string userId);
+    public Task InitializeUserAsync(InitializeUserDto initializeUserDto);
     public Task<GetUserDto> CreateCustomerAsync(CreateUserDto createUserDto);
     public Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, CreateUserDto createUserDto);
     public Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(CreateUserDto createUserDto,
