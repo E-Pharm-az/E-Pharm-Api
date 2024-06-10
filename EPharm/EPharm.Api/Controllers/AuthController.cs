@@ -135,7 +135,7 @@ public class AuthController(
             return BadRequest("User not found");
 
         // Checks if lockout duration ended
-        if (user.LockoutEnd < DateTime.UtcNow)
+        if (user.LockoutEnd > DateTime.UtcNow)
             return BadRequest("Too many attempts, please try again later.");
 
         if (user.CodeVerificationFailedAttempts >= MaxFailedLoginAttempts)
@@ -157,6 +157,7 @@ public class AuthController(
             if (user.CodeExpiryTime > DateTime.UtcNow)
             {
                 user.EmailConfirmed = true;
+                await userManager.UpdateAsync(user);
                 return Ok("Email confirmed successfully");
             }
 

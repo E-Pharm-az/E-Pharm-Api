@@ -209,6 +209,7 @@ public class UserService(
         var code = RandomCodeGenerator.GenerateCode();
         user.Code = code;
         user.CodeExpiryTime = DateTime.UtcNow.AddHours(1);
+        await userManager.UpdateAsync(user);
 
         var emailTemplate = emailService.GetEmail("confirmation-email");
         ArgumentNullException.ThrowIfNull(emailTemplate);
