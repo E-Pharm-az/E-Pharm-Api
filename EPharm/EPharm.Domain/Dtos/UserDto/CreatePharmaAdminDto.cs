@@ -5,6 +5,6 @@ namespace EPharm.Domain.Dtos.UserDto;
 
 public class CreatePharmaAdminDto
 {
-    public CreateUserDto UserRequest { get; set; }
+    public RegisterUserDto UserRequest { get; set; }
     public CreatePharmaCompanyDto PharmaCompanyRequest { get; set; } 
 }

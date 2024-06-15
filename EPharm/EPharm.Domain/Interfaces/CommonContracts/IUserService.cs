@@ -11,12 +11,12 @@ public interface IUserService
     public Task<IEnumerable<GetUserDto>> GetAllUsersAsync();
     public Task<GetUserDto?> GetUserByIdAsync(string userId);
     public Task InitializeUserAsync(InitializeUserDto initializeUserDto);
-    public Task<GetUserDto> CreateCustomerAsync(CreateUserDto createUserDto);
-    public Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, CreateUserDto createUserDto);
-    public Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(CreateUserDto createUserDto,
+    public Task<GetUserDto> CreateCustomerAsync(RegisterUserDto registerUserDto);
+    public Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, RegisterUserDto registerUserDto);
+    public Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(RegisterUserDto registerUserDto,
         CreatePharmaCompanyDto createPharmaCompanyDto);
-    public Task<GetUserDto> CreateAdminAsync(CreateUserDto createUserDto);
-    public Task<bool> UpdateUserAsync(string id, CreateUserDto createUserDto);
+    public Task<GetUserDto> CreateAdminAsync(RegisterUserDto registerUserDto);
+    public Task<bool> UpdateUserAsync(string id, RegisterUserDto registerUserDto);
     public Task InitiatePasswordChange(InitiatePasswordChangeRequest passwordChangeRequest, string url);
     public Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest);
     public Task SendEmailConfirmationAsync(AppIdentityUser user);

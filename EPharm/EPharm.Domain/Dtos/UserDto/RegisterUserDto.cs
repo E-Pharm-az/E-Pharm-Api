@@ -1,6 +1,6 @@
 namespace EPharm.Domain.Dtos.UserDto;
 
-public class CreateUserDto
+public class RegisterUserDto
 {
     public string Email { get; set; }
 }

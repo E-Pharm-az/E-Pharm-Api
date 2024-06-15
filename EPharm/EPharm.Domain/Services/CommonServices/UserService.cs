@@ -38,8 +38,8 @@ public class UserService(
         return mapper.Map<GetUserDto>(user);
     }
 
-    public async Task<GetUserDto> CreateCustomerAsync(CreateUserDto createUserDto) =>
-        await CreateUserAsync(createUserDto, [IdentityData.Customer]);
+    public async Task<GetUserDto> CreateCustomerAsync(RegisterUserDto registerUserDto) =>
+        await CreateUserAsync(registerUserDto, [IdentityData.Customer]);
 
     public async Task InitializeUserAsync(InitializeUserDto initializeUserDto)
     {
@@ -63,9 +63,9 @@ public class UserService(
     }
 
     public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId,
-        CreateUserDto createUserDto)
+        RegisterUserDto registerUserDto)
     {
-        var user = await CreateUserAsync(createUserDto, [IdentityData.PharmaCompanyManager]);
+        var user = await CreateUserAsync(registerUserDto, [IdentityData.PharmaCompanyManager]);
 
         var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
         pharmaCompanyManagerEntity.ExternalId = user.Id;
@@ -74,13 +74,13 @@ public class UserService(
         return await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
     }
 
-    public async Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(CreateUserDto createUserDto,
+    public async Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(RegisterUserDto registerUserDto,
         CreatePharmaCompanyDto createPharmaCompanyDto)
     {
         try
         {
             await unitOfWork.BeginTransactionAsync();
-            var user = await CreateUserAsync(createUserDto,
+            var user = await CreateUserAsync(registerUserDto,
                 [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager]);
 
             var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaCompanyDto, user.Id);
@@ -101,20 +101,20 @@ public class UserService(
         }
     }
 
-    public async Task<GetUserDto> CreateAdminAsync(CreateUserDto createUserDto)
+    public async Task<GetUserDto> CreateAdminAsync(RegisterUserDto registerUserDto)
     {
-        var user = await CreateUserAsync(createUserDto, [IdentityData.Admin]);
+        var user = await CreateUserAsync(registerUserDto, [IdentityData.Admin]);
         return user;
     }
 
-    public async Task<bool> UpdateUserAsync(string id, CreateUserDto createUserDto)
+    public async Task<bool> UpdateUserAsync(string id, RegisterUserDto registerUserDto)
     {
         var user = await userManager.FindByIdAsync(id);
 
         if (user is null)
             return false;
 
-        mapper.Map(createUserDto, user);
+        mapper.Map(registerUserDto, user);
 
         var result = await userManager.UpdateAsync(user);
 
@@ -166,9 +166,9 @@ public class UserService(
         await userManager.ResetPasswordAsync(user, decodedToken, passwordWithTokenRequest.NewPassword);
     }
 
-    private async Task<GetUserDto> CreateUserAsync(CreateUserDto createUserDto, string[] identityRole)
+    private async Task<GetUserDto> CreateUserAsync(RegisterUserDto registerUserDto, string[] identityRole)
     {
-        var existingUser = await userManager.FindByEmailAsync(createUserDto.Email);
+        var existingUser = await userManager.FindByEmailAsync(registerUserDto.Email);
         if (existingUser is not null)
         {
             if (existingUser.EmailConfirmed)
@@ -178,8 +178,8 @@ public class UserService(
             return mapper.Map<GetUserDto>(existingUser);
         }
 
-        var userEntity = mapper.Map<AppIdentityUser>(createUserDto);
-        userEntity.UserName = createUserDto.Email;
+        var userEntity = mapper.Map<AppIdentityUser>(registerUserDto);
+        userEntity.UserName = registerUserDto.Email;
 
         if (identityRole.Any(role => role != IdentityData.Customer))
             userEntity.EmailConfirmed = true;

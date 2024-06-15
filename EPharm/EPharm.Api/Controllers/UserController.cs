@@ -35,7 +35,7 @@ public class UserController(IUserService userService, IConfiguration configurati
 
     [HttpPost]
     [Route("register")]
-    public async Task<IActionResult> Register([FromBody] CreateUserDto request)
+    public async Task<IActionResult> Register([FromBody] RegisterUserDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -44,6 +44,11 @@ public class UserController(IUserService userService, IConfiguration configurati
         {
             await userService.CreateCustomerAsync(request);
             return Ok();
+        }
+        catch (InvalidOperationException ex)
+        {
+            Log.Error("Error creating user, {Error}", ex.Message);
+            return StatusCode(StatusCodes.Status409Conflict, new { message = "User with this email already exists." });
         }
         catch (Exception ex)
         {
@@ -74,7 +79,7 @@ public class UserController(IUserService userService, IConfiguration configurati
     [HttpPost]
     [Route("register/admin")]
     [Authorize(Roles = IdentityData.SuperAdmin)]
-    public async Task<IActionResult> RegisterAdmin([FromBody] CreateUserDto request)
+    public async Task<IActionResult> RegisterAdmin([FromBody] RegisterUserDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -114,7 +119,7 @@ public class UserController(IUserService userService, IConfiguration configurati
     [HttpPost]
     [Route("register/{companyId:int}/pharma-manager")]
     [Authorize(Roles = IdentityData.PharmaCompanyAdmin)]
-    public async Task<IActionResult> RegisterPharmaManager(int companyId, [FromBody] CreateUserDto request)
+    public async Task<IActionResult> RegisterPharmaManager(int companyId, [FromBody] RegisterUserDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -133,7 +138,7 @@ public class UserController(IUserService userService, IConfiguration configurati
 
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<ActionResult> UpdateUser(string id, [FromBody] CreateUserDto userDto)
+    public async Task<ActionResult> UpdateUser(string id, [FromBody] RegisterUserDto userDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");

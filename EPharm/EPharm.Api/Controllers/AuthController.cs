@@ -22,29 +22,7 @@ public class AuthController(
 {
     private const int MaxFailedLoginAttempts = 5;
     private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
-    
-    [HttpGet]
-    [Route("lookup/store/{email}")]
-    public async Task<IActionResult> LookupStore(string email)
-    {
-        if (string.IsNullOrEmpty(email))
-            return BadRequest("Email cannot be empty.");
-        
-        try
-        {
-            var user = await userManager.FindByEmailAsync(email);
-            if (user is null || !user.EmailConfirmed)
-                return NotFound();
-            
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Error looking up email: {Email}, Error: {Error}", email, ex.Message);
-            return BadRequest("An unexpected error occurred while looking up email.");
-        }
-    }
-    
+
     [HttpPost]
     [Route("login/store")]
     public async Task<IActionResult> LoginStore([FromBody] AuthRequest request)
