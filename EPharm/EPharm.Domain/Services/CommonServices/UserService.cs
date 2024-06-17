@@ -24,6 +24,7 @@ public class UserService(
     IEmailService emailService,
     IUnitOfWork unitOfWork,
     IConfiguration configuration,
+    IPasswordHasher<AppIdentityUser> passwordHasher,
     IMapper mapper) : IUserService
 {
     public async Task<IEnumerable<GetUserDto>> GetAllUsersAsync()
@@ -52,11 +53,9 @@ public class UserService(
 
         mapper.Map(initializeUserDto, user);
 
-        var passwordHasher = new PasswordHasher<AppIdentityUser>();
         user.PasswordHash = passwordHasher.HashPassword(user, initializeUserDto.Password);
 
         var result = await userManager.UpdateAsync(user);
-
         if (!result.Succeeded)
             throw new InvalidOperationException(
                 $"Failed to update user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
@@ -137,16 +136,17 @@ public class UserService(
         var user = await userManager.FindByEmailAsync(passwordChangeRequest.Email);
         ArgumentNullException.ThrowIfNull(user);
 
-        var token = await userManager.GeneratePasswordResetTokenAsync(user);
-        var encodedToken = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(token));
+        var code = RandomCodeGenerator.GenerateCode();
+        user.Code = code;
+        user.CodeExpiryTime = DateTime.UtcNow.AddHours(1);
+        
+        await userManager.UpdateAsync(user);
 
         var emailTemplate = emailService.GetEmail("change-password");
         if (emailTemplate is null)
-        {
             throw new KeyNotFoundException("The email template for 'change-password' was not found.");
-        }
 
-        emailTemplate = emailTemplate.Replace("{url}", $"{url}/change-password?userId={user.Id}&token={encodedToken}");
+        emailTemplate = emailTemplate.Replace("{code}", code.ToString());
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {
@@ -158,12 +158,17 @@ public class UserService(
 
     public async Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest)
     {
-        var user = await userManager.FindByIdAsync(passwordWithTokenRequest.UserId);
-        ArgumentNullException.ThrowIfNull(user);
+        var user = await userManager.FindByEmailAsync(passwordWithTokenRequest.Email);
+        if (user == null)
+            throw new ArgumentException("Invalid email address.");
 
-        var decodedToken =
-            System.Text.Encoding.UTF8.GetString(Convert.FromBase64String(passwordWithTokenRequest.Token));
-        await userManager.ResetPasswordAsync(user, decodedToken, passwordWithTokenRequest.NewPassword);
+        if (user.Code == passwordWithTokenRequest.Code && user.CodeExpiryTime > DateTime.UtcNow)
+        {
+            user.PasswordHash = passwordHasher.HashPassword(user, passwordWithTokenRequest.Password);
+            await userManager.UpdateAsync(user);
+        }
+        else
+            throw new ArgumentException("Invalid or expired code. Please generate a new one.");
     }
 
     private async Task<GetUserDto> CreateUserAsync(RegisterUserDto registerUserDto, string[] identityRole)

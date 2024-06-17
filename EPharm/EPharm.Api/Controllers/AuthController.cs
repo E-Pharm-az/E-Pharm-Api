@@ -122,10 +122,12 @@ public class AuthController(
             if (user.LockoutEnd < DateTime.UtcNow)
             {
                 user.CodeVerificationFailedAttempts = 0;
+                await userManager.UpdateAsync(user);
             }
             else
             {
                 user.LockoutEnd = DateTime.UtcNow.Add(LockoutDuration);
+                await userManager.UpdateAsync(user);
                 return BadRequest("To many tries, please try again later.");
             }
         }
@@ -142,7 +144,9 @@ public class AuthController(
             return BadRequest("Code expired. Please generate a new one.");
         }
 
-        user.CodeVerificationFailedAttempts++;
+        user.CodeVerificationFailedAttempts++; 
+        await userManager.UpdateAsync(user);
+        
         return BadRequest("Invalid code.");
     }
 
