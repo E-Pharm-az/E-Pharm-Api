@@ -72,8 +72,7 @@ public class OrderService(
 
             var productStock = product.Stock.Sum(s => s.Quantity);
 
-            if (!orderProducts.TryGetValue(product.Id, out var orderProduct))
-                throw new ArgumentException("PRODUCT_MISMATCH");
+            orderProducts.TryGetValue(product.Id, out var orderProduct);
 
             if (productStock < orderProduct.Quantity)
                 throw new ArgumentException("STOCK_NOT_ENOUGH");
@@ -132,10 +131,72 @@ public class OrderService(
         }
     }
 
-    public async Task<bool> CaptureOrderAsync(int orderId)
+    public async Task CaptureOrderAsync(string orderId)
     {
-        // TODO: Implement the stock logic, where on order the stock should go down, and if there is not stock, the order should not go through
-        throw new NotImplementedException();
+        var order = await orderRepository.GetOrderByTrackingNumberAsync(orderId);
+
+        if (order is null)
+            throw new ArgumentException("ORDER_NOT_FOUND");
+
+        var products =
+            await productRepository.GetApprovedProductsByIdAsync(order.OrderProducts.Select(p => p.ProductId)
+                .ToArray());
+
+        var orderProducts = order.OrderProducts.ToDictionary(p => p.ProductId);
+
+        // Validate that order product is still in purchasable state
+        try
+        {
+            await unitOfWork.BeginTransactionAsync();
+
+            foreach (var product in products)
+            {
+                if (product is null)
+                    throw new ArgumentException("PRODUCT_NOT_FOUND");
+
+                orderProducts.TryGetValue(product.Id, out var orderProduct);
+
+                if (product.Stock.Sum(s => s.Quantity) < orderProduct.Quantity)
+                    throw new ArgumentException("STOCK_NOT_ENOUGH");
+
+
+                // TODO: Take use of the google api key to determine the most optimal warehouse
+                // If product is located in a single warehouse, then we directly order it from there;
+                if (product.Stock.Count == 1)
+                {
+                    orderProduct.WarehouseId = product.Stock.First().WarehouseId;
+                    product.Stock.First().Quantity -= orderProduct.Quantity;
+                    productRepository.Update(product);
+                    orderProductRepository.Update(orderProduct);
+                }
+            }
+
+            var accessToken = await GenerateAccessTokenAsync();
+
+            var client = new RestClient(configuration["PayPalConfig:BaseUrl"]!);
+            var request = new RestRequest($"/v2/checkout/orders/${orderId}/capture", Method.Post);
+
+            request.AddHeader("Authorization", $"Bearer {accessToken}");
+
+            var response = await client.ExecuteAsync<CreateOrderResponse>(request);
+
+            if (!response.IsSuccessful)
+            {
+                Console.WriteLine(response.ErrorMessage);
+                throw new ArgumentException("FAILED_TO_CAPTURE_PAYPAL_ORDER");
+            }
+
+            order.Status = OrderStatus.Paid;
+            orderRepository.Update(order);
+
+            await unitOfWork.CommitTransactionAsync();
+            await unitOfWork.SaveChangesAsync();
+        }
+        catch (Exception)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     public async Task<bool> UpdateOrderAsync(int id, CreateOrderDto orderDto)

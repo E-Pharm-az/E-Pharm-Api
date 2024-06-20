@@ -18,6 +18,10 @@ public class OrderProductConfig : IEntityTypeConfiguration<OrderProduct>
             .HasForeignKey(op => op.ProductId)
             .IsRequired();
 
+        builder.HasOne(op => op.Warehouse)
+            .WithMany(o => o.OrderProducts)
+            .HasForeignKey(op => op.WarehouseId);
+
         builder.Property(op => op.Quantity)
             .IsRequired();
 
