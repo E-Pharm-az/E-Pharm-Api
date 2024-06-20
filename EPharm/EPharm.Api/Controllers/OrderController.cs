@@ -5,6 +5,7 @@ using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace EPharmApi.Controllers;
 
@@ -65,23 +66,65 @@ public class OrderController(IOrderService orderService, IPharmaCompanyService p
     public async Task<ActionResult<GetOrderDto>> CreateOrder([FromBody] CreateOrderDto orderDto)
     {
         if (!ModelState.IsValid)
-            return BadRequest("Model not valid");
+            return BadRequest(new { Error = "Model not valid" });
 
         try
         {
             var result = await orderService.CreateOrderAsync(orderDto);
             return Ok(result);
         }
-        catch (Exception e)
+        catch (ArgumentException ex) when (ex.Message == "MISSING_EMAIL_FOR_ORDER")
         {
-            return BadRequest($"Order could not be created.");
+            return BadRequest(new { Error = "Email is required for the order." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "PRODUCT_NOT_FOUND")
+        {
+            return NotFound(new { Error = "One or more products in the order were not found." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "STOCK_NOT_ENOUGH")
+        {
+            return BadRequest(new { Error = "Insufficient stock for one or more products." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "FAILED_TO_CREATE_PAYPAL_ORDER")
+        {
+            return BadRequest(new { Error = "Failed to create PayPal order." });
+        }
+        catch (Exception ex)
+        {
+            Log.Error("An error occurred while creating order. Details: {@ex}", ex);
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
 
-    [HttpPost]
-    public async Task<IActionResult> CaptureOrder()
+    [HttpPost("{orderId}")]
+    public async Task<IActionResult> CaptureOrder(string orderId)
     {
-        return Ok();
+        try
+        {
+            await orderService.CaptureOrderAsync(orderId);
+            return Ok(new { Message = "Order captured successfully." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "ORDER_NOT_FOUND")
+        {
+            return NotFound(new { Error = "Order not found." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "PRODUCT_NOT_FOUND")
+        {
+            return NotFound(new { Error = "Product not found." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "STOCK_NOT_ENOUGH")
+        {
+            return BadRequest(new { Error = "Insufficient stock for one or more products." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "FAILED_TO_CAPTURE_PAYPAL_ORDER")
+        {
+            return BadRequest(new { Error = "Failed to capture PayPal order." });
+        }
+        catch (Exception ex)
+        {
+            Log.Error("An error occurred while capturing order. Details: {@ex}", ex);
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
     }
 
     [HttpPut("{id:int}")]
