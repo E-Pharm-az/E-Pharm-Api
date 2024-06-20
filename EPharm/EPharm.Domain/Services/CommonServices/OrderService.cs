@@ -1,8 +1,10 @@
+using System.Globalization;
 using AutoMapper;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Dtos.PayPalDtos;
+using EPharm.Domain.Dtos.PayPalDtos.Payload;
+using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
-using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Product;
 using EPharm.Infrastructure.Context.Entities.Identity;
 using EPharm.Infrastructure.Context.Entities.Junctions;
@@ -20,6 +22,7 @@ namespace EPharm.Domain.Services.CommonServices;
 public class OrderService(
     IUnitOfWork unitOfWork,
     UserManager<AppIdentityUser> userManager,
+    IUserService userService,
     IOrderRepository orderRepository,
     IOrderProductRepository orderProductRepository,
     IProductRepository productRepository,
@@ -50,28 +53,27 @@ public class OrderService(
         return mapper.Map<GetOrderDto?>(order);
     }
 
+    // TODO: Cache user preferences for order delivery address.
     public async Task<GetOrderDto> CreateOrderAsync(CreateOrderDto orderDto)
     {
-        if (orderDto.Email is null && orderDto.PhoneNumber is null)
-            throw new ArgumentException("MISSING_REQUIRED_FIELDS_FOR_ORDER");
+        if (!string.IsNullOrEmpty(orderDto.Email))
+            throw new ArgumentException("MISSING_EMAIL_FOR_ORDER");
 
         var orderSummary = new OrderSummary();
-        var products =
-            await productRepository.GetApprovedProductsByIdAsync(orderDto.Products.Select(p => p.ProductId).ToArray());
+        var productIds = orderDto.Products.Select(p => p.ProductId).ToArray();
+        var products = await productRepository.GetApprovedProductsByIdAsync(productIds);
 
-        // TODO: Performance review
+        var orderProducts = orderDto.Products.ToDictionary(p => p.ProductId);
+
         foreach (var product in products)
         {
             if (product is null)
                 throw new ArgumentException("PRODUCT_NOT_FOUND");
 
-            if (product.IsApproved is false)
-                throw new ArgumentException("PRODUCT_NOT_APPROVED");
+            var productStock = product.Stock.Sum(s => s.Quantity);
 
-            var productStock = product.Stock.Select(s => s.Quantity).Sum();
-
-            // Mapping the queried product to product in order
-            var orderProduct = orderDto.Products.First(p => p.ProductId == product.Id);
+            if (!orderProducts.TryGetValue(product.Id, out var orderProduct))
+                throw new ArgumentException("PRODUCT_MISMATCH");
 
             if (productStock < orderProduct.Quantity)
                 throw new ArgumentException("STOCK_NOT_ENOUGH");
@@ -86,75 +88,48 @@ public class OrderService(
         }
 
         var accessToken = await GenerateAccessTokenAsync();
+        var payload = CreatePayPalPayload(orderDto.Currency, orderSummary);
 
-        var payload = new
-        {
-            intent = "CAPTURE",
-            purchase_units = new[]
-            {
-                new
-                {
-                    amount = new
-                    {
-                        currency_code = orderDto.Currency,
-                        value = orderSummary.TotalPrice.ToString(), // TODO: Requires conversion performance review?
-                        breakdown = new
-                        {
-                            item_total = new
-                            {
-                                currency_code = orderDto.Currency,
-                                value = orderSummary.TotalPrice.ToString("0.00"),
-                            },
-                        }
-                    },
-                    items = orderSummary.Products.Select(p => new
-                    {
-                        name = p.Name,
-                        unit_amount = new
-                        {
-                            currency_code = orderDto.Currency,
-                            value = p.Value.ToString("0.00"),
-                        },
-                        quantity = p.Quantity.ToString(),
-                    }).ToArray()
-                }
-            }
-        };
+        var response = await CreatePayPalOrderAsync(accessToken, payload);
 
-        var client = new RestClient(configuration["PayPalConfig:BaseUrl"]!);
-        var request = new RestRequest("/v2/checkout/orders", Method.Post);
-
-        request.AddHeader("Authorization", $"Basic {accessToken}");
-        request.AddJsonBody(payload);
-
-        var response = await client.ExecuteAsync<CreateOrderResponse>(request);
-
-        if (response.IsSuccessful is false)
-        {
-            throw new Exception("FAILED_TO_CREATE_PAYPAL_ORDER");
-        }
+        if (!response.IsSuccessful)
+            throw new ArgumentException("FAILED_TO_CREATE_PAYPAL_ORDER");
 
         var orderEntity = mapper.Map<Order>(orderDto);
+
         orderEntity.TrackingId = response.Data.Id;
         orderEntity.Status = OrderStatus.PendingPayment;
 
-        var user = await userManager.FindByEmailAsync(orderEntity.Email);
+        var user = await userManager.FindByEmailAsync(orderDto.Email);
 
-        if (user is not null)
+        if (user is null)
+        {
+            await userService.CreateCustomerAsync(new RegisterUserDto { Email = orderDto.Email, });
+        }
+        else
+        {
             orderEntity.UserId = user.Id;
+        }
 
-        await unitOfWork.BeginTransactionAsync();
+        try
+        {
+            await unitOfWork.BeginTransactionAsync();
 
-        var order = await orderRepository.InsertAsync(orderEntity);
+            var order = await orderRepository.InsertAsync(orderEntity);
+            var orderProductEntities = mapper.Map<IEnumerable<OrderProduct>>(orderDto.Products);
 
-        var orderProductEntities = mapper.Map<IEnumerable<OrderProduct>>(orderDto.Products);
+            await orderProductRepository.CreateManyOrderProductAsync(orderProductEntities);
 
-        await orderProductRepository.CreateManyOrderProductAsync(orderProductEntities);
+            await unitOfWork.CommitTransactionAsync();
+            await unitOfWork.SaveChangesAsync();
 
-        await unitOfWork.CommitTransactionAsync();
-        await unitOfWork.SaveChangesAsync();
-
-        return mapper.Map<GetOrderDto>(order);
+            return mapper.Map<GetOrderDto>(order);
+        }
+        catch (Exception)
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     public async Task<bool> CaptureOrderAsync(int orderId)
@@ -215,5 +190,56 @@ public class OrderService(
             throw new Exception("INVALID_PAYPAL_TOKEN_RESPONSE");
 
         return token.AccessToken;
+    }
+
+    private PayPalOrderPayload CreatePayPalPayload(string currency, OrderSummary orderSummary)
+    {
+        var payload = new PayPalOrderPayload
+        {
+            Intent = "CAPTURE",
+            PurchaseUnits =
+            [
+                new PurchaseUnit
+                {
+                    Amount = new Amount
+                    {
+                        CurrencyCode = currency,
+                        Value = orderSummary.TotalPrice.ToString("0.00", CultureInfo.InvariantCulture),
+                        Breakdown = new Breakdown
+                        {
+                            ItemTotal = new ItemTotal
+                            {
+                                CurrencyCode = currency,
+                                Value = orderSummary.TotalPrice.ToString("0.00", CultureInfo.InvariantCulture),
+                            }
+                        }
+                    },
+                    Items = orderSummary.Products.Select(p => new Item
+                    {
+                        Name = p.Name,
+                        UnitAmount = new UnitAmount
+                        {
+                            CurrencyCode = currency,
+                            Value = p.Value.ToString("0.00", CultureInfo.InvariantCulture)
+                        },
+                        Quantity = p.Quantity.ToString()
+                    }).ToArray()
+                }
+            ]
+        };
+
+        return payload;
+    }
+
+    private async Task<RestResponse<CreateOrderResponse>> CreatePayPalOrderAsync(string accessToken,
+        PayPalOrderPayload payload)
+    {
+        var client = new RestClient(configuration["PayPalConfig:BaseUrl"]!);
+        var request = new RestRequest("/v2/checkout/orders", Method.Post);
+
+        request.AddHeader("Authorization", $"Bearer {accessToken}");
+        request.AddJsonBody(payload);
+
+        return await client.ExecuteAsync<CreateOrderResponse>(request);
     }
 }
