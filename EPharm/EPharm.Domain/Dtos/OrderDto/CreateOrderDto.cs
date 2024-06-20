@@ -8,5 +8,6 @@ public class CreateOrderDto
     public string? PhoneNumber { get; set; }
     public string? FullName { get; set; }
     public string ShippingAddress { get; set; }
+    public string Currency { get; set; }
     public ICollection<CreateOrderProductDto> Products { get; set; }
 }

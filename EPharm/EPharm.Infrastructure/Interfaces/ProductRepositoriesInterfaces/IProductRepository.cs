@@ -10,5 +10,5 @@ public interface IProductRepository : IRepository<Product>
     public Task<Product?> GetApprovedProductDetailAsync(int productId);
     public Task<IEnumerable<Product>> GetApprovedAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page, int pageSize);
     public Task<IEnumerable<Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page, int pageSize);
-    
+    public Task<IEnumerable<Product>> GetApprovedProductsByIdAsync(int[] productIds);
 }

@@ -9,7 +9,7 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
 {
     public async Task SendEmailAsync(CreateEmailDto emailDto)
     {
-        var client = new RestClient(configuration["ResendConfig:Base"]!);
+        var client = new RestClient(configuration["ResendConfig:BaseUrl"]!);
         var request = new RestRequest("/emails", Method.Post);
         
         request.AddHeader("Authorization", $"Bearer {configuration["ResendConfig:Key"]}");

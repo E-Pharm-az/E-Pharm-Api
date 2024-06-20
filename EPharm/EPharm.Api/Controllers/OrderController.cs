@@ -1,6 +1,5 @@
 using System.Security.Claims;
 using EPharm.Domain.Dtos.OrderDto;
-using EPharm.Domain.Interfaces;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
@@ -58,6 +57,31 @@ public class OrderController(IOrderService orderService, IPharmaCompanyService p
         if (result.Any()) return Ok(result);
         
         return NotFound("Orders not found.");
+    }
+
+    // TODO: Needs some API design, problem with different use of structure.
+    // TODO: Fix error handling
+    [HttpPost]
+    public async Task<ActionResult<GetOrderDto>> CreateOrder([FromBody] CreateOrderDto orderDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Model not valid");
+
+        try
+        {
+            var result = await orderService.CreateOrderAsync(orderDto);
+            return Ok(result);
+        }
+        catch (Exception e)
+        {
+            return BadRequest($"Order could not be created.");
+        }
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CaptureOrder()
+    {
+        return Ok();
     }
 
     [HttpPut("{id:int}")]

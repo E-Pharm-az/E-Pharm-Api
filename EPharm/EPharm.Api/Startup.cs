@@ -243,6 +243,6 @@ public class Startup(IConfiguration configuration)
 
         dbSeeder.SeedSuperAdminAsync().Wait();
         emailService.CompileEmail("confirmation-email", "Emails/confirmation-email.html").Wait();
-        emailService.CompileEmail("change-password", "Emails/change-password.html").Wait();
+        // emailService.CompileEmail("change-password", "Emails/change-password.html").Wait();
     }
 }

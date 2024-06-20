@@ -10,14 +10,9 @@ namespace EPharm.Infrastructure.Repositories.JunctionsRepositories;
 public class OrderProductRepository(AppDbContext context, IProductRepository productRepository)
     : Repository<OrderProduct>(context), IOrderProductRepository
 {
-    public async Task<Product> InsertOrderProductAsync(OrderProduct orderProduct) 
+    public async Task CreateManyOrderProductAsync(IEnumerable<OrderProduct> orderProducts)
     {
-        var product = await productRepository.GetByIdAsync(orderProduct.ProductId);
-
-        if (product is null)
-            throw new InvalidOperationException($"Product with id {orderProduct.Id} does not exist.");
-
-        await InsertAsync(orderProduct);
-        return product;
+        await context.OrderProducts.AddRangeAsync(orderProducts);
+        await context.SaveChangesAsync();
     }
 }

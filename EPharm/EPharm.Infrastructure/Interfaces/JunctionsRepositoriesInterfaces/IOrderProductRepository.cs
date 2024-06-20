@@ -6,5 +6,5 @@ namespace EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
 
 public interface IOrderProductRepository : IRepository<OrderProduct>
 {
-    public Task<Product> InsertOrderProductAsync(OrderProduct orderProduct);
+    public Task CreateManyOrderProductAsync(IEnumerable<OrderProduct> orderProducts);
 }

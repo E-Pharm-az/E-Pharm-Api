@@ -32,6 +32,13 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         return (await Entities.AsNoTracking().SingleOrDefaultAsync(s => s.Id == entityItem.Entity.Id))!;
     }
 
+    public virtual async Task InsertManyAsync(IEnumerable<T> entities)
+    {
+        ArgumentNullException.ThrowIfNull(entities);
+        await Entities.AddRangeAsync(entities);
+        await _context.SaveChangesAsync();
+    }
+
     public virtual void Update(T entity)
     {
         ArgumentNullException.ThrowIfNull(entity);
