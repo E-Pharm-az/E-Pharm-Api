@@ -1,6 +1,6 @@
 using EPharm.Infrastructure.Context.Entities.Identity;
 
-namespace EPharm.Infrastructure.Interfaces.IdentityRepositoriesInterfaces;
+namespace EPharm.Infrastructure.Interfaces.Identity;
 
 public interface IAppIdentityUserRepository
 {

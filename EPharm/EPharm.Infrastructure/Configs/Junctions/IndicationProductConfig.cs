@@ -2,7 +2,7 @@ using EPharm.Infrastructure.Context.Entities.Junctions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EPharm.Infrastructure.Context.Configs.JunctionConfigs;
+namespace EPharm.Infrastructure.Configs.Junctions;
 
 public class IndicationProductConfig : IEntityTypeConfiguration<IndicationProduct>
 {

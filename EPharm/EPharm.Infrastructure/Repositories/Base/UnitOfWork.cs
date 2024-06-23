@@ -1,8 +1,8 @@
 using EPharm.Infrastructure.Context;
-using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
+using EPharm.Infrastructure.Interfaces.Base;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace EPharm.Infrastructure.Repositories.BaseRepositories;
+namespace EPharm.Infrastructure.Repositories.Base;
 
 public class UnitOfWork(AppDbContext context) : IUnitOfWork
 {
@@ -29,4 +29,21 @@ public class UnitOfWork(AppDbContext context) : IUnitOfWork
         if (_transaction is null) throw new ArgumentException("Transaction has not started");
         await _transaction.RollbackAsync();
     }
+    
+    public async Task ExecuteTransactionAsync(Func<Task> action)
+    {
+        await BeginTransactionAsync();
+        try
+        {
+            await action();
+            await CommitTransactionAsync();
+            await SaveChangesAsync();
+        }
+        catch
+        {
+            await RollbackTransactionAsync();
+            throw;
+        }
+    } 
+
 }

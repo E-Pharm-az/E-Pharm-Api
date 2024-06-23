@@ -7,8 +7,8 @@ namespace EPharm.Infrastructure.Context;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<PharmaCompany> PharmaCompanies { get; set; }
-    public DbSet<PharmaCompanyManager> PharmaCompanyManagers { get; set; }
+    public DbSet<Pharmacy> PharmaCompanies { get; set; }
+    public DbSet<PharmacyStaff> PharmaCompanyManagers { get; set; }
     
     public DbSet<ActiveIngredient> ActiveIngredients { get; set; }
     public DbSet<Allergy> Allergies { get; set; }

@@ -1,7 +1,7 @@
 using EPharm.Infrastructure.Context.Entities.Junctions;
 using EPharm.Infrastructure.Interfaces.Base;
 
-namespace EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
+namespace EPharm.Infrastructure.Interfaces.Junctions;
 
 public interface IIndicationProductRepository : IRepository<IndicationProduct>
 {

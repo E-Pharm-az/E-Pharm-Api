@@ -1,7 +1,7 @@
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using EPharm.Infrastructure.Interfaces.Base;
 
-namespace EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
+namespace EPharm.Infrastructure.Interfaces.Pharma;
 
 public interface IPharmacyStaffRepository : IRepository<PharmacyStaff>
 {

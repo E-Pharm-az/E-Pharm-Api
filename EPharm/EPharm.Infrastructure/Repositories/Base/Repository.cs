@@ -1,9 +1,9 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.Base;
-using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
+using EPharm.Infrastructure.Interfaces.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace EPharm.Infrastructure.Repositories.BaseRepositories;
+namespace EPharm.Infrastructure.Repositories.Base;
 
 public class Repository<T> : IRepository<T> where T : BaseEntity
 {

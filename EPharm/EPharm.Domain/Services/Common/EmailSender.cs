@@ -3,7 +3,7 @@ using EPharm.Domain.Interfaces.CommonContracts;
 using Microsoft.Extensions.Configuration;
 using RestSharp;
 
-namespace EPharm.Domain.Services.CommonServices;
+namespace EPharm.Domain.Services.Common;
 
 public class EmailSender(IConfiguration configuration) : IEmailSender
 {

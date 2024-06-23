@@ -2,7 +2,7 @@ using EPharm.Infrastructure.Context.Entities.PharmaEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EPharm.Infrastructure.Context.Configs.PharmaConfigs;
+namespace EPharm.Infrastructure.Configs.Pharma;
 
 public class PharmaCompanyConfig : IEntityTypeConfiguration<Pharmacy>
 {

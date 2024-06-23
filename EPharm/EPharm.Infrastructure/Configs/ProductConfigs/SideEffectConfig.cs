@@ -2,7 +2,7 @@ using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EPharm.Infrastructure.Context.Configs.ProductConfigs;
+namespace EPharm.Infrastructure.Configs.ProductConfigs;
 
 public class SideEffectConfig : IEntityTypeConfiguration<SideEffect>
 {

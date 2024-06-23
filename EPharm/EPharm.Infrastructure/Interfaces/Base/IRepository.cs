@@ -1,6 +1,6 @@
 using EPharm.Infrastructure.Context.Entities.Base;
 
-namespace EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
+namespace EPharm.Infrastructure.Interfaces.Base;
 
 public interface IRepository<T> where T : BaseEntity
 {

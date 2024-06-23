@@ -10,14 +10,12 @@ public interface IUserService
 {
     public Task<IEnumerable<GetUserDto>> GetAllUsersAsync();
     public Task<GetUserDto?> GetUserByIdAsync(string userId);
+    public Task CreateCustomerAsync(EmailDto emailDto);
     public Task InitializeUserAsync(InitializeUserDto initializeUserDto);
-    public Task<GetUserDto> CreateCustomerAsync(RegisterUserDto registerUserDto);
-    public Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, RegisterUserDto registerUserDto);
-    public Task<GetPharmaCompanyManagerDto> CreatePharmaAdminAsync(RegisterUserDto registerUserDto,
-        CreatePharmaCompanyDto createPharmaCompanyDto);
-    public Task<GetUserDto> CreateAdminAsync(RegisterUserDto registerUserDto);
-    public Task<bool> UpdateUserAsync(string id, RegisterUserDto registerUserDto);
+    public Task<GetUserDto> CreateAdminAsync(EmailDto emailDto);
+    public Task<bool> UpdateUserAsync(string id, EmailDto emailDto);
     public Task InitiatePasswordChange(InitiatePasswordChangeRequest passwordChangeRequest, string url);
+    public Task<AppIdentityUser> CreateUserAsync(EmailDto emailDto, string[] identityRole);
     public Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest);
     public Task SendEmailConfirmationAsync(AppIdentityUser user);
     public Task<bool> DeleteUserAsync(string userId);

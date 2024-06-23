@@ -8,7 +8,7 @@ using EPharm.Infrastructure.Context.Entities.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace EPharm.Domain.Services.JwtServices;
+namespace EPharm.Domain.Services.Jwt;
 
 public class TokenCreationService(IConfiguration configuration) : ITokenCreationService
 {

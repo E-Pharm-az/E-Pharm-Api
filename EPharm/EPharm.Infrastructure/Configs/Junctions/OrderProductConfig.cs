@@ -2,7 +2,7 @@ using EPharm.Infrastructure.Context.Entities.Junctions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace EPharm.Infrastructure.Configs.Junction;
+namespace EPharm.Infrastructure.Configs.Junctions;
 
 public class OrderProductConfig : IEntityTypeConfiguration<OrderProduct>
 {

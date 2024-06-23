@@ -1,17 +1,11 @@
-using System.Text;
 using AutoMapper;
 using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Dtos.EmailDto;
-using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
-using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
 using EPharm.Infrastructure.Context.Entities.Identity;
-using EPharm.Infrastructure.Interfaces.Base;
-using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -20,12 +14,8 @@ namespace EPharm.Domain.Services.Common;
 public class UserService(
     UserManager<AppIdentityUser> userManager,
     RoleManager<IdentityRole> roleManager,
-    IPharmaCompanyManagerService pharmaCompanyManagerService,
-    IPharmaCompanyService pharmaCompanyService,
-    IPharmacyStaffRepository pharmacyStaffRepository,
     IEmailSender emailSender,
     IEmailService emailService,
-    IUnitOfWork unitOfWork,
     IConfiguration configuration,
     IPasswordHasher<AppIdentityUser> passwordHasher,
     IMapper mapper) : IUserService
@@ -65,113 +55,6 @@ public class UserService(
         if (!result.Succeeded)
             throw new InvalidOperationException(
                 $"Failed to update user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
-    }
-
-    public async Task InvitePharmaAsync(EmailDto emailDto)
-    {
-        var user = await CreateUserAsync(emailDto, [IdentityData.PharmaCompanyAdmin, IdentityData.PharmaCompanyManager]);
-        await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(new CreatePharmaCompanyManagerDto { Email = user.Email, ExternalId = user.Id });
-
-        await SendEmailInvitationAsync(user);
-    }
-
-    public async Task InitializePharmaAsync(string userId, string token, CreatePharmaDto createPharmaDto)
-    {
-        var user = await userManager.FindByEmailAsync(createPharmaDto.UserRequest.Email);
-        if (user is null)
-            throw new InvalidOperationException("USER_NOT_FOUND");
-
-        if (user.Id != userId)
-            throw new InvalidOperationException("INVALID_USER");
-
-        var pharmacyManager = await pharmacyStaffRepository.GetPharmaCompanyManagerByExternalIdAsync(userId);
-        if (pharmacyManager is null)
-            throw new InvalidOperationException("USER_NOT_FOUND");
-
-        try
-        {
-            await unitOfWork.BeginTransactionAsync();
-
-            await userManager.ConfirmEmailAsync(user, token);
-            user.PasswordHash = passwordHasher.HashPassword(user, createPharmaDto.UserRequest.Password);
-
-            var pharmacy =
-                await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaDto.PharmaCompanyRequest, user.Id);
-            
-            pharmacyManager.PharmaCompanyId = pharmacy.Id;
-            pharmacyStaffRepository.Update(pharmacyManager);
-
-            await pharmaCompanyManagerService.UpdatePharmaCompanyManagerAsync(pharmacyManager.Id,
-                new CreatePharmaCompanyManagerDto { PharmaCompanyId = pharmacy.Id });
-
-            await unitOfWork.CommitTransactionAsync();
-            await unitOfWork.SaveChangesAsync();
-            await userManager.UpdateAsync(user);
-        }
-        catch (Exception)
-        {
-            await unitOfWork.RollbackTransactionAsync();
-            throw;
-        }
-    }
-    
-    public async Task CreatePharmaAsync(CreatePharmaDto createPharmaDto)
-    {
-        try
-        {
-            await unitOfWork.BeginTransactionAsync();
-            
-            var existingUser = await userManager.FindByEmailAsync(createPharmaDto.UserRequest.Email);
-            if (existingUser is not null)
-            {
-                if (existingUser.EmailConfirmed)
-                    throw new InvalidOperationException("USER_ALREADY_EXISTS");
-            }
-
-            var userEntity = mapper.Map<AppIdentityUser>(createPharmaDto.UserRequest);
-            userEntity.UserName = createPharmaDto.UserRequest.Email;
-            userEntity.EmailConfirmed = true;
-
-            if (!await roleManager.RoleExistsAsync(IdentityData.PharmaCompanyAdmin))
-                await roleManager.CreateAsync(new IdentityRole(IdentityData.PharmaCompanyAdmin));
-            
-            if (!await roleManager.RoleExistsAsync(IdentityData.PharmaCompanyManager))
-                await roleManager.CreateAsync(new IdentityRole(IdentityData.PharmaCompanyManager));
-            
-            var result = await userManager.CreateAsync(userEntity, configuration["UniqueKey"]!);
-
-            if (!result.Succeeded)
-                throw new InvalidOperationException(string.Join("; ", result.Errors.Select(e => e.Description)));
-            
-            var pharmaCompany = await pharmaCompanyService.CreatePharmaCompanyAsync(createPharmaDto.PharmaCompanyRequest, userEntity.Id);
-
-            var pharmaCompanyAdminEntity = mapper.Map<CreatePharmaCompanyManagerDto>(userEntity);
-            pharmaCompanyAdminEntity.ExternalId = userEntity.Id;
-            pharmaCompanyAdminEntity.PharmaCompanyId = pharmaCompany.Id;
-
-           await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyAdminEntity);
-           await userManager.UpdateAsync(userEntity);
-           
-           await unitOfWork.CommitTransactionAsync();
-           await unitOfWork.SaveChangesAsync();
-        }
-        catch (Exception)
-        {
-            await unitOfWork.RollbackTransactionAsync();
-            throw;
-        }
-    }
-
-    public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId,
-        EmailDto emailDto)
-    {
-        var user = await CreateUserAsync(emailDto, [IdentityData.PharmaCompanyManager]);
-
-        var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
-        pharmaCompanyManagerEntity.ExternalId = user.Id;
-        pharmaCompanyManagerEntity.PharmaCompanyId = pharmaCompanyId;
-
-        return await pharmaCompanyManagerService.CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
     }
 
     public async Task<GetUserDto> CreateAdminAsync(EmailDto emailDto)
@@ -247,7 +130,7 @@ public class UserService(
             throw new ArgumentException("Invalid or expired code. Please generate a new one.");
     }
 
-    private async Task<AppIdentityUser> CreateUserAsync(EmailDto emailDto, string[] identityRole)
+    public async Task<AppIdentityUser> CreateUserAsync(EmailDto emailDto, string[] identityRole)
     {
         var existingUser = await userManager.FindByEmailAsync(emailDto.Email);
         if (existingUser is not null)
@@ -299,22 +182,4 @@ public class UserService(
         });
     }
 
-    public async Task SendEmailInvitationAsync(AppIdentityUser user)
-    {
-        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
-        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
-
-        var emailTemplate = emailService.GetEmail("pharmacy-invitation");
-        if (emailTemplate is null) 
-            throw new KeyNotFoundException("EMAIL_NOT_FOUND");
-        
-        emailTemplate = emailTemplate.Replace("{url}", $"{configuration["PharmaPortalClient"]}/join?token={encodedToken}?userId={user.Id}");
-        
-        await emailSender.SendEmailAsync(new CreateEmailDto
-        {
-            Email = user.Email,
-            Subject = "Welcome to E-Pharm: Complete Your Pharmacy Registration",
-            Message = emailTemplate
-        });
-    }
 }

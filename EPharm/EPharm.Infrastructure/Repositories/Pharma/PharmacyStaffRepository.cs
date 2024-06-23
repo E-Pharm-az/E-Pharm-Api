@@ -1,10 +1,10 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
-using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
+using EPharm.Infrastructure.Interfaces.Pharma;
 using EPharm.Infrastructure.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 
-namespace EPharm.Infrastructure.Repositories.Pharmacy;
+namespace EPharm.Infrastructure.Repositories.Pharma;
 
 public class PharmacyStaffRepository(AppDbContext context)
     : Repository<PharmacyStaff>(context), IPharmacyStaffRepository

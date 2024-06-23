@@ -4,7 +4,7 @@ using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Context.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
 
-namespace EPharm.Domain.Services.ProductServices;
+namespace EPharm.Domain.Services.Entities;
 
 public class ActiveIngredientService(IActiveIngredientRepository activeIngredientRepository, IMapper mapper)
     : IActiveIngredientService

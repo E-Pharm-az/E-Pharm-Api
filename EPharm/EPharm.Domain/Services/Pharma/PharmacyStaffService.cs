@@ -1,12 +1,21 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
+using EPharm.Domain.Dtos.UserDto;
+using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
+using EPharm.Domain.Models.Identity;
+using EPharm.Infrastructure.Context.Entities.Identity;
 using EPharm.Infrastructure.Context.Entities.PharmaEntities;
-using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
+using EPharm.Infrastructure.Interfaces.Pharma;
+using Microsoft.AspNetCore.Identity;
 
 namespace EPharm.Domain.Services.Pharma;
 
-public class PharmacyStaffService(IPharmacyStaffRepository pharmacyStaffRepository, IMapper mapper) : IPharmaCompanyManagerService
+public class PharmacyStaffService(
+    IPharmacyStaffRepository pharmacyStaffRepository,
+    IUserService userService,
+    UserManager<AppIdentityUser> userManager,
+    IMapper mapper) : IPharmacyStaffService
 {
     public async Task<IEnumerable<GetPharmaCompanyManagerDto>> GetAllPharmaCompanyManagersAsync(int companyId)
     {
@@ -32,6 +41,31 @@ public class PharmacyStaffService(IPharmacyStaffRepository pharmacyStaffReposito
         var pharmaCompanyManger = await pharmacyStaffRepository.InsertAsync(pharmaCompanyManagerEntity);
 
         return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManger);
+    }
+    
+    public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, EmailDto emailDto)
+    {
+        var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmaCompanyManager]);
+
+        var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
+        pharmaCompanyManagerEntity.ExternalId = user.Id;
+        pharmaCompanyManagerEntity.PharmaCompanyId = pharmaCompanyId;
+
+        return await CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
+    }
+
+    public async Task<bool> UpdateUserAsync(string id, EmailDto emailDto)
+    {
+        var user = await userManager.FindByIdAsync(id);
+
+        if (user is null)
+            return false;
+
+        mapper.Map(emailDto, user);
+
+        var result = await userManager.UpdateAsync(user);
+
+        return result.Succeeded;
     }
 
     public async Task<bool> UpdatePharmaCompanyManagerAsync(int id, CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)

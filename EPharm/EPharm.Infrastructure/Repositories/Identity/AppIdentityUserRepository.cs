@@ -1,6 +1,6 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.Identity;
-using EPharm.Infrastructure.Interfaces.IdentityRepositoriesInterfaces;
+using EPharm.Infrastructure.Interfaces.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace EPharm.Infrastructure.Repositories.Identity;
