@@ -1,18 +1,18 @@
 using System.Security.Claims;
 using EPharm.Domain.Dtos.OrderDto;
-using EPharm.Domain.Interfaces;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class OrderController(IOrderService orderService, IPharmaCompanyService pharmaCompanyService) : Controller
+public class OrderController(IOrderService orderService, IPharmacyService pharmacyService) : Controller
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -28,7 +28,7 @@ public class OrderController(IOrderService orderService, IPharmaCompanyService p
     [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmaCompanyManager)]
     public async Task<ActionResult<GetOrderDto>> GetOrderById(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -58,6 +58,73 @@ public class OrderController(IOrderService orderService, IPharmaCompanyService p
         if (result.Any()) return Ok(result);
         
         return NotFound("Orders not found.");
+    }
+
+    // TODO: Needs some API design, problem with different use of structure.
+    // TODO: Fix error handling
+    [HttpPost]
+    public async Task<ActionResult<GetOrderDto>> CreateOrder([FromBody] CreateOrderDto orderDto)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(new { Error = "Model not valid" });
+
+        try
+        {
+            var result = await orderService.CreateOrderAsync(orderDto);
+            return Ok(result);
+        }
+        catch (ArgumentException ex) when (ex.Message == "MISSING_EMAIL_FOR_ORDER")
+        {
+            return BadRequest(new { Error = "Email is required for the order." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "PRODUCT_NOT_FOUND")
+        {
+            return NotFound(new { Error = "One or more products in the order were not found." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "STOCK_NOT_ENOUGH")
+        {
+            return BadRequest(new { Error = "Insufficient stock for one or more products." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "FAILED_TO_CREATE_PAYPAL_ORDER")
+        {
+            return BadRequest(new { Error = "Failed to create PayPal order." });
+        }
+        catch (Exception ex)
+        {
+            Log.Error("An error occurred while creating order. Details: {@ex}", ex);
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
+    }
+
+    [HttpPost("{orderId}")]
+    public async Task<IActionResult> CaptureOrder(string orderId)
+    {
+        try
+        {
+            await orderService.CaptureOrderAsync(orderId);
+            return Ok(new { Message = "Order captured successfully." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "ORDER_NOT_FOUND")
+        {
+            return NotFound(new { Error = "Order not found." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "PRODUCT_NOT_FOUND")
+        {
+            return NotFound(new { Error = "Product not found." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "STOCK_NOT_ENOUGH")
+        {
+            return BadRequest(new { Error = "Insufficient stock for one or more products." });
+        }
+        catch (ArgumentException ex) when (ex.Message == "FAILED_TO_CAPTURE_PAYPAL_ORDER")
+        {
+            return BadRequest(new { Error = "Failed to capture PayPal order." });
+        }
+        catch (Exception ex)
+        {
+            Log.Error("An error occurred while capturing order. Details: {@ex}", ex);
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
     }
 
     [HttpPut("{id:int}")]

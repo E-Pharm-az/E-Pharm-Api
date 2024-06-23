@@ -51,7 +51,7 @@ namespace EPharm.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Frequency")
+                    b.Property<int?>("Frequency")
                         .HasColumnType("integer");
 
                     b.Property<int>("OrderId")
@@ -63,7 +63,7 @@ namespace EPharm.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
 
-                    b.Property<int>("SupplyDuration")
+                    b.Property<int?>("SupplyDuration")
                         .HasColumnType("integer");
 
                     b.Property<double>("TotalPrice")
@@ -225,7 +225,7 @@ namespace EPharm.Infrastructure.Migrations
                     b.ToTable("WarehouseProduct");
                 });
 
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", b =>
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -300,7 +300,7 @@ namespace EPharm.Infrastructure.Migrations
                     b.ToTable("PharmaCompanies");
                 });
 
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompanyManager", b =>
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmacyStaff", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -322,23 +322,8 @@ namespace EPharm.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<int>("PharmaCompanyId")
                         .HasColumnType("integer");
-
-                    b.Property<string>("PhoneNumber")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
 
                     b.HasKey("Id");
 
@@ -398,12 +383,12 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int?>("PharmaCompanyId")
+                    b.Property<int?>("PharmacyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PharmaCompanyId");
+                    b.HasIndex("PharmacyId");
 
                     b.ToTable("Allergies");
                 });
@@ -421,12 +406,12 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int?>("PharmaCompanyId")
+                    b.Property<int?>("PharmacyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PharmaCompanyId");
+                    b.HasIndex("PharmacyId");
 
                     b.ToTable("DosageForms");
                 });
@@ -454,12 +439,12 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int?>("PharmaCompanyId")
+                    b.Property<int?>("PharmacyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PharmaCompanyId");
+                    b.HasIndex("PharmacyId");
 
                     b.ToTable("Indications");
                 });
@@ -710,12 +695,12 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int?>("PharmaCompanyId")
+                    b.Property<int?>("PharmacyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PharmaCompanyId");
+                    b.HasIndex("PharmacyId");
 
                     b.ToTable("RouteOfAdministrations");
                 });
@@ -743,12 +728,12 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int?>("PharmaCompanyId")
+                    b.Property<int?>("PharmacyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PharmaCompanyId");
+                    b.HasIndex("PharmacyId");
 
                     b.ToTable("SideEffects");
                 });
@@ -820,12 +805,12 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
-                    b.Property<int?>("PharmaCompanyId")
+                    b.Property<int?>("PharmacyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PharmaCompanyId");
+                    b.HasIndex("PharmacyId");
 
                     b.ToTable("UsageWarnings");
                 });
@@ -1042,58 +1027,58 @@ namespace EPharm.Infrastructure.Migrations
                     b.Navigation("Warehouse");
                 });
 
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompanyManager", b =>
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmacyStaff", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("Managers")
                         .HasForeignKey("PharmaCompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PharmaCompany");
+                    b.Navigation("Pharmacy");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.ActiveIngredient", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("ActiveIngredients")
                         .HasForeignKey("PharmaCompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PharmaCompany");
+                    b.Navigation("Pharmacy");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Allergy", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", null)
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", null)
                         .WithMany("Allergies")
-                        .HasForeignKey("PharmaCompanyId");
+                        .HasForeignKey("PharmacyId");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.DosageForm", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", null)
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", null)
                         .WithMany("DosageForms")
-                        .HasForeignKey("PharmaCompanyId");
+                        .HasForeignKey("PharmacyId");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Indication", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", null)
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", null)
                         .WithMany("Indications")
-                        .HasForeignKey("PharmaCompanyId");
+                        .HasForeignKey("PharmacyId");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Manufacturer", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("Manufacturers")
                         .HasForeignKey("PharmaCompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PharmaCompany");
+                    b.Navigation("Pharmacy");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Product", b =>
@@ -1104,7 +1089,7 @@ namespace EPharm.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("Products")
                         .HasForeignKey("PharmaCompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1124,7 +1109,7 @@ namespace EPharm.Infrastructure.Migrations
 
                     b.Navigation("Manufacturer");
 
-                    b.Navigation("PharmaCompany");
+                    b.Navigation("Pharmacy");
 
                     b.Navigation("RegulatoryInformation");
 
@@ -1133,59 +1118,59 @@ namespace EPharm.Infrastructure.Migrations
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.RegulatoryInformation", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("RegulatoryInformations")
                         .HasForeignKey("PharmaCompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PharmaCompany");
+                    b.Navigation("Pharmacy");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.RouteOfAdministration", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", null)
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", null)
                         .WithMany("RouteOfAdministrations")
-                        .HasForeignKey("PharmaCompanyId");
+                        .HasForeignKey("PharmacyId");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.SideEffect", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", null)
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", null)
                         .WithMany("SideEffects")
-                        .HasForeignKey("PharmaCompanyId");
+                        .HasForeignKey("PharmacyId");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.SpecialRequirement", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("SpecialRequirements")
                         .HasForeignKey("PharmaCompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PharmaCompany");
+                    b.Navigation("Pharmacy");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.UsageWarning", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", null)
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", null)
                         .WithMany("UsageWarnings")
-                        .HasForeignKey("PharmaCompanyId");
+                        .HasForeignKey("PharmacyId");
                 });
 
             modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.ProductEntities.Warehouse", b =>
                 {
-                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", "PharmaCompany")
+                    b.HasOne("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("Warehouses")
                         .HasForeignKey("PharmaCompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("PharmaCompany");
+                    b.Navigation("Pharmacy");
                 });
 
-            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.PharmaCompany", b =>
+            modelBuilder.Entity("EPharm.Infrastructure.Context.Entities.PharmaEntities.Pharmacy", b =>
                 {
                     b.Navigation("ActiveIngredients");
 

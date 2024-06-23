@@ -9,8 +9,8 @@ public class PharmaCompanyManagerProfile : Profile
 {
     public PharmaCompanyManagerProfile()
     {
-        CreateMap<PharmaCompanyManager, GetPharmaCompanyManagerDto>();
-        CreateMap<CreatePharmaCompanyManagerDto, PharmaCompanyManager>();
+        CreateMap<PharmacyStaff, GetPharmaCompanyManagerDto>();
+        CreateMap<CreatePharmaCompanyManagerDto, PharmacyStaff>();
         CreateMap<GetUserDto, CreatePharmaCompanyManagerDto>();
     }
 }

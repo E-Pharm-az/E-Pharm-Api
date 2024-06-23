@@ -56,6 +56,9 @@ namespace EPharm.Infrastructure.Migrations.AppIdentityDb
                     b.Property<string>("FirstName")
                         .HasColumnType("text");
 
+                    b.Property<bool>("IsAAccountSetup")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LastName")
                         .HasColumnType("text");
 

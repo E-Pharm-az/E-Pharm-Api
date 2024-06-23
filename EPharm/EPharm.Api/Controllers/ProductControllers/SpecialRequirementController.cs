@@ -11,14 +11,14 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]/{pharmaCompanyId:int}/[controller]")]
-public class SpecialRequirementController(ISpecialRequirementService specialRequirementService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
+public class SpecialRequirementController(ISpecialRequirementService specialRequirementService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult<IEnumerable<GetSpecialRequirementDto>>> GetAllCompanySpecialRequirements(
         int pharmaCompanyId)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -41,7 +41,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult<GetSpecialRequirementDto>> GetSpecialRequirementById(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -67,7 +67,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -96,7 +96,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -119,7 +119,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult> DeleteSpecialRequirement(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

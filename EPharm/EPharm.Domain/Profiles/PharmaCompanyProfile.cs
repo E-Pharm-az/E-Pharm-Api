@@ -8,7 +8,7 @@ public class PharmaCompanyProfile : Profile
 {
     public PharmaCompanyProfile()
     {
-        CreateMap<PharmaCompany, GetPharmaCompanyDto>();
-        CreateMap<CreatePharmaCompanyDto, PharmaCompany>();
+        CreateMap<Pharmacy, GetPharmaCompanyDto>();
+        CreateMap<CreatePharmaCompanyDto, Pharmacy>();
     } 
 }
