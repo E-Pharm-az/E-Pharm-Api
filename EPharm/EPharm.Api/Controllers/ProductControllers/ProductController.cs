@@ -13,8 +13,8 @@ namespace EPharmApi.Controllers.ProductControllers;
 [Route("api/[controller]")]
 public class ProductController(
     IProductService productService,
-    IPharmaCompanyService pharmaCompanyService,
-    IPharmaCompanyManagerService pharmaCompanyManagerService) : ControllerBase
+    IPharmacyService pharmacyService,
+    IPharmacyStaffService pharmacyStaffService) : ControllerBase
 {
     [HttpGet("all/{page:int}")]
     [Authorize(Roles = IdentityData.Admin)]
@@ -57,7 +57,7 @@ public class ProductController(
     {
         try
         {
-            var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+            var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
             if (company is null)
                 return NotFound("Pharmaceutical company not found.");
@@ -65,7 +65,7 @@ public class ProductController(
             if (!User.IsInRole(IdentityData.Admin))
             {
                 var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-                var companyUser = await pharmaCompanyManagerService.GetPharmaCompanyManagerByExternalIdAsync(userId);
+                var companyUser = await pharmacyStaffService.GetPharmaCompanyManagerByExternalIdAsync(userId);
                 
                 ArgumentNullException.ThrowIfNull(companyUser);
 
@@ -129,7 +129,7 @@ public class ProductController(
 
         try
         {
-            var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+            var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
             if (company is null)
                 return NotFound("Pharmaceutical company not found.");
@@ -156,7 +156,7 @@ public class ProductController(
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -181,7 +181,7 @@ public class ProductController(
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult> DeleteProduct(int pharmaCompanyId, int productId)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

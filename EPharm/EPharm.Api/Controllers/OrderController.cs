@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class OrderController(IOrderService orderService, IPharmaCompanyService pharmaCompanyService) : Controller
+public class OrderController(IOrderService orderService, IPharmacyService pharmacyService) : Controller
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -28,7 +28,7 @@ public class OrderController(IOrderService orderService, IPharmaCompanyService p
     [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmaCompanyManager)]
     public async Task<ActionResult<GetOrderDto>> GetOrderById(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

@@ -35,7 +35,7 @@ public class UserController(IUserService userService, IConfiguration configurati
 
     [HttpPost]
     [Route("register")]
-    public async Task<IActionResult> Register([FromBody] RegisterUserDto request)
+    public async Task<IActionResult> Register([FromBody] EmailDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -79,7 +79,7 @@ public class UserController(IUserService userService, IConfiguration configurati
     [HttpPost]
     [Route("register/admin")]
     [Authorize(Roles = IdentityData.SuperAdmin)]
-    public async Task<IActionResult> RegisterAdmin([FromBody] RegisterUserDto request)
+    public async Task<IActionResult> RegisterAdmin([FromBody] EmailDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -96,49 +96,10 @@ public class UserController(IUserService userService, IConfiguration configurati
         }
     }
 
-    [HttpPost]
-    [Route("register/pharma-admin")]
-    [Authorize(Roles = IdentityData.Admin)]
-    public async Task<IActionResult> RegisterPharmaAdmin([FromBody] CreatePharmaAdminDto request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            await userService.CreatePharmaAdminAsync(request.UserRequest, request.PharmaCompanyRequest);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Error creating pharma admin, {Error}", ex.Message);
-            return BadRequest("Error creating admin.");
-        }
-    }
-
-    [HttpPost]
-    [Route("register/{companyId:int}/pharma-manager")]
-    [Authorize(Roles = IdentityData.PharmaCompanyAdmin)]
-    public async Task<IActionResult> RegisterPharmaManager(int companyId, [FromBody] RegisterUserDto request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            await userService.CreatePharmaManagerAsync(companyId, request);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Error creating pharma manager, {Error}", ex.Message);
-            return BadRequest("Error creating pharma manager");
-        }
-    }
 
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<ActionResult> UpdateUser(string id, [FromBody] RegisterUserDto userDto)
+    public async Task<ActionResult> UpdateUser(string id, [FromBody] EmailDto userDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");

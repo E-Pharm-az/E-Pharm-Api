@@ -11,13 +11,13 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]/{pharmaCompanyId:int}/[controller]")]
-public class RegulatoryInformationController(IRegulatoryInformationService regulatoryInformationService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
+public class RegulatoryInformationController(IRegulatoryInformationService regulatoryInformationService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult<IEnumerable<GetRegulatoryInformationDto>>> GetAllCompanyRegulatoryInformation(int pharmaCompanyId)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -40,7 +40,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult<GetRegulatoryInformationDto>> GetRegulatoryInformationById(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -67,7 +67,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -94,7 +94,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult> UpdateRegulatoryInformation(int pharmaCompanyId, int id, [FromBody] CreateRegulatoryInformationDto regulatoryInformation)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -117,7 +117,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult> DeleteRegulatoryInformation(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

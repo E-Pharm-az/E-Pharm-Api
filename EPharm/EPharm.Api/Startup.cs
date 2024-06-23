@@ -3,22 +3,22 @@ using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
-using EPharm.Domain.Services.CommonServices;
-using EPharm.Domain.Services.JwtServices;
-using EPharm.Domain.Services.PharmaServices;
-using EPharm.Domain.Services.ProductServices;
+using EPharm.Domain.Services.Common;
+using EPharm.Domain.Services.Jwt;
+using EPharm.Domain.Services.Pharma;
+using EPharm.Domain.Services.Entities;
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Context.Entities.Identity;
-using EPharm.Infrastructure.Interfaces.BaseRepositoriesInterfaces;
-using EPharm.Infrastructure.Interfaces.IdentityRepositoriesInterfaces;
-using EPharm.Infrastructure.Interfaces.JunctionsRepositoriesInterfaces;
-using EPharm.Infrastructure.Interfaces.PharmaRepositoriesInterfaces;
-using EPharm.Infrastructure.Interfaces.ProductRepositoriesInterfaces;
-using EPharm.Infrastructure.Repositories.BaseRepositories;
-using EPharm.Infrastructure.Repositories.IdentityRepositories;
-using EPharm.Infrastructure.Repositories.JunctionsRepositories;
-using EPharm.Infrastructure.Repositories.PharmaRepositories;
-using EPharm.Infrastructure.Repositories.ProductRepositories;
+using EPharm.Infrastructure.Interfaces.Base;
+using EPharm.Infrastructure.Interfaces.Junctions;
+using EPharm.Infrastructure.Interfaces.Entities;
+using EPharm.Infrastructure.Interfaces.Identity;
+using EPharm.Infrastructure.Interfaces.Pharma;
+using EPharm.Infrastructure.Repositories.Base;
+using EPharm.Infrastructure.Repositories.Identity;
+using EPharm.Infrastructure.Repositories.Junctions;
+using EPharm.Infrastructure.Repositories.Entities;
+using EPharm.Infrastructure.Repositories.Pharma;
 using EPharmApi.Health;
 using EPharmApi.Services;
 using HealthChecks.UI.Client;
@@ -29,9 +29,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using OrderService = EPharm.Domain.Services.CommonServices.OrderService;
-using ProductService = EPharm.Domain.Services.ProductServices.ProductService;
-using TokenService = EPharm.Domain.Services.JwtServices.TokenService;
+using OrderService = EPharm.Domain.Services.Common.OrderService;
+using ProductService = EPharm.Domain.Services.Entities.ProductService;
+using TokenService = EPharm.Domain.Services.Jwt.TokenService;
 
 namespace EPharmApi;
 
@@ -183,8 +183,8 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IOrderProductRepository, OrderProductRepository>();
         services.AddScoped<IWarehouseProductRepository, WarehouseProductRepository>();
 
-        services.AddScoped<IPharmaCompanyRepository, PharmaCompanyRepository>();
-        services.AddScoped<IPharmaCompanyManagerRepository, PharmaCompanyManagerRepository>();
+        services.AddScoped<IPharmacyRepository, PharmacyRepository>();
+        services.AddScoped<IPharmacyStaffRepository, PharmacyStaffRepository>();
         services.AddScoped<IAppIdentityUserRepository, AppIdentityUserRepository>();
 
         services.AddScoped<IProductService, ProductService>();
@@ -202,8 +202,8 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IWarehouseService, WarehouseService>();
         services.AddScoped<IProductImageService, ProductImageService>();
 
-        services.AddScoped<IPharmaCompanyService, PharmaCompanyService>();
-        services.AddScoped<IPharmaCompanyManagerService, PharmaCompanyManagerService>();
+        services.AddScoped<IPharmacyService, PharmacyService>();
+        services.AddScoped<IPharmacyStaffService, PharmacyStaffService>();
         services.AddScoped<IUserService, UserService>();
 
         services.AddScoped<IEmailSender, EmailSender>();
@@ -243,6 +243,7 @@ public class Startup(IConfiguration configuration)
 
         dbSeeder.SeedSuperAdminAsync().Wait();
         emailService.CompileEmail("confirmation-email", "Emails/confirmation-email.html").Wait();
-        // emailService.CompileEmail("change-password", "Emails/change-password.html").Wait();
+        emailService.CompileEmail("change-password", "Emails/change-password.html").Wait();
+        emailService.CompileEmail("pharmacy-invitation", "Emails/pharmacy-invitation-email.html").Wait();
     }
 }

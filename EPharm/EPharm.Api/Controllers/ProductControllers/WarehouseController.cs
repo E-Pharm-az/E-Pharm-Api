@@ -11,13 +11,13 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]/{pharmaCompanyId:int}/[controller]")]
-public class WarehouseController(IWarehouseService warehouseService, IPharmaCompanyService pharmaCompanyService) : Controller
+public class WarehouseController(IWarehouseService warehouseService, IPharmacyService pharmacyService) : Controller
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult<IEnumerable<GetWarehouseDto>>> GetAllCompanyWarehouses(int pharmaCompanyId)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -41,7 +41,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
     [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
     public async Task<ActionResult<GetWarehouseDto>> GetWarehouseById(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -67,7 +67,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
         
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -96,7 +96,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
         
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -116,7 +116,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmaComp
     [Authorize(Roles = IdentityData.PharmaCompanyManager)]
     public async Task<ActionResult> DeleteWarehouse(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

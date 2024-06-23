@@ -11,7 +11,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/active-ingredient")]
-public class ActiveIngredientController(IActiveIngredientService activeIngredientService, IPharmaCompanyService pharmaCompanyService) : ControllerBase
+public class ActiveIngredientController(IActiveIngredientService activeIngredientService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetActiveIngredientDto>>> GetAllActiveIngredients()
@@ -26,7 +26,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
     [HttpGet("pharma-company/{pharmaCompanyId:int}/active-ingredients")]
     public async Task<ActionResult<IEnumerable<GetActiveIngredientDto>>> GetAllCompanyActiveIngredients(int pharmaCompanyId)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -60,7 +60,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
     
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -89,7 +89,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
         
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -114,7 +114,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
     [Authorize(Roles = IdentityData.PharmaCompanyManager)]
     public async Task<ActionResult> DeleteActiveIngredient(int pharmaCompanyId, int id)
     {
-        var company = await pharmaCompanyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
