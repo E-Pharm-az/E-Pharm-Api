@@ -1,7 +1,7 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.UsageWarningDto;
-using EPharm.Infrastructure.Context.Entities.Junctions;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.Junctions;
+using EPharm.Infrastructure.Entities.ProductEntities;
 
 namespace EPharm.Domain.Profiles;
 

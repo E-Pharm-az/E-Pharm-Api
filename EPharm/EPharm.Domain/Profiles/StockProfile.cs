@@ -1,6 +1,6 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.StockDto;
-using EPharm.Infrastructure.Context.Entities.Junctions;
+using EPharm.Infrastructure.Entities.Junctions;
 
 namespace EPharm.Domain.Profiles;
 

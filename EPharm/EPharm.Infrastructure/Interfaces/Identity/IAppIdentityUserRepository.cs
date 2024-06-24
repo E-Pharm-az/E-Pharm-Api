@@ -1,4 +1,4 @@
-using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 
 namespace EPharm.Infrastructure.Interfaces.Identity;
 

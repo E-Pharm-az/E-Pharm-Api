@@ -1,14 +1,14 @@
 using EPharm.Infrastructure.Context;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
 using EPharm.Infrastructure.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 
 namespace EPharm.Infrastructure.Repositories.Entities;
 
-public class ProductRepository(AppDbContext context) : Repository<Context.Entities.ProductEntities.Product>(context), IProductRepository
+public class ProductRepository(AppDbContext context) : Repository<Infrastructure.Entities.ProductEntities.Product>(context), IProductRepository
 {
-    public async Task<ICollection<Context.Entities.ProductEntities.Product>> GetAlLProductsAsync(int page, int pageSize)
+    public async Task<ICollection<Infrastructure.Entities.ProductEntities.Product>> GetAlLProductsAsync(int page, int pageSize)
     {
         var skip = (page - 1) * pageSize;
 
@@ -21,7 +21,7 @@ public class ProductRepository(AppDbContext context) : Repository<Context.Entiti
             .ToListAsync();
     }
 
-    public async Task<ICollection<Context.Entities.ProductEntities.Product>> GetAlLApprovedProductsAsync(int page, int pageSize)
+    public async Task<ICollection<Infrastructure.Entities.ProductEntities.Product>> GetAlLApprovedProductsAsync(int page, int pageSize)
     {
         var skip = (page - 1) * pageSize;
 
@@ -35,7 +35,7 @@ public class ProductRepository(AppDbContext context) : Repository<Context.Entiti
             .ToListAsync();
     }
 
-    public async Task<Context.Entities.ProductEntities.Product?> GetApprovedProductDetailAsync(int productId) =>
+    public async Task<Infrastructure.Entities.ProductEntities.Product?> GetApprovedProductDetailAsync(int productId) =>
         await Entities
             .Where(product => product.Id == productId)
             .Where(product => product.IsApproved)
@@ -55,7 +55,7 @@ public class ProductRepository(AppDbContext context) : Repository<Context.Entiti
             .AsNoTracking()
             .SingleOrDefaultAsync();
 
-    public async Task<IEnumerable<Context.Entities.ProductEntities.Product>> GetApprovedAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page,
+    public async Task<IEnumerable<Infrastructure.Entities.ProductEntities.Product>> GetApprovedAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page,
         int pageSize)
     {
         var skip = (page - 1) * pageSize;
@@ -68,7 +68,7 @@ public class ProductRepository(AppDbContext context) : Repository<Context.Entiti
             .AsNoTracking().ToListAsync();
     }
 
-    public async Task<IEnumerable<Context.Entities.ProductEntities.Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page,
+    public async Task<IEnumerable<Infrastructure.Entities.ProductEntities.Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page,
         int pageSize)
     {
         var skip = (page - 1) * pageSize;
@@ -80,7 +80,7 @@ public class ProductRepository(AppDbContext context) : Repository<Context.Entiti
             .AsNoTracking().ToListAsync();
     }
 
-    public async Task<IEnumerable<Context.Entities.ProductEntities.Product>> GetApprovedProductsByIdAsync(int[] productIds) =>
+    public async Task<IEnumerable<Infrastructure.Entities.ProductEntities.Product>> GetApprovedProductsByIdAsync(int[] productIds) =>
         await Entities
             .Where(product => productIds.Contains(product.Id) && product.IsApproved)
             .AsNoTracking().ToListAsync();

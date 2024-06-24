@@ -1,7 +1,7 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.AllergyDto;
 using EPharm.Domain.Interfaces.ProductContracts;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
 
 namespace EPharm.Domain.Services.Entities;

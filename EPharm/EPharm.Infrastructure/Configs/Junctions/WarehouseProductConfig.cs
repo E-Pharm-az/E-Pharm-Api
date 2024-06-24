@@ -1,4 +1,4 @@
-using EPharm.Infrastructure.Context.Entities.Junctions;
+using EPharm.Infrastructure.Entities.Junctions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

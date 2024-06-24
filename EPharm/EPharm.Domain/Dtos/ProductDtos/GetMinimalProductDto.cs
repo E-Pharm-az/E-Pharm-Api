@@ -6,7 +6,7 @@ public class GetMinimalProductDto
 {
     public int Id { get; set; }
     public int PharmaCompanyId { get; set; }
-    
+
     public string Name { get; set; }
     public string Description { get; set; }
     public string? ImageUrl { get; set; }

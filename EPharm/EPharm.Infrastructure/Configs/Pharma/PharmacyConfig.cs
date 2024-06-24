@@ -1,10 +1,10 @@
-using EPharm.Infrastructure.Context.Entities.PharmaEntities;
+using EPharm.Infrastructure.Entities.PharmaEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EPharm.Infrastructure.Configs.Pharma;
 
-public class PharmaCompanyConfig : IEntityTypeConfiguration<Pharmacy>
+public class PharmacyConfig : IEntityTypeConfiguration<Pharmacy>
 {
     public void Configure(EntityTypeBuilder<Pharmacy> builder)
     {
@@ -37,9 +37,9 @@ public class PharmaCompanyConfig : IEntityTypeConfiguration<Pharmacy>
         builder.Property(pc => pc.Region)
             .HasMaxLength(255);
         
-        builder.HasMany(pc => pc.Managers)
+        builder.HasMany(pc => pc.PharmacyStaff)
             .WithOne(pcm => pcm.Pharmacy)
-            .HasForeignKey(pcm => pcm.PharmaCompanyId);
+            .HasForeignKey(pcm => pcm.PharmacyId);
 
         builder.Property(pc => pc.CreatedAt)
             .HasDefaultValueSql("NOW()");

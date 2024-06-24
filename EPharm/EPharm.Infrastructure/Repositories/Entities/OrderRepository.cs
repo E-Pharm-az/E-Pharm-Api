@@ -1,5 +1,5 @@
 using EPharm.Infrastructure.Context;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
 using EPharm.Infrastructure.Repositories.Base;
 using Microsoft.EntityFrameworkCore;

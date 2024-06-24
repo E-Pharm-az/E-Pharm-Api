@@ -4,5 +4,5 @@ public class CreateRegulatoryInformationDto
 {
     public string Name { get; set; }
     public DateTime ApprovalDate { get; set; }
-    public string Certification { get; set; }  
+    public string Certification { get; set; }
 }

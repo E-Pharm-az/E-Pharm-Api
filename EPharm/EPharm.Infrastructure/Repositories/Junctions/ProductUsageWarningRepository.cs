@@ -1,5 +1,5 @@
 using EPharm.Infrastructure.Context;
-using EPharm.Infrastructure.Context.Entities.Junctions;
+using EPharm.Infrastructure.Entities.Junctions;
 using EPharm.Infrastructure.Interfaces.Junctions;
 using EPharm.Infrastructure.Interfaces.Entities;
 using EPharm.Infrastructure.Repositories.Base;

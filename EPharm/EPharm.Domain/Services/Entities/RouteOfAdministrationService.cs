@@ -1,12 +1,14 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.RouteOfAdministrationDto;
 using EPharm.Domain.Interfaces.ProductContracts;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
 
 namespace EPharm.Domain.Services.Entities;
 
-public class RouteOfAdministrationService(IRouteOfAdministrationRepository routeOfAdministrationRepository, IMapper mapper) : IRouteOfAdministrationService
+public class RouteOfAdministrationService(
+    IRouteOfAdministrationRepository routeOfAdministrationRepository,
+    IMapper mapper) : IRouteOfAdministrationService
 {
     public async Task<IEnumerable<GetRouteOfAdministrationDto>> GetAllRouteOfAdministrationsAsync()
     {
@@ -20,7 +22,8 @@ public class RouteOfAdministrationService(IRouteOfAdministrationRepository route
         return mapper.Map<GetRouteOfAdministrationDto>(routeOfAdministration);
     }
 
-    public async Task<GetRouteOfAdministrationDto> CreateRouteOfAdministrationAsync(CreateRouteOfAdministrationDto routeOfAdministrationDto)
+    public async Task<GetRouteOfAdministrationDto> CreateRouteOfAdministrationAsync(
+        CreateRouteOfAdministrationDto routeOfAdministrationDto)
     {
         try
         {
@@ -35,7 +38,8 @@ public class RouteOfAdministrationService(IRouteOfAdministrationRepository route
         }
     }
 
-    public async Task<bool> UpdateRouteOfAdministrationAsync(int id, CreateRouteOfAdministrationDto routeOfAdministrationDto)
+    public async Task<bool> UpdateRouteOfAdministrationAsync(int id,
+        CreateRouteOfAdministrationDto routeOfAdministrationDto)
     {
         var routeOfAdministration = await routeOfAdministrationRepository.GetByIdAsync(id);
 

@@ -3,5 +3,4 @@
 public class Breakdown
 {
     public ItemTotal ItemTotal { get; set; }
-
 }

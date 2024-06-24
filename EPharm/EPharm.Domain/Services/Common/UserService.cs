@@ -4,7 +4,7 @@ using EPharm.Domain.Dtos.EmailDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Identity;
-using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -61,7 +61,7 @@ public class UserService(
     {
         var user = await CreateUserAsync(emailDto, [IdentityData.Admin]);
         await SendEmailConfirmationAsync(user);
-        
+
         return mapper.Map<GetUserDto>(user);
     }
 
@@ -98,7 +98,7 @@ public class UserService(
         var code = RandomCodeGenerator.GenerateCode();
         user.Code = code;
         user.CodeExpiryTime = DateTime.UtcNow.AddHours(1);
-        
+
         await userManager.UpdateAsync(user);
 
         var emailTemplate = emailService.GetEmail("change-password");
@@ -143,7 +143,7 @@ public class UserService(
 
         var userEntity = mapper.Map<AppIdentityUser>(emailDto);
         userEntity.UserName = emailDto.Email;
-        
+
         var result = await userManager.CreateAsync(userEntity, configuration["UniqueKey"]!);
 
         foreach (var role in identityRole)
@@ -181,5 +181,4 @@ public class UserService(
             Message = emailTemplate
         });
     }
-
 }

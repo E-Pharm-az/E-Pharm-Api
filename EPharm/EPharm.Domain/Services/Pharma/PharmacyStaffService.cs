@@ -4,8 +4,8 @@ using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
-using EPharm.Infrastructure.Context.Entities.Identity;
-using EPharm.Infrastructure.Context.Entities.PharmaEntities;
+using EPharm.Infrastructure.Entities.Identity;
+using EPharm.Infrastructure.Entities.PharmaEntities;
 using EPharm.Infrastructure.Interfaces.Pharma;
 using Microsoft.AspNetCore.Identity;
 
@@ -22,27 +22,28 @@ public class PharmacyStaffService(
         var pharmaCompanyManagers = await pharmacyStaffRepository.GetAllPharmaCompanyManagersAsync(companyId);
         return mapper.Map<IEnumerable<GetPharmaCompanyManagerDto>>(pharmaCompanyManagers);
     }
-    
+
     public async Task<GetPharmaCompanyManagerDto?> GetPharmaCompanyManagerByExternalIdAsync(string externalId)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetPharmaCompanyManagerByExternalIdAsync(externalId);
         return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManager);
     }
- 
+
     public async Task<GetPharmaCompanyManagerDto?> GetPharmaCompanyManagerByIdAsync(int pharmaCompanyManagerId)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetByIdAsync(pharmaCompanyManagerId);
         return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManager);
     }
 
-    public async Task<GetPharmaCompanyManagerDto> CreatePharmaCompanyManagerAsync(CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
+    public async Task<GetPharmaCompanyManagerDto> CreatePharmaCompanyManagerAsync(
+        CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
     {
         var pharmaCompanyManagerEntity = mapper.Map<PharmacyStaff>(pharmaCompanyManagerDto);
         var pharmaCompanyManger = await pharmacyStaffRepository.InsertAsync(pharmaCompanyManagerEntity);
 
         return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManger);
     }
-    
+
     public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, EmailDto emailDto)
     {
         var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmaCompanyManager]);
@@ -68,7 +69,8 @@ public class PharmacyStaffService(
         return result.Succeeded;
     }
 
-    public async Task<bool> UpdatePharmaCompanyManagerAsync(int id, CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
+    public async Task<bool> UpdatePharmaCompanyManagerAsync(int id,
+        CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetByIdAsync(id);
 

@@ -1,6 +1,6 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
-using EPharm.Infrastructure.Context.Entities.PharmaEntities;
+using EPharm.Infrastructure.Entities.PharmaEntities;
 
 namespace EPharm.Domain.Profiles;
 
@@ -10,5 +10,5 @@ public class PharmaCompanyProfile : Profile
     {
         CreateMap<Pharmacy, GetPharmaCompanyDto>();
         CreateMap<CreatePharmaCompanyDto, Pharmacy>();
-    } 
+    }
 }

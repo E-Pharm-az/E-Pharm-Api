@@ -17,7 +17,7 @@ public class GetFullProductDto
 {
     public int Id { get; set; }
     public GetPharmaCompanyDto PharmaCompany { get; set; }
-    
+
     public string Name { get; set; }
     public string Description { get; set; }
     public string? ImageUrl { get; set; }
@@ -31,7 +31,7 @@ public class GetFullProductDto
     public GetSpecialRequirementDto SpecialRequirement { get; set; }
     public GetManufacturerDto Manufacturer { get; set; }
     public GetRegulatoryInformationDto RegulatoryInformation { get; set; }
-    
+
     public ICollection<GetActiveIngredientDto> ActiveIngredients { get; set; }
     public ICollection<GetDosageFormDto> DosageForms { get; set; }
     public ICollection<GetRouteOfAdministrationDto> RouteOfAdministrations { get; set; }
@@ -48,5 +48,5 @@ public class GetFullProductDto
 
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }
-    public decimal PackagingWeight { get; set; } 
+    public decimal PackagingWeight { get; set; }
 }

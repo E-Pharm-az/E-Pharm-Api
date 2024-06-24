@@ -1,14 +1,14 @@
-using EPharm.Infrastructure.Context.Entities.Junctions;
-using EPharm.Infrastructure.Context.Entities.PharmaEntities;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.Junctions;
+using EPharm.Infrastructure.Entities.PharmaEntities;
+using EPharm.Infrastructure.Entities.ProductEntities;
 using Microsoft.EntityFrameworkCore;
 
 namespace EPharm.Infrastructure.Context;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public DbSet<Pharmacy> PharmaCompanies { get; set; }
-    public DbSet<PharmacyStaff> PharmaCompanyManagers { get; set; }
+    public DbSet<Pharmacy> Pharmacy { get; set; }
+    public DbSet<PharmacyStaff> PharmacyStaff { get; set; }
     
     public DbSet<ActiveIngredient> ActiveIngredients { get; set; }
     public DbSet<Allergy> Allergies { get; set; }
@@ -33,8 +33,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<ProductUsageWarning> ProductUsageWarnings { get; set; }
     public DbSet<OrderProduct> OrderProducts { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
+    protected override void OnModelCreating(ModelBuilder modelBuilder) =>
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-    }
 }

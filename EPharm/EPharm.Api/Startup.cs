@@ -8,7 +8,7 @@ using EPharm.Domain.Services.Jwt;
 using EPharm.Domain.Services.Pharma;
 using EPharm.Domain.Services.Entities;
 using EPharm.Infrastructure.Context;
-using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 using EPharm.Infrastructure.Interfaces.Base;
 using EPharm.Infrastructure.Interfaces.Junctions;
 using EPharm.Infrastructure.Interfaces.Entities;

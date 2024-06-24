@@ -25,7 +25,7 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmaCompanyAdmin + "," + IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmaCompanyManager)]
     public async Task<ActionResult<GetPharmaCompanyDto>> GetAllPharmaCompanies(int id)
     {
         var company = await pharmacyService.GetPharmaCompanyByIdAsync(id);
@@ -45,7 +45,6 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
 
         return NotFound($"Pharmaceutical company with ID: {id} not found.");
     }
-    
     
     [HttpPost]
     [Route("invite")]

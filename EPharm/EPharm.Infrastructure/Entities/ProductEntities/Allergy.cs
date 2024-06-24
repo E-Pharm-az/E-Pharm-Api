@@ -1,7 +1,7 @@
-using EPharm.Infrastructure.Context.Entities.Base;
-using EPharm.Infrastructure.Context.Entities.Junctions;
+using EPharm.Infrastructure.Entities.Base;
+using EPharm.Infrastructure.Entities.Junctions;
 
-namespace EPharm.Infrastructure.Context.Entities.ProductEntities;
+namespace EPharm.Infrastructure.Entities.ProductEntities;
 
 public class Allergy : BaseEntity
 {

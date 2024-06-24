@@ -11,7 +11,7 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
     {
         var client = new RestClient(configuration["ResendConfig:BaseUrl"]!);
         var request = new RestRequest("/emails", Method.Post);
-        
+
         request.AddHeader("Authorization", $"Bearer {configuration["ResendConfig:Key"]}");
         request.AddHeader("Content-Type", "application/json");
 
@@ -20,9 +20,9 @@ public class EmailSender(IConfiguration configuration) : IEmailSender
             from = configuration["SmtpConfig:Sender"],
             to = emailDto.Email,
             subject = emailDto.Subject,
-            html  = emailDto.Message
+            html = emailDto.Message
         });
-        
+
         await client.ExecuteAsync(request);
     }
 }

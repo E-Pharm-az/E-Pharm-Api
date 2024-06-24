@@ -3,9 +3,9 @@ using EPharm.Domain.Dtos.ProductDtos;
 using EPharm.Domain.Dtos.WarehouseDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
-using EPharm.Infrastructure.Context.Entities.Identity;
-using EPharm.Infrastructure.Context.Entities.Junctions;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.Identity;
+using EPharm.Infrastructure.Entities.Junctions;
+using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Base;
 using EPharm.Infrastructure.Interfaces.Junctions;
 using EPharm.Infrastructure.Interfaces.Entities;
@@ -34,7 +34,7 @@ public class ProductService(
         var products = await productRepository.GetAlLProductsAsync(page, pageSize: 30);
         return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
     }
-    
+
     public async Task<IEnumerable<GetMinimalProductDto>> SearchProduct(string parameter, int page)
     {
         var allProducts = await productRepository.GetAlLApprovedProductsAsync(page, pageSize: 30);
@@ -63,10 +63,10 @@ public class ProductService(
     {
         var user = await userManager.FindByIdAsync(adminId);
         ArgumentNullException.ThrowIfNull(user);
-        
+
         var product = await GetProductByIdAsync(productId);
         ArgumentNullException.ThrowIfNull(product);
-        
+
         var productEntity = mapper.Map<Product>(product);
         productEntity.IsApproved = true;
         productEntity.ApprovedByAdminId = adminId;
@@ -80,12 +80,12 @@ public class ProductService(
             productEntity.PharmaCompanyId = pharmaCompanyId;
 
             if (productDto.Image is not null)
-                productEntity.ImageUrl =  await productImageService.UploadProductImageAsync(productDto.Image);
+                productEntity.ImageUrl = await productImageService.UploadProductImageAsync(productDto.Image);
 
             productEntity.ImageUrl = productDto.ImageURL;
-            
+
             await unitOfWork.BeginTransactionAsync();
-            
+
             var product = await productRepository.InsertAsync(productEntity);
 
             foreach (var stock in productDto.Stocks)
@@ -97,15 +97,17 @@ public class ProductService(
                     Quantity = stock.Quantity
                 });
             }
-            
-            await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id, productDto.ActiveIngredientsIds);
+
+            await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id,
+                productDto.ActiveIngredientsIds);
             await productAllergyRepository.InsertProductAllergyAsync(product.Id, productDto.AllergiesIds);
             await productDosageFormRepository.InsertProductDosageFormAsync(product.Id, productDto.DosageFormsIds);
             await indicationProductRepository.InsertIndicationProductAsync(product.Id, productDto.IndicationsIds);
-            await productRouteOfAdministrationRepository.InsertProductRouteOfAdministrationAsync(product.Id, productDto.RouteOfAdministrationsIds);
+            await productRouteOfAdministrationRepository.InsertProductRouteOfAdministrationAsync(product.Id,
+                productDto.RouteOfAdministrationsIds);
             await productSideEffectRepository.InsertProductSideEffectAsync(product.Id, productDto.SideEffectsIds);
             await productUsageWarningRepository.InsertProductUsageWarningAsync(product.Id, productDto.UsageWarningsIds);
-                
+
             await unitOfWork.CommitTransactionAsync();
             await unitOfWork.SaveChangesAsync();
 

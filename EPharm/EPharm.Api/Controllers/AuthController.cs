@@ -4,7 +4,7 @@ using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
 using EPharm.Domain.Models.Jwt;
-using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;

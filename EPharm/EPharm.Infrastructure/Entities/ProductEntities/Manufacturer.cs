@@ -1,7 +1,7 @@
-using EPharm.Infrastructure.Context.Entities.Base;
-using EPharm.Infrastructure.Context.Entities.PharmaEntities;
+using EPharm.Infrastructure.Entities.Base;
+using EPharm.Infrastructure.Entities.PharmaEntities;
 
-namespace EPharm.Infrastructure.Context.Entities.ProductEntities;
+namespace EPharm.Infrastructure.Entities.ProductEntities;
 
 public class Manufacturer : BaseEntity
 {

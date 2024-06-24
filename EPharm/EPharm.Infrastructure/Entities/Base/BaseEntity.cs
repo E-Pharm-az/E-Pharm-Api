@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace EPharm.Infrastructure.Context.Entities.Base;
+namespace EPharm.Infrastructure.Entities.Base;
 
 public class BaseEntity
 {

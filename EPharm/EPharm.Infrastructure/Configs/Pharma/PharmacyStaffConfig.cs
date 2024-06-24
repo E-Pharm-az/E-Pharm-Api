@@ -1,10 +1,10 @@
-using EPharm.Infrastructure.Context.Entities.PharmaEntities;
+using EPharm.Infrastructure.Entities.PharmaEntities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EPharm.Infrastructure.Configs.Pharma;
 
-public class PharmaCompanyManagerConfig : IEntityTypeConfiguration<PharmacyStaff>
+public class PharmacyStaffConfig : IEntityTypeConfiguration<PharmacyStaff>
 {
     public void Configure(EntityTypeBuilder<PharmacyStaff> builder)
     {
@@ -16,8 +16,8 @@ public class PharmaCompanyManagerConfig : IEntityTypeConfiguration<PharmacyStaff
             .IsRequired();
 
         builder.HasOne(pcm => pcm.Pharmacy)
-            .WithMany(pc => pc.Managers)
-            .HasForeignKey(pcm => pcm.PharmaCompanyId);
+            .WithMany(pc => pc.PharmacyStaff)
+            .HasForeignKey(pcm => pcm.PharmacyId);
 
         builder.Property(pcm => pcm.CreatedAt)
             .HasDefaultValueSql("NOW()");

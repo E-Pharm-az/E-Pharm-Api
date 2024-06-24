@@ -1,7 +1,7 @@
-using EPharm.Infrastructure.Context.Entities.Base;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.Base;
+using EPharm.Infrastructure.Entities.ProductEntities;
 
-namespace EPharm.Infrastructure.Context.Entities.Junctions;
+namespace EPharm.Infrastructure.Entities.Junctions;
 
 public class WarehouseProduct : BaseEntity
 {

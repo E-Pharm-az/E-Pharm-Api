@@ -9,5 +9,5 @@ public class GetSpecialRequirementDto
     public decimal MinimumWeighInKgRequirement { get; set; }
     public decimal MaximumWeighInKgRequirement { get; set; }
     public string MedicalConditionsDescription { get; set; }
-    public string OtherRequirementsDescription { get; set; }     
+    public string OtherRequirementsDescription { get; set; }
 }

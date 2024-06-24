@@ -1,5 +1,5 @@
 using EPharm.Domain.Models.Identity;
-using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 
@@ -39,8 +39,6 @@ public class DbSeeder(
                 {
                     await userManager.AddToRoleAsync(superAdmin, IdentityData.SuperAdmin);
                     await userManager.AddToRoleAsync(superAdmin, IdentityData.Admin);
-
-                    
                     
                     Log.Information("SuperAdmin user created successfully.");
                 }

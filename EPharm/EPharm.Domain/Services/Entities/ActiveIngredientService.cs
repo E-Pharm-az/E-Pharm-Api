@@ -1,7 +1,7 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.ActiveIngredientDto;
 using EPharm.Domain.Interfaces.ProductContracts;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
 
 namespace EPharm.Domain.Services.Entities;
@@ -27,7 +27,8 @@ public class ActiveIngredientService(IActiveIngredientRepository activeIngredien
         return mapper.Map<GetActiveIngredientDto>(activeIngredient);
     }
 
-    public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(int pharmaCompanyId, CreateActiveIngredientDto createActiveIngredientDto)
+    public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(int pharmaCompanyId,
+        CreateActiveIngredientDto createActiveIngredientDto)
     {
         try
         {

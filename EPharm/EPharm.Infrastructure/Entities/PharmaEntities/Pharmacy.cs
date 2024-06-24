@@ -1,7 +1,7 @@
-using EPharm.Infrastructure.Context.Entities.Base;
-using EPharm.Infrastructure.Context.Entities.ProductEntities;
+using EPharm.Infrastructure.Entities.Base;
+using EPharm.Infrastructure.Entities.ProductEntities;
 
-namespace EPharm.Infrastructure.Context.Entities.PharmaEntities;
+namespace EPharm.Infrastructure.Entities.PharmaEntities;
 
 public class Pharmacy : BaseEntity
 {
@@ -19,7 +19,7 @@ public class Pharmacy : BaseEntity
     public int Floor { get; set; }
     public int RoomNumber { get; set; }  
     
-    public ICollection<PharmacyStaff> Managers { get; set; }
+    public ICollection<PharmacyStaff> PharmacyStaff { get; set; }
     public ICollection<Warehouse> Warehouses { get; set; }
     public ICollection<Product> Products { get; set; }
     public ICollection<ActiveIngredient> ActiveIngredients { get; set; }

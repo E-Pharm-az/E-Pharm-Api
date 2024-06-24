@@ -1,4 +1,4 @@
-using EPharm.Infrastructure.Context.Entities.Base;
+using EPharm.Infrastructure.Entities.Base;
 
 namespace EPharm.Infrastructure.Interfaces.Base;
 

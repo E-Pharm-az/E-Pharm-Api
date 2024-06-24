@@ -16,17 +16,17 @@ public class ProductImageService : IProductImageService
     public ProductImageService(IConfiguration configuration)
     {
         _configuration = configuration;
-        
+
         var credentials = new BasicAWSCredentials(
             _configuration["AwsConfig:AccessKey"],
             _configuration["AwsConfig:SecretKey"]
-            );
-        
+        );
+
         var config = new AmazonS3Config
         {
             RegionEndpoint = Amazon.RegionEndpoint.EUCentral1
         };
-        
+
         _s3Client = new AmazonS3Client(credentials, config);
     }
 
@@ -43,7 +43,7 @@ public class ProductImageService : IProductImageService
             ContentType = "image/jpeg"
         };
         var response = await _s3Client.PutObjectAsync(request);
-        
+
         if (response.HttpStatusCode == HttpStatusCode.OK)
             return $"https://{_configuration["AwsConfig:ImageBucket"]}.s3.eu-central-1.amazonaws.com/{request.Key}";
 
@@ -57,9 +57,9 @@ public class ProductImageService : IProductImageService
             BucketName = _configuration["AwsConfig:ImageBucket"],
             Key = imageUrl.Split("/").Last()
         };
-        
+
         var response = await _s3Client.DeleteObjectAsync(request);
-        
+
         return response.HttpStatusCode == HttpStatusCode.OK;
     }
 }

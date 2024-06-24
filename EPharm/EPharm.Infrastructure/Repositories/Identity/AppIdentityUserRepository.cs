@@ -1,5 +1,5 @@
 using EPharm.Infrastructure.Context;
-using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 using EPharm.Infrastructure.Interfaces.Identity;
 using Microsoft.EntityFrameworkCore;
 

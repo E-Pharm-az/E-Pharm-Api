@@ -2,7 +2,7 @@ using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Dtos.PharmaCompanyDtos;
 using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
 using EPharm.Domain.Dtos.UserDto;
-using EPharm.Infrastructure.Context.Entities.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 
 namespace EPharm.Domain.Interfaces.CommonContracts;
 
