@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.PharmaCompanyDtos;
+using EPharm.Domain.Dtos.PharmacyDtos;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
@@ -16,19 +16,19 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetPharmaCompanyDto>>> GetAllPharmaCompanies()
+    public async Task<ActionResult<IEnumerable<GetPharmacyDto>>> GetAllPharmacies()
     {
-        var result = await pharmacyService.GetAllPharmaCompaniesAsync();
+        var result = await pharmacyService.GetAllPharmacyAsync();
         if (result.Any()) return Ok(result);
 
         return NotFound("Pharmaceutical companies not found.");
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmaCompanyManager)]
-    public async Task<ActionResult<GetPharmaCompanyDto>> GetAllPharmaCompanies(int id)
+    [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmacyStaff)]
+    public async Task<ActionResult<GetPharmacyDto>> GetAllPharmacies(int id)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(id);
+        var company = await pharmacyService.GetPharmacyByIdAsync(id);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -40,7 +40,7 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
                 return Forbid();
         }
         
-        var result = await pharmacyService.GetPharmaCompanyByIdAsync(id);
+        var result = await pharmacyService.GetPharmacyByIdAsync(id);
         if (result is not null) return Ok(result);
 
         return NotFound($"Pharmaceutical company with ID: {id} not found.");
@@ -49,14 +49,14 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
     [HttpPost]
     [Route("invite")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<IActionResult> InvitePharmaAdmin([FromBody] EmailDto request)
+    public async Task<IActionResult> InvitePharmacy([FromBody] EmailDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         try
         {
-            await pharmacyService.InvitePharmaAsync(request);
+            await pharmacyService.InvitePharmacyAsync(request);
             return Ok();
         }
         catch (Exception ex)
@@ -68,14 +68,14 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
 
     [HttpPost]
     [Route("initialize")]
-    public async Task<IActionResult> InitializePharmaCompany([FromQuery] string userId, [FromQuery] string token, [FromBody] CreatePharmaDto request)
+    public async Task<IActionResult> InitializePharmacy([FromQuery] string userId, [FromQuery] string token, [FromBody] CreatePharmaDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         try
         {
-            await pharmacyService.InitializePharmaAsync(userId, token, request);
+            await pharmacyService.InitializePharmacyAsync(userId, token, request);
             return Ok();
         }
         catch (Exception ex)
@@ -88,14 +88,14 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
     [HttpPost]
     [Route("register")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<IActionResult> RegisterPharmaAdmin([FromBody] CreatePharmaDto request)
+    public async Task<IActionResult> RegisterPharmacyAdmin([FromBody] CreatePharmaDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         try
         {
-            await pharmacyService.CreatePharmaAsync(request);
+            await pharmacyService.CreatePharmacyAsync(request);
             return Ok();
         }
         catch (Exception ex)
@@ -107,12 +107,12 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult> UpdatePharmaCompany(int id, [FromBody] CreatePharmaCompanyDto pharmaCompanyDto)
+    public async Task<ActionResult> UpdatePharmaCompany(int id, [FromBody] CreatePharmacyDto pharmacyDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var result = await pharmacyService.UpdatePharmaCompanyAsync(id, pharmaCompanyDto);
+        var result = await pharmacyService.UpdatePharmacyAsync(id, pharmacyDto);
 
         if (result)
             return Ok("Pharmaceutical company updated with success.");
@@ -125,7 +125,7 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
     [Authorize(Roles = IdentityData.Admin)]
     public async Task<ActionResult> DeletePharmaCompany(int id)
     {
-        var result = await pharmacyService.DeletePharmaCompanyAsync(id);
+        var result = await pharmacyService.DeletePharmacyAsync(id);
 
         if (result) return NoContent();
 

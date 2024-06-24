@@ -14,7 +14,7 @@ public class ManufacturerConfig : IEntityTypeConfiguration<Manufacturer>
         
         builder.HasOne(a => a.Pharmacy)
             .WithMany(a => a.Manufacturers)
-            .HasForeignKey(a => a.PharmaCompanyId);
+            .HasForeignKey(a => a.PharmacyId);
 
         builder.Property(m => m.Country)
             .HasMaxLength(255);

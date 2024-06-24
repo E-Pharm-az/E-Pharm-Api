@@ -1,8 +1,6 @@
-using System.ComponentModel.DataAnnotations;
+namespace EPharm.Domain.Dtos.PharmacyDtos;
 
-namespace EPharm.Domain.Dtos.PharmaCompanyDtos;
-
-public class CreatePharmaCompanyDto
+public class CreatePharmacyDto
 {
     public string TIN { get; set; }
     public string Name { get; set; }

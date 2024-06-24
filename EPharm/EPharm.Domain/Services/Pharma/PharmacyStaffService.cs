@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
+using EPharm.Domain.Dtos.PharmacyStaffDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
@@ -17,42 +17,42 @@ public class PharmacyStaffService(
     UserManager<AppIdentityUser> userManager,
     IMapper mapper) : IPharmacyStaffService
 {
-    public async Task<IEnumerable<GetPharmaCompanyManagerDto>> GetAllPharmaCompanyManagersAsync(int companyId)
+    public async Task<IEnumerable<GetPharmacyStaffDto>> GetAllPharmacyStaffAsync(int companyId)
     {
         var pharmaCompanyManagers = await pharmacyStaffRepository.GetAllPharmaCompanyManagersAsync(companyId);
-        return mapper.Map<IEnumerable<GetPharmaCompanyManagerDto>>(pharmaCompanyManagers);
+        return mapper.Map<IEnumerable<GetPharmacyStaffDto>>(pharmaCompanyManagers);
     }
 
-    public async Task<GetPharmaCompanyManagerDto?> GetPharmaCompanyManagerByExternalIdAsync(string externalId)
+    public async Task<GetPharmacyStaffDto?> GetPharmacyStaffByExternalIdAsync(string externalId)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetPharmaCompanyManagerByExternalIdAsync(externalId);
-        return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManager);
+        return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManager);
     }
 
-    public async Task<GetPharmaCompanyManagerDto?> GetPharmaCompanyManagerByIdAsync(int pharmaCompanyManagerId)
+    public async Task<GetPharmacyStaffDto?> GetPharmacyStaffByIdAsync(int pharmaCompanyManagerId)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetByIdAsync(pharmaCompanyManagerId);
-        return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManager);
+        return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManager);
     }
 
-    public async Task<GetPharmaCompanyManagerDto> CreatePharmaCompanyManagerAsync(
-        CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
+    public async Task<GetPharmacyStaffDto> CreatePharmacyStaffAsync(
+        CreatePharmacyStaffDto pharmacyStaffDto)
     {
-        var pharmaCompanyManagerEntity = mapper.Map<PharmacyStaff>(pharmaCompanyManagerDto);
+        var pharmaCompanyManagerEntity = mapper.Map<PharmacyStaff>(pharmacyStaffDto);
         var pharmaCompanyManger = await pharmacyStaffRepository.InsertAsync(pharmaCompanyManagerEntity);
 
-        return mapper.Map<GetPharmaCompanyManagerDto>(pharmaCompanyManger);
+        return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManger);
     }
 
-    public async Task<GetPharmaCompanyManagerDto> CreatePharmaManagerAsync(int pharmaCompanyId, EmailDto emailDto)
+    public async Task<GetPharmacyStaffDto> CreatePharmacyStaffAsync(int pharmaCompanyId, EmailDto emailDto)
     {
-        var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmaCompanyManager]);
+        var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmacyStaff]);
 
-        var pharmaCompanyManagerEntity = mapper.Map<CreatePharmaCompanyManagerDto>(user);
+        var pharmaCompanyManagerEntity = mapper.Map<CreatePharmacyStaffDto>(user);
         pharmaCompanyManagerEntity.ExternalId = user.Id;
         pharmaCompanyManagerEntity.PharmaCompanyId = pharmaCompanyId;
 
-        return await CreatePharmaCompanyManagerAsync(pharmaCompanyManagerEntity);
+        return await CreatePharmacyStaffAsync(pharmaCompanyManagerEntity);
     }
 
     public async Task<bool> UpdateUserAsync(string id, EmailDto emailDto)
@@ -69,15 +69,15 @@ public class PharmacyStaffService(
         return result.Succeeded;
     }
 
-    public async Task<bool> UpdatePharmaCompanyManagerAsync(int id,
-        CreatePharmaCompanyManagerDto pharmaCompanyManagerDto)
+    public async Task<bool> UpdatePharmacyStaffAsync(int id,
+        CreatePharmacyStaffDto pharmacyStaffDto)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetByIdAsync(id);
 
         if (pharmaCompanyManager is null)
             return false;
 
-        mapper.Map(pharmaCompanyManagerDto, pharmaCompanyManager);
+        mapper.Map(pharmacyStaffDto, pharmaCompanyManager);
 
         pharmacyStaffRepository.Update(pharmaCompanyManager);
 
@@ -85,7 +85,7 @@ public class PharmacyStaffService(
         return result > 0;
     }
 
-    public async Task<bool> DeletePharmaCompanyManagerAsync(int pharmaCompanyManagerId)
+    public async Task<bool> DeletePharmacyStaffAsync(int pharmaCompanyManagerId)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetByIdAsync(pharmaCompanyManagerId);
 

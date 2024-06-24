@@ -10,5 +10,5 @@ public class ActiveIngredientRepository(AppDbContext context)
     : Repository<ActiveIngredient>(context), IActiveIngredientRepository
 {
     public async Task<IEnumerable<ActiveIngredient>> GetAllCompanyActiveIngredientsAsync(int pharmaCompanyId) =>
-        await Entities.Where(x => x.PharmaCompanyId == pharmaCompanyId).ToListAsync();
+        await Entities.Where(x => x.PharmacyId == pharmaCompanyId).ToListAsync();
 }

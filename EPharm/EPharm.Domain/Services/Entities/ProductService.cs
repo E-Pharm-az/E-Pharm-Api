@@ -77,7 +77,7 @@ public class ProductService(
         try
         {
             var productEntity = mapper.Map<Product>(productDto);
-            productEntity.PharmaCompanyId = pharmaCompanyId;
+            productEntity.PharmacyId = pharmaCompanyId;
 
             if (productDto.Image is not null)
                 productEntity.ImageUrl = await productImageService.UploadProductImageAsync(productDto.Image);

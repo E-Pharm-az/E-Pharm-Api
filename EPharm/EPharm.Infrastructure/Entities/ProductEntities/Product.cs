@@ -6,7 +6,7 @@ namespace EPharm.Infrastructure.Entities.ProductEntities;
 
 public class Product : BaseEntity
 {
-    public int PharmaCompanyId { get; set; }
+    public int PharmacyId { get; set; }
     public Pharmacy Pharmacy { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }

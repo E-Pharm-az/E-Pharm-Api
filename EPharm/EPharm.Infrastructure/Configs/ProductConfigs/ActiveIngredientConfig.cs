@@ -14,7 +14,7 @@ public class ActiveIngredientConfig : IEntityTypeConfiguration<ActiveIngredient>
 
         builder.HasOne(ai => ai.Pharmacy)
             .WithMany(ai => ai.ActiveIngredients)
-            .HasForeignKey(ai => ai.PharmaCompanyId);
+            .HasForeignKey(ai => ai.PharmacyId);
         
         builder.Property(ai => ai.Description)
             .HasMaxLength(500);

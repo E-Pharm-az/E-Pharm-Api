@@ -14,10 +14,10 @@ namespace EPharmApi.Controllers.ProductControllers;
 public class ManufacturerController(IManufacturerService manufacturerService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult<IEnumerable<GetManufacturerDto>>> GetAllCompanyManufacturers(int pharmaCompanyId)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -39,10 +39,10 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
     }
 
     [HttpGet("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult<GetManufacturerDto>> GetManufacturerById(int pharmaCompanyId, int id)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -61,13 +61,13 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
     }
 
     [HttpPost]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult<GetManufacturerDto>> CreateManufacturer(int pharmaCompanyId, [FromBody] CreateManufacturerDto manufacturerDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
         
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -90,13 +90,13 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
     }
 
     [HttpPut("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult> UpdateManufacturer(int pharmaCompanyId, int id, [FromBody] CreateManufacturerDto manufacturerDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
         
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -117,10 +117,10 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
     }
 
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult> DeleteManufacturer(int pharmaCompanyId, int id)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

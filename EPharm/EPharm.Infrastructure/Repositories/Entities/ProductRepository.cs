@@ -60,7 +60,7 @@ public class ProductRepository(AppDbContext context) : Repository<Infrastructure
     {
         var skip = (page - 1) * pageSize;
 
-        return await Entities.Where(product => product.PharmaCompanyId == pharmaCompanyId)
+        return await Entities.Where(product => product.PharmacyId == pharmaCompanyId)
             .Where(product => product.IsApproved)
             .OrderByDescending(product => product.Name)
             .Skip(skip)
@@ -73,7 +73,7 @@ public class ProductRepository(AppDbContext context) : Repository<Infrastructure
     {
         var skip = (page - 1) * pageSize;
 
-        return await Entities.Where(product => product.PharmaCompanyId == pharmaCompanyId)
+        return await Entities.Where(product => product.PharmacyId == pharmaCompanyId)
             .OrderByDescending(product => product.Name)
             .Skip(skip)
             .Take(pageSize)

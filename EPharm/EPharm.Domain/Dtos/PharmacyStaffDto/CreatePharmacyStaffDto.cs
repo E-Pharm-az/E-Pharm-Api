@@ -1,6 +1,6 @@
-namespace EPharm.Domain.Dtos.PharmaCompanyManagerDto;
+namespace EPharm.Domain.Dtos.PharmacyStaffDto;
 
-public class CreatePharmaCompanyManagerDto
+public class CreatePharmacyStaffDto
 {
     public string ExternalId { get; set; }
     public int? PharmaCompanyId { get; set; }

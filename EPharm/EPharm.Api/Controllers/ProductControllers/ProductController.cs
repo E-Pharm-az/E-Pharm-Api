@@ -52,12 +52,12 @@ public class ProductController(
     }
 
     [HttpGet("pharma-company/{pharmaCompanyId:int}/[controller]/{page:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllPharmaCompanyProducts(int pharmaCompanyId, int page)
     {
         try
         {
-            var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+            var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
 
             if (company is null)
                 return NotFound("Pharmaceutical company not found.");
@@ -65,7 +65,7 @@ public class ProductController(
             if (!User.IsInRole(IdentityData.Admin))
             {
                 var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-                var companyUser = await pharmacyStaffService.GetPharmaCompanyManagerByExternalIdAsync(userId);
+                var companyUser = await pharmacyStaffService.GetPharmacyStaffByExternalIdAsync(userId);
                 
                 ArgumentNullException.ThrowIfNull(companyUser);
 
@@ -121,7 +121,7 @@ public class ProductController(
     }
     
     [HttpPost("pharma-company/{pharmaCompanyId:int}/[controller]")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult<GetMinimalProductDto>> CreateProduct(int pharmaCompanyId, [FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
@@ -129,7 +129,7 @@ public class ProductController(
 
         try
         {
-            var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+            var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
 
             if (company is null)
                 return NotFound("Pharmaceutical company not found.");
@@ -150,13 +150,13 @@ public class ProductController(
     }
 
     [HttpPut("pharma-company/{pharmaCompanyId:int}/[controller]/{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult> UpdateProduct(int pharmaCompanyId, int id, [FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -178,10 +178,10 @@ public class ProductController(
     }
 
     [HttpDelete("pharma-company/{pharmaCompanyId:int}/[Controller]/{productId:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult> DeleteProduct(int pharmaCompanyId, int productId)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

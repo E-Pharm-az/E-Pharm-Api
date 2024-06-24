@@ -26,7 +26,7 @@ public class ManufacturerService(IManufacturerRepository manufacturerRepository,
         try
         {
             var manufacturerEntity = mapper.Map<Manufacturer>(createManufacturerDto);
-            manufacturerEntity.PharmaCompanyId = pharmaCompanyId;
+            manufacturerEntity.PharmacyId = pharmaCompanyId;
             var manufacturer = await manufacturerRepository.InsertAsync(manufacturerEntity);
 
             return mapper.Map<GetManufacturerDto>(manufacturer);

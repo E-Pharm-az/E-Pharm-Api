@@ -10,7 +10,7 @@ public class ProductConfig : IEntityTypeConfiguration<Product>
     {
         builder.HasOne(p => p.Pharmacy)
             .WithMany(p => p.Products)
-            .HasForeignKey(p => p.PharmaCompanyId)
+            .HasForeignKey(p => p.PharmacyId)
             .IsRequired();
         
         builder.Property(p => p.Name)

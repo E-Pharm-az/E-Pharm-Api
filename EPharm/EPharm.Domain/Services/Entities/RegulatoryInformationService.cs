@@ -30,7 +30,7 @@ public class RegulatoryInformationService(
         try
         {
             var regulatoryInformationEntity = mapper.Map<RegulatoryInformation>(regulatoryInformationDto);
-            regulatoryInformationEntity.PharmaCompanyId = pharmaCompanyId;
+            regulatoryInformationEntity.PharmacyId = pharmaCompanyId;
             var regulatoryInformation = await regulatoryInformationRepository.InsertAsync(regulatoryInformationEntity);
 
             return mapper.Map<GetRegulatoryInformationDto>(regulatoryInformation);

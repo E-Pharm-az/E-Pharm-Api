@@ -10,5 +10,5 @@ public class SpecialRequirementRepository(AppDbContext context)
     : Repository<SpecialRequirement>(context), ISpecialRequirementRepository
 {
     public async Task<IEnumerable<SpecialRequirement>> GetAllCompanySpecialRequirementsAsync(int pharmaCompanyId) =>
-        await Entities.Where(x => x.PharmaCompanyId == pharmaCompanyId).ToListAsync();
+        await Entities.Where(x => x.PharmacyId == pharmaCompanyId).ToListAsync();
 }

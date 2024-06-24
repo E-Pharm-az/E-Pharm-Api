@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
+using EPharm.Domain.Dtos.PharmacyStaffDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
@@ -10,14 +10,14 @@ using Serilog;
 namespace EPharmApi.Controllers.PharmaControllers;
 
 [ApiController]
-[Route("api/[controller]/{pharmaCompanyId:int}")]
-[Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmaCompanyAdmin)]
+[Route("api/[controller]/{pharmacyId:int}")]
+[Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmacyAdmin)]
 public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetPharmaCompanyManagerDto>>> GetAllPharmaCompanyManagers(int pharmaCompanyId)
+    public async Task<ActionResult<IEnumerable<GetPharmacyStaffDto>>> GetAllPharmacyStaff(int pharmacyId)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmacyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -29,7 +29,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService,
                 return Forbid();
         }
 
-        var result = await pharmacyStaffService.GetAllPharmaCompanyManagersAsync(pharmaCompanyId);
+        var result = await pharmacyStaffService.GetAllPharmacyStaffAsync(pharmacyId);
 
         if (result.Any()) return Ok(result);
 
@@ -37,9 +37,9 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService,
     }
     
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GetPharmaCompanyManagerDto>> GetPharmaCompanyManagerById(int pharmaCompanyId, int id)
+    public async Task<ActionResult<GetPharmacyStaffDto>> GetPharmaCompanyManagerById(int pharmacyId, int id)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmacyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -51,7 +51,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService,
                 return Forbid();
         }
 
-        var result = await pharmacyStaffService.GetPharmaCompanyManagerByIdAsync(id);
+        var result = await pharmacyStaffService.GetPharmacyStaffByIdAsync(id);
         if (result is not null) return Ok(result);
 
         return NotFound($"Pharmaceutical company manager with ID: {id} not found.");
@@ -61,7 +61,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService,
 
     [HttpPost]
     [Route("register/{companyId:int}/pharma/")]
-    [Authorize(Roles = IdentityData.PharmaCompanyAdmin)]
+    [Authorize(Roles = IdentityData.PharmacyAdmin)]
     public async Task<IActionResult> RegisterPharmaManager(int companyId, [FromBody] EmailDto request)
     {
         if (!ModelState.IsValid)
@@ -69,7 +69,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService,
 
         try
         {
-            await pharmacyStaffService.CreatePharmaManagerAsync(companyId, request);
+            await pharmacyStaffService.CreatePharmacyStaffAsync(companyId, request);
             return Ok();
         }
         catch (Exception ex)

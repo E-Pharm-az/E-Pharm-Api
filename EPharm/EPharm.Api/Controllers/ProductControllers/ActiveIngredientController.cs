@@ -22,11 +22,11 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
         return NotFound("Active ingredients not found.");
     }
     
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     [HttpGet("pharma-company/{pharmaCompanyId:int}/active-ingredients")]
     public async Task<ActionResult<IEnumerable<GetActiveIngredientDto>>> GetAllCompanyActiveIngredients(int pharmaCompanyId)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -44,7 +44,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
     }
 
     [HttpGet("{id:int}", Name = "getActiveIngredientById")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult<GetActiveIngredientDto>> GetActiveIngredientById(int id)
     {
         var result = await activeIngredientService.GetActiveIngredientByIdAsync(id);
@@ -54,13 +54,13 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
     }
 
     [HttpPost("pharma-company/{pharmaCompanyId:int}/active-ingredients")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult<GetActiveIngredientDto>> CreateActiveIngredient(int pharmaCompanyId, [FromBody] CreateActiveIngredientDto activeIngredientDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
     
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -83,13 +83,13 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
     }
 
     [HttpPut("pharma-company/{pharmaCompanyId:int}/active-ingredients/{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult> UpdateActiveIngredient(int pharmaCompanyId, int id, [FromBody] CreateActiveIngredientDto activeIngredientDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
         
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -111,10 +111,10 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
     }
 
     [HttpDelete("pharma-company/{pharmaCompanyId:int}/active-ingredients/{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult> DeleteActiveIngredient(int pharmaCompanyId, int id)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

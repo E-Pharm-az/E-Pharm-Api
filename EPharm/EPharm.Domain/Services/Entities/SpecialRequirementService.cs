@@ -28,7 +28,7 @@ public class SpecialRequirementService(ISpecialRequirementRepository specialRequ
         try
         {
             var specialRequirementEntity = mapper.Map<SpecialRequirement>(specialRequirementDto);
-            specialRequirementEntity.PharmaCompanyId = pharmaCompanyId;
+            specialRequirementEntity.PharmacyId = pharmaCompanyId;
             var specialRequirement = await specialRequirementRepository.InsertAsync(specialRequirementEntity);
 
             return mapper.Map<GetSpecialRequirementDto>(specialRequirement);

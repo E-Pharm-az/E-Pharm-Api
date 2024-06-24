@@ -51,7 +51,7 @@ public class AuthController(
         
         try
         {
-            var response = await ProcessLogin(request, IdentityData.PharmaCompanyManager);
+            var response = await ProcessLogin(request, IdentityData.PharmacyStaff);
             return Ok(response);
         }
         catch (Exception ex)

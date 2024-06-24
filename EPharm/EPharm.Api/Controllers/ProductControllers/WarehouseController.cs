@@ -14,10 +14,10 @@ namespace EPharmApi.Controllers.ProductControllers;
 public class WarehouseController(IWarehouseService warehouseService, IPharmacyService pharmacyService) : Controller
 {
     [HttpGet]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult<IEnumerable<GetWarehouseDto>>> GetAllCompanyWarehouses(int pharmaCompanyId)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
 
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -38,10 +38,10 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
     }
     
     [HttpGet("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager + "," + IdentityData.Admin)]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     public async Task<ActionResult<GetWarehouseDto>> GetWarehouseById(int pharmaCompanyId, int id)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -61,13 +61,13 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
     }
     
     [HttpPost]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult<GetWarehouseDto>> CreateWarehouse(int pharmaCompanyId, CreateWarehouseDto warehouseDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
         
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -90,13 +90,13 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
     }
     
     [HttpPut("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult> UpdateWarehouse(int pharmaCompanyId, int id, CreateWarehouseDto warehouseDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
         
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
@@ -113,10 +113,10 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
     }
     
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
     public async Task<ActionResult> DeleteWarehouse(int pharmaCompanyId, int id)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

@@ -14,7 +14,7 @@ public class RegulatoryInformationConfig : IEntityTypeConfiguration<RegulatoryIn
         
         builder.HasOne(ri => ri.Pharmacy)
             .WithMany(ri => ri.RegulatoryInformations)
-            .HasForeignKey(ri => ri.PharmaCompanyId);
+            .HasForeignKey(ri => ri.PharmacyId);
 
         builder.Property(ri => ri.ApprovalDate)
             .HasColumnType("date");

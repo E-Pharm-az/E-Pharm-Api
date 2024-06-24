@@ -1,6 +1,6 @@
 using EPharm.Domain.Dtos.AuthDto;
-using EPharm.Domain.Dtos.PharmaCompanyDtos;
-using EPharm.Domain.Dtos.PharmaCompanyManagerDto;
+using EPharm.Domain.Dtos.PharmacyDtos;
+using EPharm.Domain.Dtos.PharmacyStaffDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Infrastructure.Entities.Identity;
 

@@ -33,7 +33,7 @@ public class ActiveIngredientService(IActiveIngredientRepository activeIngredien
         try
         {
             var activeIngredientEntity = mapper.Map<ActiveIngredient>(createActiveIngredientDto);
-            activeIngredientEntity.PharmaCompanyId = pharmaCompanyId;
+            activeIngredientEntity.PharmacyId = pharmaCompanyId;
             var activeIngredient = await activeIngredientRepository.InsertAsync(activeIngredientEntity);
 
             return mapper.Map<GetActiveIngredientDto>(activeIngredient);

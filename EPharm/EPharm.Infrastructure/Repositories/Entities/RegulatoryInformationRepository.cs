@@ -10,5 +10,5 @@ public class RegulatoryInformationRepository(AppDbContext context)
     : Repository<RegulatoryInformation>(context), IRegulatoryInformationRepository
 {
     public async Task<IEnumerable<RegulatoryInformation>> GetAllCompanyRegulatoryInformationAsync(int pharmaCompanyId) =>
-        await Entities.Where(x => x.PharmaCompanyId == pharmaCompanyId).ToListAsync();
+        await Entities.Where(x => x.PharmacyId == pharmaCompanyId).ToListAsync();
 }

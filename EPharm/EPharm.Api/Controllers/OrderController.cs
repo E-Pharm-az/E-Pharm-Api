@@ -25,10 +25,10 @@ public class OrderController(IOrderService orderService, IPharmacyService pharma
     }
 
     [HttpGet("pharma-company/{pharmaCompanyId:int}/{id:int}")]
-    [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmaCompanyManager)]
+    [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmacyStaff)]
     public async Task<ActionResult<GetOrderDto>> GetOrderById(int pharmaCompanyId, int id)
     {
-        var company = await pharmacyService.GetPharmaCompanyByIdAsync(pharmaCompanyId);
+        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");

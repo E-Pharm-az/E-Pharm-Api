@@ -3,7 +3,7 @@ using EPharm.Domain.Dtos.AllergyDto;
 using EPharm.Domain.Dtos.DosageFormDto;
 using EPharm.Domain.Dtos.IndicationDto;
 using EPharm.Domain.Dtos.ManufacturerDto;
-using EPharm.Domain.Dtos.PharmaCompanyDtos;
+using EPharm.Domain.Dtos.PharmacyDtos;
 using EPharm.Domain.Dtos.RegulatoryInformationDto;
 using EPharm.Domain.Dtos.RouteOfAdministrationDto;
 using EPharm.Domain.Dtos.SideEffectDto;
@@ -16,7 +16,7 @@ namespace EPharm.Domain.Dtos.ProductDtos;
 public class GetFullProductDto
 {
     public int Id { get; set; }
-    public GetPharmaCompanyDto PharmaCompany { get; set; }
+    public GetPharmacyDto Pharmacy { get; set; }
 
     public string Name { get; set; }
     public string Description { get; set; }
