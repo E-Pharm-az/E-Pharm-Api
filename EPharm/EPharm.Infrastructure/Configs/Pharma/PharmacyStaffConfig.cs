@@ -12,8 +12,7 @@ public class PharmacyStaffConfig : IEntityTypeConfiguration<PharmacyStaff>
             .IsRequired();
 
         builder.Property(pcm => pcm.Email)
-            .HasMaxLength(255)
-            .IsRequired();
+            .HasMaxLength(255);
 
         builder.HasOne(pcm => pcm.Pharmacy)
             .WithMany(pc => pc.PharmacyStaff)

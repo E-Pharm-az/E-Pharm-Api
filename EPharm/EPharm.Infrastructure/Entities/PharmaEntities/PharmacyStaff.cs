@@ -6,8 +6,8 @@ public class PharmacyStaff : BaseEntity
 {
     public string ExternalId { get; set; }
     public string Email { get; set; }
-    public int PharmacyId { get; set; }
-    public Pharmacy Pharmacy { get; set; }
+    public int? PharmacyId { get; set; }
+    public Pharmacy? Pharmacy { get; set; }
     
     public DateTime CreatedAt { get; set; } 
 }

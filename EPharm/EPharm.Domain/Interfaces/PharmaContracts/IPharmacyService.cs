@@ -9,7 +9,7 @@ public interface IPharmacyService
     public Task<GetPharmacyDto?> GetPharmacyByIdAsync(int pharmaCompanyId);
     public Task InvitePharmacyAsync(EmailDto emailDto);
     public Task InitializePharmacyAsync(string userId, string token, CreatePharmaDto createPharmaDto);
-    public Task CreatePharmacyAsync(CreatePharmaDto createPharmaDto);
+    public Task<GetPharmacyDto> CreatePharmacyAsync(CreatePharmaDto createPharmaDto);
     public Task<bool> UpdatePharmacyAsync(int id, CreatePharmacyDto pharmacyDto);
     public Task<bool> DeletePharmacyAsync(int pharmaCompanyId);
 }
