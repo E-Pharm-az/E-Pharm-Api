@@ -22,21 +22,6 @@ public class PharmacyConfig : IEntityTypeConfiguration<Pharmacy>
         builder.Property(pc => pc.ContactPhone)
             .HasMaxLength(20);
         
-        builder.Property(pc => pc.StreetAddress)
-            .HasMaxLength(255);
-        
-        builder.Property(pc => pc.PostalCode)
-            .HasMaxLength(20);
-        
-        builder.Property(pc => pc.City)
-            .HasMaxLength(255);
-        
-        builder.Property(pc => pc.Country)
-            .HasMaxLength(255);
-        
-        builder.Property(pc => pc.Region)
-            .HasMaxLength(255);
-        
         builder.HasMany(pc => pc.PharmacyStaff)
             .WithOne(pcm => pcm.Pharmacy)
             .HasForeignKey(pcm => pcm.PharmacyId);

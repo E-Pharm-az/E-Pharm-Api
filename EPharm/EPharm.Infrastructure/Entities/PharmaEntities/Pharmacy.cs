@@ -10,14 +10,7 @@ public class Pharmacy : BaseEntity
     public string Name { get; set; }
     public string ContactEmail { get; set; }
     public string ContactPhone { get; set; }
-    public string StreetAddress { get; set; }
-    public string PostalCode { get; set; }
-    public string City { get; set; }
-    public string Country { get; set; }
-    public string Region { get; set; }
-    public int BuildingNumber { get; set; }
-    public int Floor { get; set; }
-    public int RoomNumber { get; set; }  
+    public string Address { get; set; }
     
     public ICollection<PharmacyStaff> PharmacyStaff { get; set; }
     public ICollection<Warehouse> Warehouses { get; set; }
