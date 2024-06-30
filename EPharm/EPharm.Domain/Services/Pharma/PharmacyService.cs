@@ -31,18 +31,22 @@ public class PharmacyService(
     IUnitOfWork unitOfWork,
     IMapper mapper) : IPharmacyService
 {
+    public async Task<GetPharmacyDto?> GetPharmacyByIdAsync(int pharmaCompanyId)
+    {
+        var pharmacy = await pharmacyRepository.GetByIdAsync(pharmaCompanyId);
+        var admin = await userService.GetUserByIdAsync(pharmacy.OwnerId);
+        
+        var pharmacyDto = mapper.Map<GetPharmacyDto>(pharmacy);
+        pharmacyDto.Owner = admin;
+
+        return pharmacyDto;
+    }
+    
     public async Task<IEnumerable<GetPharmacyDto>> GetAllPharmacyAsync()
     {
         var pharmaCompanies = await pharmacyRepository.GetAllAsync();
         return mapper.Map<IEnumerable<GetPharmacyDto>>(pharmaCompanies);
     }
-
-    public async Task<GetPharmacyDto?> GetPharmacyByIdAsync(int pharmaCompanyId)
-    {
-        var pharmaCompany = await pharmacyRepository.GetByIdAsync(pharmaCompanyId);
-        return mapper.Map<GetPharmacyDto>(pharmaCompany);
-    }
-
 
     public async Task InvitePharmacyAsync(EmailDto emailDto)
     {

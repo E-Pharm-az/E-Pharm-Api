@@ -15,11 +15,11 @@ public class PharmacyConfig : IEntityTypeConfiguration<Pharmacy>
         builder.Property(pc => pc.TIN)
             .IsRequired();
 
-        builder.Property(pc => pc.ContactEmail)
+        builder.Property(pc => pc.Email)
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(pc => pc.ContactPhone)
+        builder.Property(pc => pc.Phone)
             .HasMaxLength(20);
         
         builder.HasMany(pc => pc.PharmacyStaff)

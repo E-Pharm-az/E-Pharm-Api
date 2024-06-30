@@ -33,7 +33,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
 
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
         
-        if (company.OwnerId != userId)
+        if (company.Owner.Id != userId)
             return Forbid(); 
         
         var result = await activeIngredientService.GetAllCompanyActiveIngredientsAsync(pharmaCompanyId);
@@ -67,7 +67,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
 
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
     
-        if (company.OwnerId != userId)
+        if (company.Owner.Id != userId)
             return Forbid();
 
         try
@@ -98,7 +98,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         } 
         
@@ -123,7 +123,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }  
         

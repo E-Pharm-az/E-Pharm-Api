@@ -26,7 +26,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         
@@ -50,7 +50,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         
@@ -74,7 +74,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
         
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
         
-        if (company.OwnerId != userId)
+        if (company.Owner.Id != userId)
             return Forbid();
 
         try
@@ -103,7 +103,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
         
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
         
-        if (company.OwnerId != userId)
+        if (company.Owner.Id != userId)
             return Forbid();
         
         var result = await warehouseService.UpdateWarehouseAsync(id, warehouseDto);
@@ -123,7 +123,7 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
         
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
          
-        if (company.OwnerId != userId)
+        if (company.Owner.Id != userId)
             return Forbid();
         
         var result = await warehouseService.DeleteWarehouseAsync(id);

@@ -27,7 +27,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
 
@@ -50,7 +50,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
 
@@ -74,7 +74,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
         
-        if (company.OwnerId != userId)
+        if (company.Owner.Id != userId)
             return Forbid();
 
         try
@@ -105,7 +105,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
 
@@ -128,7 +128,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         

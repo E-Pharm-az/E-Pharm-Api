@@ -36,9 +36,10 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
+        
         
         var result = await pharmacyService.GetPharmacyByIdAsync(id);
         if (result is not null) return Ok(result);

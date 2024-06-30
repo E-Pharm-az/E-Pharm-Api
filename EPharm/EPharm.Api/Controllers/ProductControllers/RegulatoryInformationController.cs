@@ -26,7 +26,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         
@@ -49,7 +49,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         
@@ -74,7 +74,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
     
-        if (company.OwnerId != userId)
+        if (company.Owner.Id != userId)
             return Forbid(); 
 
         try
@@ -103,7 +103,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         
@@ -126,7 +126,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         

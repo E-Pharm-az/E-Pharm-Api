@@ -26,7 +26,7 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         
@@ -50,7 +50,7 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
         
@@ -74,7 +74,7 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         
         var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
         
-        if (company.OwnerId != userId)
+        if (company.Owner.Id != userId)
             return Forbid();
 
         try
@@ -104,7 +104,7 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
 
@@ -129,7 +129,7 @@ public class ManufacturerController(IManufacturerService manufacturerService, IP
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
             
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         } 
         

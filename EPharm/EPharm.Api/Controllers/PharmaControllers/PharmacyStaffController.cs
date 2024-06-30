@@ -25,7 +25,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService,
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
 
@@ -47,7 +47,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService,
         if (!User.IsInRole(IdentityData.Admin))
         {
             var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            if (company.OwnerId != userId)
+            if (company.Owner.Id != userId)
                 return Forbid();
         }
 
