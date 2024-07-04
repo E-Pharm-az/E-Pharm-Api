@@ -1,4 +1,7 @@
+using System.Text;
+using Amazon.S3.Model;
 using AutoMapper;
+using EPharm.Domain.Dtos.EmailDto;
 using EPharm.Domain.Dtos.PharmacyStaffDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
@@ -8,13 +11,19 @@ using EPharm.Infrastructure.Entities.Identity;
 using EPharm.Infrastructure.Entities.PharmaEntities;
 using EPharm.Infrastructure.Interfaces.Pharma;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Configuration;
 
 namespace EPharm.Domain.Services.Pharma;
 
 public class PharmacyStaffService(
+    IConfiguration configuration,
     IPharmacyStaffRepository pharmacyStaffRepository,
+    IPharmacyService pharmacyService,
     IUserService userService,
     UserManager<AppIdentityUser> userManager,
+    IEmailService emailService,
+    IEmailSender emailSender,
     IMapper mapper) : IPharmacyStaffService
 {
     public async Task<IEnumerable<GetPharmacyStaffDto>> GetAllPharmacyStaffAsync(int companyId)
@@ -44,7 +53,7 @@ public class PharmacyStaffService(
         return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManger);
     }
 
-    public async Task<GetPharmacyStaffDto> CreatePharmacyStaffAsync(int pharmaCompanyId, EmailDto emailDto)
+    public async Task<AppIdentityUser> CreatePharmacyStaffAsync(int pharmaCompanyId, EmailDto emailDto)
     {
         var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmacyStaff]);
 
@@ -52,7 +61,8 @@ public class PharmacyStaffService(
         pharmaCompanyManagerEntity.ExternalId = user.Id;
         pharmaCompanyManagerEntity.PharmaCompanyId = pharmaCompanyId;
 
-        return await CreatePharmacyStaffAsync(pharmaCompanyManagerEntity);
+        await CreatePharmacyStaffAsync(pharmaCompanyManagerEntity);
+        return user;
     }
 
     public async Task<bool> UpdateUserAsync(string id, EmailDto emailDto)
@@ -96,5 +106,34 @@ public class PharmacyStaffService(
 
         var result = await pharmacyStaffRepository.SaveChangesAsync();
         return result > 0;
+    }
+
+    public async Task BulkInvitePharmacyStaffAsync(int pharmaCompanyId, BulkEmailDto bulkEmailDto)
+    {
+        foreach (var email in bulkEmailDto.Emails)
+        {
+            var user = await CreatePharmacyStaffAsync(pharmaCompanyId, email);
+            await InvitePharmacyStaffAsync(user);
+        }
+    }
+
+    private async Task InvitePharmacyStaffAsync(AppIdentityUser user)
+    {
+        var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
+        var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
+
+        var emailTemplate = emailService.GetEmail("pharmacy-staff-invitation");
+        if (emailTemplate is null)
+            throw new KeyNotFoundException("EMAIL_NOT_FOUND");
+
+        emailTemplate = emailTemplate.Replace("{url}",
+            $"{configuration["AppUrls:PharmaPortalClient"]}/onboarding?token={encodedToken}&userId={user.Id}");
+
+        await emailSender.SendEmailAsync(new CreateEmailDto
+        {
+            Email = user.Email,
+            Subject = "Welcome to E-Pharm: Complete Your Pharmacy Registration",
+            Message = emailTemplate
+        });
     }
 }

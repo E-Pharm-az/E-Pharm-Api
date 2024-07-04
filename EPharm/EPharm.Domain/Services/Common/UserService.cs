@@ -169,7 +169,7 @@ public class UserService(
         user.CodeExpiryTime = DateTime.UtcNow.AddHours(1);
         await userManager.UpdateAsync(user);
 
-        var emailTemplate = emailService.GetEmail("confirmation-email");
+        var emailTemplate = emailService.GetEmail("confirmation");
         ArgumentNullException.ThrowIfNull(emailTemplate);
 
         emailTemplate = emailTemplate.Replace("{code}", code.ToString());

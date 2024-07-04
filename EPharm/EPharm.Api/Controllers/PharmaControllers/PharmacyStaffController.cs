@@ -1,7 +1,9 @@
 using EPharm.Domain.Dtos.PharmacyStaffDto;
 using EPharm.Domain.Dtos.UserDto;
+using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
+using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -10,59 +12,65 @@ using Serilog;
 namespace EPharmApi.Controllers.PharmaControllers;
 
 [ApiController]
-[Route("api/[controller]/{pharmacyId:int}")]
-[Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmacyAdmin)]
-public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService, IPharmacyService pharmacyService) : ControllerBase
+[Route("api/[controller]")]
+public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("{pharmacyId:int}")]
+    [Authorize(Roles = IdentityData.PharmacyAdmin)]
+    [PharmacyOwner]
     public async Task<ActionResult<IEnumerable<GetPharmacyStaffDto>>> GetAllPharmacyStaff(int pharmacyId)
     {
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmacyId);
-        
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-        
-        if (!User.IsInRole(IdentityData.Admin))
-        {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            if (company.Owner.Id != userId)
-                return Forbid();
-        }
-
         var result = await pharmacyStaffService.GetAllPharmacyStaffAsync(pharmacyId);
-
         if (result.Any()) return Ok(result);
 
         return NotFound("Pharmaceutical company managers not found.");
     }
     
-    [HttpGet("{id:int}")]
-    public async Task<ActionResult<GetPharmacyStaffDto>> GetPharmaCompanyManagerById(int pharmacyId, int id)
+    [HttpGet("{pharmacyId:int}/{id:int}")]
+    [Authorize(Roles = IdentityData.PharmacyAdmin)]
+    [PharmacyOwner]
+    public async Task<ActionResult<GetPharmacyStaffDto>> GetPharmacyStaffById(int pharmacyId, int id)
     {
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmacyId);
-        
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-        
-        if (!User.IsInRole(IdentityData.Admin))
-        {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            if (company.Owner.Id != userId)
-                return Forbid();
-        }
-
         var result = await pharmacyStaffService.GetPharmacyStaffByIdAsync(id);
         if (result is not null) return Ok(result);
 
         return NotFound($"Pharmaceutical company manager with ID: {id} not found.");
     }
-    
-    
 
+    [HttpPost]
+    [Route("{pharmacyId:int}/invite")]
+    [Authorize(Roles = IdentityData.PharmacyAdmin)]
+    [PharmacyOwner]
+    public async Task<IActionResult> InvitePharmacyStaff(int pharmacyId, [FromBody] BulkEmailDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        try
+        {
+            await pharmacyStaffService.BulkInvitePharmacyStaffAsync(pharmacyId, request);
+            return Ok(new { Message = "Pharmacy staff invited successfully." });
+        }
+        catch (ApplicationException ex) when (ex.Message == "FAILED_TO_SEND_INVITATION_EMAIL")
+        {
+            return StatusCode(500, new { Error = "Failed to send invitation email. Please try again later." });
+        }
+        catch (ApplicationException ex) when (ex.Message.StartsWith("Failed to invite staff member:"))
+        {
+            return BadRequest(new { Error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An error occurred while inviting pharmacy staff");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
+    }    
+    
     [HttpPost]
     [Route("register/{companyId:int}/pharma/")]
     [Authorize(Roles = IdentityData.PharmacyAdmin)]
-    public async Task<IActionResult> RegisterPharmaManager(int companyId, [FromBody] EmailDto request)
+    [PharmacyOwner]
+    public async Task<IActionResult> RegisterPharmacyManager(int companyId, [FromBody] EmailDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

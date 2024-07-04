@@ -176,7 +176,7 @@ public class PharmacyService(
             throw new KeyNotFoundException("EMAIL_NOT_FOUND");
 
         emailTemplate = emailTemplate.Replace("{url}",
-            $"{configuration["AppUrls:PharmaPortalClient"]}/join?token={encodedToken}?userId={user.Id}");
+            $"{configuration["AppUrls:PharmaPortalClient"]}/onboarding?token={encodedToken}&userId={user.Id}");
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {

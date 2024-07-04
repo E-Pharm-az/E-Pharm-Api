@@ -33,7 +33,7 @@
       <Content Include="Properties\launchSettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>
-      <None Update="Emails\confirmation-email.html">
+      <None Update="Emails\confirmation.html">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

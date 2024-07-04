@@ -1,8 +1,11 @@
 using EPharm.Domain.Dtos.PharmacyDtos;
 using EPharm.Domain.Dtos.UserDto;
+using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
@@ -12,7 +15,7 @@ namespace EPharmApi.Controllers.PharmaControllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PharmacyController(IPharmacyService pharmacyService) : ControllerBase
+public class PharmacyController(IPharmacyService pharmacyService, IUserService userService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -68,7 +71,20 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
     }
 
     [HttpPost]
-    [Route("initialize")]
+    [Route("verify")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Validate([FromQuery] string userId)
+    {
+        var user = await userService.GetUserByIdAsync(userId);
+        
+        if (user is null)
+            return NotFound();
+
+        return Ok(user);
+    }
+
+    [HttpPost]
+    [Route("onboard")]
     public async Task<IActionResult> InitializePharmacy([FromQuery] string userId, [FromQuery] string token, [FromBody] CreatePharmaDto request)
     {
         if (!ModelState.IsValid)
