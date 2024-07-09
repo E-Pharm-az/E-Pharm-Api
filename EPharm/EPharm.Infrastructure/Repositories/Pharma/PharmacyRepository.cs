@@ -6,8 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EPharm.Infrastructure.Repositories.Pharma;
 
-public class PharmacyRepository(AppDbContext context)
-    : Repository<Infrastructure.Entities.PharmaEntities.Pharmacy>(context), IPharmacyRepository
+public class PharmacyRepository(AppDbContext context) : Repository<Pharmacy>(context), IPharmacyRepository
 {
     public override async Task<Pharmacy?> GetByIdAsync(int id) =>
         await Entities

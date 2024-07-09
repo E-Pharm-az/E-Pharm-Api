@@ -1,12 +1,12 @@
 using EPharm.Domain.Dtos.PharmacyDtos;
 using EPharm.Domain.Dtos.UserDto;
-using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
 using EPharm.Infrastructure.Entities.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
@@ -15,7 +15,7 @@ namespace EPharmApi.Controllers.PharmaControllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PharmacyController(IPharmacyService pharmacyService, IUserService userService) : ControllerBase
+public class PharmacyController(IPharmacyService pharmacyService, UserManager<AppIdentityUser> userManager) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -42,7 +42,6 @@ public class PharmacyController(IPharmacyService pharmacyService, IUserService u
             if (company.Owner.Id != userId)
                 return Forbid();
         }
-        
         
         var result = await pharmacyService.GetPharmacyByIdAsync(id);
         if (result is not null) return Ok(result);
@@ -73,18 +72,29 @@ public class PharmacyController(IPharmacyService pharmacyService, IUserService u
     [HttpPost]
     [Route("verify")]
     [AllowAnonymous]
-    public async Task<IActionResult> Validate([FromQuery] string userId)
+    public async Task<IActionResult> Validate([FromQuery] string userId, [FromQuery] string token)
     {
-        var user = await userService.GetUserByIdAsync(userId);
-        
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            return BadRequest("User ID and token are required.");
+
+        var user = await userManager.FindByIdAsync(userId);
+    
         if (user is null)
-            return NotFound();
+            return NotFound("User not found.");
 
-        return Ok(user);
+        if (user.EmailConfirmed)
+            return BadRequest("Email is already confirmed.");
+
+        var result = await userManager.ConfirmEmailAsync(user, token);
+
+        if (result.Succeeded)
+            return Ok("Email confirmed successfully.");
+
+        return BadRequest($"Email confirmation failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
     }
-
     [HttpPost]
     [Route("onboard")]
+    [AllowAnonymous]
     public async Task<IActionResult> InitializePharmacy([FromQuery] string userId, [FromQuery] string token, [FromBody] CreatePharmaDto request)
     {
         if (!ModelState.IsValid)

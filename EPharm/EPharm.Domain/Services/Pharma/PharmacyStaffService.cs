@@ -1,5 +1,4 @@
 using System.Text;
-using Amazon.S3.Model;
 using AutoMapper;
 using EPharm.Domain.Dtos.EmailDto;
 using EPharm.Domain.Dtos.PharmacyStaffDto;
@@ -19,7 +18,6 @@ namespace EPharm.Domain.Services.Pharma;
 public class PharmacyStaffService(
     IConfiguration configuration,
     IPharmacyStaffRepository pharmacyStaffRepository,
-    IPharmacyService pharmacyService,
     IUserService userService,
     UserManager<AppIdentityUser> userManager,
     IEmailService emailService,

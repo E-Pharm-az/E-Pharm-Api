@@ -130,7 +130,7 @@ public class UserService(
             throw new ArgumentException("Invalid or expired code. Please generate a new one.");
     }
 
-    public async Task<AppIdentityUser> CreateUserAsync(EmailDto emailDto, string[] identityRole)
+    public async Task<AppIdentityUser> CreateUserAsync(EmailDto emailDto, string[] identityRoles)
     {
         var existingUser = await userManager.FindByEmailAsync(emailDto.Email);
         if (existingUser is not null)
@@ -146,7 +146,7 @@ public class UserService(
 
         var result = await userManager.CreateAsync(userEntity, configuration["UniqueKey"]!);
 
-        foreach (var role in identityRole)
+        foreach (var role in identityRoles)
         {
             if (!await roleManager.RoleExistsAsync(role))
                 await roleManager.CreateAsync(new IdentityRole(role));
@@ -156,8 +156,7 @@ public class UserService(
             throw new InvalidOperationException(
                 $"Failed to create user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
 
-        foreach (var role in identityRole)
-            await userManager.AddToRoleAsync(userEntity, role);
+        await userManager.AddToRolesAsync(userEntity, identityRoles);
 
         return userEntity;
     }

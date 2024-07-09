@@ -1,12 +1,10 @@
 using EPharm.Domain.Dtos.PharmacyStaffDto;
 using EPharm.Domain.Dtos.UserDto;
-using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
 using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
 namespace EPharmApi.Controllers.PharmaControllers;

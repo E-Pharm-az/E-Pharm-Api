@@ -56,29 +56,37 @@ public class PharmacyService(
         await SendEmailInvitationAsync(user);
     }
 
-    public async Task InitializePharmacyAsync(string userId, string token, CreatePharmaDto createPharmaDto)
+    public async Task<GetPharmacyDto> InitializePharmacyAsync(string userId, string token, CreatePharmaDto createPharmaDto)
     {
-        var user = await userManager.FindByEmailAsync(createPharmaDto.UserRequest.Email);
-        if (user is null || user.Id != userId)
+        var user = await userManager.FindByIdAsync(userId);
+        if (user is null)
             throw new InvalidOperationException("USER_NOT_FOUND");
-
-        var pharmacyManager = await pharmacyStaffRepository.GetPharmaCompanyManagerByExternalIdAsync(userId);
-        if (pharmacyManager is null)
-            throw new InvalidOperationException("USER_NOT_FOUND");
-
+        
+        await userManager.ConfirmEmailAsync(user, token);
+        
+        GetPharmacyDto pharmacyDto = new();
+        
         await unitOfWork.ExecuteTransactionAsync(async () =>
         {
-            await userManager.ConfirmEmailAsync(user, token);
-            user.PasswordHash = passwordHasher.HashPassword(user, createPharmaDto.UserRequest.Password);
-
             var pharmacy = await CreatePharmacyAsync(createPharmaDto.PharmacyRequest, user.Id);
-            pharmacyManager.PharmacyId = pharmacy.Id;
-            pharmacyStaffRepository.Update(pharmacyManager);
 
-            await pharmacyStaffService.UpdatePharmacyStaffAsync(pharmacyManager.Id,
-                new CreatePharmacyStaffDto { PharmaCompanyId = pharmacy.Id });
-            await userManager.UpdateAsync(user);
+            var pharmaCompanyAdminEntity = mapper.Map<CreatePharmacyStaffDto>(user);
+            pharmaCompanyAdminEntity.ExternalId = user.Id;
+            pharmaCompanyAdminEntity.PharmaCompanyId = pharmacy.Id;
+
+            await pharmacyStaffService.CreatePharmacyStaffAsync(pharmaCompanyAdminEntity);
+            
+            pharmacyDto =  mapper.Map<GetPharmacyDto>(pharmacy);
         });
+
+        mapper.Map(createPharmaDto.UserRequest, user);
+        user.IsAccountSetup = true;
+        await userManager.UpdateAsync(user);
+        
+        await EnsureRolesExistAsync([IdentityData.PharmacyAdmin, IdentityData.PharmacyStaff]);
+        await userManager.AddToRolesAsync(user, [IdentityData.PharmacyAdmin, IdentityData.PharmacyStaff]);
+
+        return pharmacyDto;
     }
 
     public async Task<GetPharmacyDto> CreatePharmacyAsync(CreatePharmaDto createPharmaDto)
@@ -117,8 +125,7 @@ public class PharmacyService(
             pharmacyDto = mapper.Map<GetPharmacyDto>(pharmacy);
         });
         
-        return pharmacyDto;
-    }
+        return pharmacyDto;    }
 
     public async Task<bool> UpdatePharmacyAsync(int id, CreatePharmacyDto pharmacyDto)
     {
