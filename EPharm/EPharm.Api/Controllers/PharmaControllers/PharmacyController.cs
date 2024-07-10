@@ -69,6 +69,7 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
     
     [HttpPost]
     [Route("verify")]
+    [AllowAnonymous]
     public async Task<IActionResult> VerifyInvitation([FromQuery] string userId)
     {
         if (!ModelState.IsValid)

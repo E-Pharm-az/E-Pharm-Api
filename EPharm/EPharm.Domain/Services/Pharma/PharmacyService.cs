@@ -47,6 +47,11 @@ public class PharmacyService(
     public async Task InviteAsync(EmailDto emailDto)
     {
         var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmacyAdmin, IdentityData.PharmacyStaff]);
+
+        var existingPharmacyStaff = await pharmacyStaffService.GetByExternalIdAsync(user.Id);
+        if (existingPharmacyStaff is not null)
+            throw new InvalidOperationException("USER_ALREADY_EXISTS");
+        
         var pharmacy = await pharmacyRepository.InsertAsync(new Pharmacy { OwnerId = user.Id });
         await pharmacyStaffService.CreateAsync(new CreatePharmacyStaffDto
         {
@@ -54,7 +59,7 @@ public class PharmacyService(
             ExternalId = user.Id,
             PharmacyId = pharmacy.Id
         });
-        
+
         await SendInvitationEmailAsync(user);
     }
 
@@ -160,7 +165,7 @@ public class PharmacyService(
         if (email is null)
             throw new KeyNotFoundException("EMAIL_NOT_FOUND");
 
-        email = email.Replace("{url}", $"{config["AppUrls:PharmaPortalClient"]}/onboarding?userId={user.Id}");
+        email = email.Replace("{url}", $"{config["AppUrls:PharmaPortalClient"]}/onboarding/{user.Id}");
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {
