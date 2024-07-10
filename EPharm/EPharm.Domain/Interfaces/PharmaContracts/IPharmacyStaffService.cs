@@ -6,12 +6,12 @@ namespace EPharm.Domain.Interfaces.PharmaContracts;
 
 public interface IPharmacyStaffService
 {
-    public Task<IEnumerable<GetPharmacyStaffDto>> GetAllPharmacyStaffAsync(int pharmaCompanyId);
-    public Task<GetPharmacyStaffDto?> GetPharmacyStaffByIdAsync(int pharmaCompanyManagerId);
-    public Task<GetPharmacyStaffDto?> GetPharmacyStaffByExternalIdAsync(string externalId);
-    public Task<GetPharmacyStaffDto> CreatePharmacyStaffAsync(CreatePharmacyStaffDto pharmacyStaffDto);
-    public Task<AppIdentityUser> CreatePharmacyStaffAsync(int pharmaCompanyId, EmailDto emailDto);
-    public Task<bool> UpdatePharmacyStaffAsync(int id, CreatePharmacyStaffDto pharmacyStaffDto);
-    public Task<bool> DeletePharmacyStaffAsync(int pharmaCompanyManagerId);
-    public Task BulkInvitePharmacyStaffAsync(int pharmaCompanyId, BulkEmailDto bulkEmailDto);
+    public Task<IEnumerable<GetPharmacyStaffDto>> GetAllAsync(int pharmaCompanyId);
+    public Task<GetPharmacyStaffDto?> GetByIdAsync(int pharmaCompanyManagerId);
+    public Task<GetPharmacyStaffDto?> GetByExternalIdAsync(string externalId);
+    public Task<GetPharmacyStaffDto> CreateAsync(CreatePharmacyStaffDto pharmacyStaffDto);
+    public Task<AppIdentityUser> CreateAsync(int pharmaCompanyId, EmailDto emailDto);
+    public Task<bool> UpdateAsync(int id, CreatePharmacyStaffDto pharmacyStaffDto);
+    public Task<bool> DeleteAsync(int pharmaCompanyManagerId);
+    public Task BulkInviteAsync(int pharmaCompanyId, BulkEmailDto bulkEmailDto);
 }

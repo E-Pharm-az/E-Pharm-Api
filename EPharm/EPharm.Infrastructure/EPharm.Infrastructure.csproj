@@ -15,7 +15,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Migrations\AppDb\" />
       <Folder Include="Migrations\AppIdentityDb\" />
     </ItemGroup>
 

@@ -65,11 +65,11 @@ public class ProductController(
             if (!User.IsInRole(IdentityData.Admin))
             {
                 var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-                var companyUser = await pharmacyStaffService.GetPharmacyStaffByExternalIdAsync(userId);
+                var companyUser = await pharmacyStaffService.GetByExternalIdAsync(userId);
                 
                 ArgumentNullException.ThrowIfNull(companyUser);
 
-                if (company.Id != companyUser.PharmaCompanyId)
+                if (company.Id != companyUser.PharmacyId)
                     return Forbid();
             }
 

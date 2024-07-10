@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EPharm.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class PharmacyNullChanges : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -40,18 +40,12 @@ namespace EPharm.Infrastructure.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     OwnerId = table.Column<string>(type: "text", nullable: false),
-                    TIN = table.Column<string>(type: "text", nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ContactEmail = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    ContactPhone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    StreetAddress = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    PostalCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    City = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Country = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    Region = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    BuildingNumber = table.Column<int>(type: "integer", nullable: false),
-                    Floor = table.Column<int>(type: "integer", nullable: false),
-                    RoomNumber = table.Column<int>(type: "integer", nullable: false),
+                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    TIN = table.Column<string>(type: "text", nullable: true),
+                    Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Phone = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: true),
+                    Website = table.Column<string>(type: "text", nullable: true),
+                    Address = table.Column<string>(type: "text", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
@@ -173,7 +167,7 @@ namespace EPharm.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ExternalId = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    PharmacyId = table.Column<int>(type: "integer", nullable: false),
+                    PharmacyId = table.Column<int>(type: "integer", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
@@ -183,8 +177,7 @@ namespace EPharm.Infrastructure.Migrations
                         name: "FK_PharmacyStaff_Pharmacy_PharmacyId",
                         column: x => x.PharmacyId,
                         principalTable: "Pharmacy",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(

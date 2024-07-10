@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using EPharm.Domain.Dtos.AuthDto;
+using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
@@ -17,8 +18,7 @@ public class AuthController(
     IConfiguration configuration,
     UserManager<AppIdentityUser> userManager,
     ITokenService tokenService,
-    IUserService userService
-) : ControllerBase
+    IUserService userService) : ControllerBase
 {
     private const int MaxFailedLoginAttempts = 5;
     private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
@@ -48,7 +48,7 @@ public class AuthController(
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
-        
+
         try
         {
             var response = await ProcessLogin(request, IdentityData.PharmacyStaff);
@@ -69,7 +69,7 @@ public class AuthController(
             return BadRequest(ModelState);
         try
         {
-            var response =  await ProcessLogin(request, IdentityData.Admin);
+            var response = await ProcessLogin(request, IdentityData.Admin);
             return Ok(response);
         }
         catch (Exception ex)
@@ -81,7 +81,7 @@ public class AuthController(
 
     [HttpPost]
     [Route("resend-confirmation-email")]
-    public async Task<IActionResult> ResendConfirmationEmail([FromBody] ResendEmailDto request)
+    public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailDto request)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
         if (user == null)
@@ -98,7 +98,6 @@ public class AuthController(
             return StatusCode(500, "An unexpected error occurred");
         }
     }
-    
 
     [HttpPost]
     [Route("confirm-email")]
@@ -106,7 +105,7 @@ public class AuthController(
     {
         if (string.IsNullOrEmpty(request.Email))
             return BadRequest("Invalid request parameters");
-        
+
         var user = await userManager.FindByEmailAsync(request.Email);
 
         if (user == null)
@@ -144,9 +143,9 @@ public class AuthController(
             return BadRequest("Code expired. Please generate a new one.");
         }
 
-        user.CodeVerificationFailedAttempts++; 
+        user.CodeVerificationFailedAttempts++;
         await userManager.UpdateAsync(user);
-        
+
         return BadRequest("Invalid code.");
     }
 

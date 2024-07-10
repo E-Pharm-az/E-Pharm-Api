@@ -1,8 +1,7 @@
 namespace EPharm.Domain.Dtos.UserDto;
 
-public class InitializeUserDto
+public class InitializeUserDto : EmailDto
 {
-    public string Email { get; set; }
     public int Code { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }

@@ -24,25 +24,25 @@ public class PharmacyStaffService(
     IEmailSender emailSender,
     IMapper mapper) : IPharmacyStaffService
 {
-    public async Task<IEnumerable<GetPharmacyStaffDto>> GetAllPharmacyStaffAsync(int companyId)
+    public async Task<IEnumerable<GetPharmacyStaffDto>> GetAllAsync(int companyId)
     {
         var pharmaCompanyManagers = await pharmacyStaffRepository.GetAllPharmaCompanyManagersAsync(companyId);
         return mapper.Map<IEnumerable<GetPharmacyStaffDto>>(pharmaCompanyManagers);
     }
 
-    public async Task<GetPharmacyStaffDto?> GetPharmacyStaffByExternalIdAsync(string externalId)
+    public async Task<GetPharmacyStaffDto?> GetByExternalIdAsync(string externalId)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetPharmaCompanyManagerByExternalIdAsync(externalId);
         return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManager);
     }
 
-    public async Task<GetPharmacyStaffDto?> GetPharmacyStaffByIdAsync(int pharmaCompanyManagerId)
+    public async Task<GetPharmacyStaffDto?> GetByIdAsync(int pharmaCompanyManagerId)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetByIdAsync(pharmaCompanyManagerId);
         return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManager);
     }
 
-    public async Task<GetPharmacyStaffDto> CreatePharmacyStaffAsync(
+    public async Task<GetPharmacyStaffDto> CreateAsync(
         CreatePharmacyStaffDto pharmacyStaffDto)
     {
         var pharmaCompanyManagerEntity = mapper.Map<PharmacyStaff>(pharmacyStaffDto);
@@ -51,33 +51,19 @@ public class PharmacyStaffService(
         return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManger);
     }
 
-    public async Task<AppIdentityUser> CreatePharmacyStaffAsync(int pharmaCompanyId, EmailDto emailDto)
+    public async Task<AppIdentityUser> CreateAsync(int pharmaCompanyId, EmailDto emailDto)
     {
         var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmacyStaff]);
 
         var pharmaCompanyManagerEntity = mapper.Map<CreatePharmacyStaffDto>(user);
         pharmaCompanyManagerEntity.ExternalId = user.Id;
-        pharmaCompanyManagerEntity.PharmaCompanyId = pharmaCompanyId;
+        pharmaCompanyManagerEntity.PharmacyId = pharmaCompanyId;
 
-        await CreatePharmacyStaffAsync(pharmaCompanyManagerEntity);
+        await CreateAsync(pharmaCompanyManagerEntity);
         return user;
     }
 
-    public async Task<bool> UpdateUserAsync(string id, EmailDto emailDto)
-    {
-        var user = await userManager.FindByIdAsync(id);
-
-        if (user is null)
-            return false;
-
-        mapper.Map(emailDto, user);
-
-        var result = await userManager.UpdateAsync(user);
-
-        return result.Succeeded;
-    }
-
-    public async Task<bool> UpdatePharmacyStaffAsync(int id,
+    public async Task<bool> UpdateAsync(int id,
         CreatePharmacyStaffDto pharmacyStaffDto)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetByIdAsync(id);
@@ -93,7 +79,7 @@ public class PharmacyStaffService(
         return result > 0;
     }
 
-    public async Task<bool> DeletePharmacyStaffAsync(int pharmaCompanyManagerId)
+    public async Task<bool> DeleteAsync(int pharmaCompanyManagerId)
     {
         var pharmaCompanyManager = await pharmacyStaffRepository.GetByIdAsync(pharmaCompanyManagerId);
 
@@ -106,16 +92,16 @@ public class PharmacyStaffService(
         return result > 0;
     }
 
-    public async Task BulkInvitePharmacyStaffAsync(int pharmaCompanyId, BulkEmailDto bulkEmailDto)
+    public async Task BulkInviteAsync(int pharmaCompanyId, BulkEmailDto bulkEmailDto)
     {
         foreach (var email in bulkEmailDto.Emails)
         {
-            var user = await CreatePharmacyStaffAsync(pharmaCompanyId, email);
-            await InvitePharmacyStaffAsync(user);
+            var user = await CreateAsync(pharmaCompanyId, email);
+            await InviteAsync(user);
         }
     }
 
-    private async Task InvitePharmacyStaffAsync(AppIdentityUser user)
+    private async Task InviteAsync(AppIdentityUser user)
     {
         var token = await userManager.GenerateEmailConfirmationTokenAsync(user);
         var encodedToken = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));

@@ -7,9 +7,10 @@ public interface IPharmacyService
 {
     public Task<IEnumerable<GetPharmacyDto>> GetAllPharmacyAsync();
     public Task<GetPharmacyDto?> GetPharmacyByIdAsync(int pharmaCompanyId);
-    public Task InvitePharmacyAsync(EmailDto emailDto);
-    public Task<GetPharmacyDto> InitializePharmacyAsync(string userId, string token, CreatePharmaDto createPharmaDto);
-    public Task<GetPharmacyDto> CreatePharmacyAsync(CreatePharmaDto createPharmaDto);
-    public Task<bool> UpdatePharmacyAsync(int id, CreatePharmacyDto pharmacyDto);
-    public Task<bool> DeletePharmacyAsync(int pharmaCompanyId);
+    public Task InviteAsync(EmailDto emailDto);
+    public Task<bool> VerifyInvitationAsync(string userId);
+    public Task<GetPharmacyDto> Register(CreatePharmaDto createPharmaDto);
+    public Task<GetPharmacyDto> CreateAsync(string userId, CreatePharmacyDto createPharmacyDto);
+    public Task<bool> UpdateAsync(int id, CreatePharmacyDto pharmacyDto);
+    public Task<bool> DeleteAsync(int pharmaCompanyId);
 }

@@ -9,14 +9,9 @@ public class PharmacyConfig : IEntityTypeConfiguration<Pharmacy>
     public void Configure(EntityTypeBuilder<Pharmacy> builder)
     {
         builder.Property(pc => pc.Name)
-            .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(pc => pc.TIN)
-            .IsRequired();
-
         builder.Property(pc => pc.Email)
-            .IsRequired()
             .HasMaxLength(255);
 
         builder.Property(pc => pc.Phone)

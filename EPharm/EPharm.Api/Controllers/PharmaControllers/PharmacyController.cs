@@ -2,11 +2,9 @@ using EPharm.Domain.Dtos.PharmacyDtos;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
-using EPharm.Infrastructure.Entities.Identity;
+using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
@@ -15,7 +13,7 @@ namespace EPharmApi.Controllers.PharmaControllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class PharmacyController(IPharmacyService pharmacyService, UserManager<AppIdentityUser> userManager) : ControllerBase
+public class PharmacyController(IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -52,82 +50,79 @@ public class PharmacyController(IPharmacyService pharmacyService, UserManager<Ap
     [HttpPost]
     [Route("invite")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<IActionResult> InvitePharmacy([FromBody] EmailDto request)
+    public async Task<IActionResult> Invite([FromBody] EmailDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         try
         {
-            await pharmacyService.InvitePharmacyAsync(request);
+            await pharmacyService.InviteAsync(request);
             return Ok();
         }
         catch (Exception ex)
         {
-            Log.Error("Error inviting pharma admin, {Error}", ex.Message);
+            Log.Error(ex, "Error inviting pharma admin,");
             return BadRequest("Error inviting pharma admin.");
         }
     }
-
+    
     [HttpPost]
     [Route("verify")]
-    [AllowAnonymous]
-    public async Task<IActionResult> Validate([FromQuery] string userId, [FromQuery] string token)
-    {
-        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
-            return BadRequest("User ID and token are required.");
-
-        var user = await userManager.FindByIdAsync(userId);
-    
-        if (user is null)
-            return NotFound("User not found.");
-
-        if (user.EmailConfirmed)
-            return BadRequest("Email is already confirmed.");
-
-        var result = await userManager.ConfirmEmailAsync(user, token);
-
-        if (result.Succeeded)
-            return Ok("Email confirmed successfully.");
-
-        return BadRequest($"Email confirmation failed: {string.Join(", ", result.Errors.Select(e => e.Description))}");
-    }
-    [HttpPost]
-    [Route("onboard")]
-    [AllowAnonymous]
-    public async Task<IActionResult> InitializePharmacy([FromQuery] string userId, [FromQuery] string token, [FromBody] CreatePharmaDto request)
+    public async Task<IActionResult> VerifyInvitation([FromQuery] string userId)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         try
         {
-            await pharmacyService.InitializePharmacyAsync(userId, token, request);
+            var user = await pharmacyService.VerifyInvitationAsync(userId);
+            if (user)
+                return Ok(user);
+
+            return BadRequest("Invalid invitation");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error verifying invitation");
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+    }
+
+    [HttpPost("{userId}")]
+    [PharmacyOwner]
+    public async Task<IActionResult> Create(string userId, [FromBody] CreatePharmacyDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            await pharmacyService.CreateAsync(userId, request);
             return Ok();
         }
         catch (Exception ex)
         {
-            Log.Error("Error initializing pharma company, {Error}", ex.Message);
+            Log.Error(ex, "Error initializing pharma company.");
             return BadRequest("Error initializing pharmaceutical company.");
         }
     }
 
-    [HttpPost]
-    [Route("register")]
+    [HttpPost("register")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<IActionResult> RegisterPharmacyAdmin([FromBody] CreatePharmaDto request)
+    public async Task<IActionResult> Register([FromBody] CreatePharmaDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
         try
         {
-            await pharmacyService.CreatePharmacyAsync(request);
+            await pharmacyService.Register(request);
             return Ok();
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating pharma admin, {Error}", ex.Message);
+            Log.Error(ex, "Error creating pharma admin.");
             return BadRequest("Error creating admin.");
         }
     }
@@ -139,7 +134,7 @@ public class PharmacyController(IPharmacyService pharmacyService, UserManager<Ap
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var result = await pharmacyService.UpdatePharmacyAsync(id, pharmacyDto);
+        var result = await pharmacyService.UpdateAsync(id, pharmacyDto);
 
         if (result)
             return Ok("Pharmaceutical company updated with success.");
@@ -152,7 +147,7 @@ public class PharmacyController(IPharmacyService pharmacyService, UserManager<Ap
     [Authorize(Roles = IdentityData.Admin)]
     public async Task<ActionResult> DeletePharmaCompany(int id)
     {
-        var result = await pharmacyService.DeletePharmacyAsync(id);
+        var result = await pharmacyService.DeleteAsync(id);
 
         if (result) return NoContent();
 

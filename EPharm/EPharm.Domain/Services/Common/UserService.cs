@@ -130,9 +130,9 @@ public class UserService(
             throw new ArgumentException("Invalid or expired code. Please generate a new one.");
     }
 
-    public async Task<AppIdentityUser> CreateUserAsync(EmailDto emailDto, string[] identityRoles)
+    public async Task<AppIdentityUser> CreateUserAsync<T>(T user, string[] identityRoles) where T: EmailDto
     {
-        var existingUser = await userManager.FindByEmailAsync(emailDto.Email);
+        var existingUser = await userManager.FindByEmailAsync(user.Email);
         if (existingUser is not null)
         {
             if (existingUser.EmailConfirmed)
@@ -141,8 +141,8 @@ public class UserService(
             return existingUser;
         }
 
-        var userEntity = mapper.Map<AppIdentityUser>(emailDto);
-        userEntity.UserName = emailDto.Email;
+        var userEntity = mapper.Map<AppIdentityUser>(user);
+        userEntity.UserName = user.Email;
 
         var result = await userManager.CreateAsync(userEntity, configuration["UniqueKey"]!);
 

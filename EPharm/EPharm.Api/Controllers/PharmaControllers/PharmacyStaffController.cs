@@ -18,7 +18,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService)
     [PharmacyOwner]
     public async Task<ActionResult<IEnumerable<GetPharmacyStaffDto>>> GetAllPharmacyStaff(int pharmacyId)
     {
-        var result = await pharmacyStaffService.GetAllPharmacyStaffAsync(pharmacyId);
+        var result = await pharmacyStaffService.GetAllAsync(pharmacyId);
         if (result.Any()) return Ok(result);
 
         return NotFound("Pharmaceutical company managers not found.");
@@ -29,7 +29,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService)
     [PharmacyOwner]
     public async Task<ActionResult<GetPharmacyStaffDto>> GetPharmacyStaffById(int pharmacyId, int id)
     {
-        var result = await pharmacyStaffService.GetPharmacyStaffByIdAsync(id);
+        var result = await pharmacyStaffService.GetByIdAsync(id);
         if (result is not null) return Ok(result);
 
         return NotFound($"Pharmaceutical company manager with ID: {id} not found.");
@@ -46,7 +46,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService)
         
         try
         {
-            await pharmacyStaffService.BulkInvitePharmacyStaffAsync(pharmacyId, request);
+            await pharmacyStaffService.BulkInviteAsync(pharmacyId, request);
             return Ok(new { Message = "Pharmacy staff invited successfully." });
         }
         catch (ApplicationException ex) when (ex.Message == "FAILED_TO_SEND_INVITATION_EMAIL")
@@ -75,7 +75,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService)
 
         try
         {
-            await pharmacyStaffService.CreatePharmacyStaffAsync(companyId, request);
+            await pharmacyStaffService.CreateAsync(companyId, request);
             return Ok();
         }
         catch (Exception ex)

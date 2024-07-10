@@ -6,12 +6,12 @@ namespace EPharm.Infrastructure.Entities.PharmaEntities;
 public class Pharmacy : BaseEntity
 {
     public string OwnerId { get; set; } 
-    public string Name { get; set; }
-    public string TIN { get; set; }
-    public string Email { get; set; }
-    public string Phone { get; set; }
-    public string Website { get; set; }
-    public string Address { get; set; }
+    public string? Name { get; set; }
+    public string? TIN { get; set; }
+    public string? Email { get; set; }
+    public string? Phone { get; set; }
+    public string? Website { get; set; }
+    public string? Address { get; set; }
     
     public ICollection<PharmacyStaff> PharmacyStaff { get; set; }
     public ICollection<Warehouse> Warehouses { get; set; }
