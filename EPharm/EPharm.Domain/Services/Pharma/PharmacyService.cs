@@ -21,7 +21,6 @@ public class PharmacyService(
     IPharmacyStaffService pharmacyStaffService,
     IUserService userService,
     UserManager<AppIdentityUser> userManager,
-    RoleManager<IdentityRole> roleManager,
     IEmailSender emailSender,
     IEmailService emailService,
     IUnitOfWork unitOfWork,
@@ -30,7 +29,12 @@ public class PharmacyService(
     public async Task<GetPharmacyDto?> GetPharmacyByIdAsync(int pharmaCompanyId)
     {
         var pharmacy = await pharmacyRepository.GetByIdAsync(pharmaCompanyId);
+        if (pharmacy is null)
+            throw new InvalidOperationException("PHARMACY_NOT_FOUND");
+        
         var admin = await userService.GetUserByIdAsync(pharmacy.OwnerId);
+        if (admin is null)
+            throw new InvalidOperationException("USER_NOT_FOUND");
 
         var pharmacyDto = mapper.Map<GetPharmacyDto>(pharmacy);
         pharmacyDto.Owner = admin;
@@ -55,7 +59,7 @@ public class PharmacyService(
         var pharmacy = await pharmacyRepository.InsertAsync(new Pharmacy { OwnerId = user.Id });
         await pharmacyStaffService.CreateAsync(new CreatePharmacyStaffDto
         {
-            Email = user.Email,
+            Email = user.Email!,
             ExternalId = user.Id,
             PharmacyId = pharmacy.Id
         });
@@ -102,7 +106,7 @@ public class PharmacyService(
             
             await pharmacyStaffService.CreateAsync(new CreatePharmacyStaffDto
             {
-                Email = user.Email,
+                Email = user.Email!,
                 ExternalId = user.Id,
                 PharmacyId = pharmacy.Id
             });
@@ -169,18 +173,9 @@ public class PharmacyService(
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {
-            Email = user.Email,
+            Email = user.Email!,
             Subject = "Welcome to E-Pharm: Complete Your Pharmacy Registration",
             Message = email
         });
-    }
-
-    private async Task EnsureRolesExistAsync(string[] roles)
-    {
-        foreach (var role in roles)
-        {
-            if (!await roleManager.RoleExistsAsync(role))
-                await roleManager.CreateAsync(new IdentityRole(role));
-        }
     }
 }
