@@ -67,17 +67,20 @@ public class PharmacyService(
         await SendInvitationEmailAsync(user);
     }
 
-    public async Task<bool> VerifyInvitationAsync(string userId)
+    public async Task<AppIdentityUser> VerifyInvitationAsync(string userId)
     {
         var user = await userManager.FindByIdAsync(userId);
         if (user is null)
-            return false;
+            throw new InvalidOperationException("INVALID_INVITATION");
 
         if (user.IsAccountSetup == true)
-            return false;
+            throw new InvalidOperationException("INVALID_INVITATION");
 
         var staff = await pharmacyStaffService.GetByExternalIdAsync(user.Id);
-        return staff is not null;
+        if (staff is null)
+            throw new InvalidOperationException("INVALID_INVITATION");
+
+        return user;
     }
     
     public async Task<GetPharmacyDto> CreateAsync(string userId, CreatePharmacyDto createPharmacyDto)

@@ -78,9 +78,10 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
         try
         {
             var user = await pharmacyService.VerifyInvitationAsync(userId);
-            if (user)
-                return Ok(user);
-
+            return Ok(user);
+        }
+        catch (Exception ex) when (ex.Message == "INVALID_INVITATION")
+        {
             return BadRequest("Invalid invitation");
         }
         catch (Exception ex)
