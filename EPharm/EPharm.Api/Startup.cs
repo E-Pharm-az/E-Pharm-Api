@@ -242,7 +242,7 @@ public class Startup(IConfiguration configuration)
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
         dbSeeder.SeedSuperAdminAsync().Wait();
-        emailService.CompileEmail("confirmation-email", "Emails/confirmation.html").Wait();
+        emailService.CompileEmail("confirmation", "Emails/confirmation.html").Wait();
         emailService.CompileEmail("change-password", "Emails/change-password.html").Wait();
         emailService.CompileEmail("pharmacy-invitation", "Emails/pharmacy-invitation.html").Wait();
         emailService.CompileEmail("pharmacy-staff-invitation", "Emails/pharmacy-staff-invitation.html").Wait();

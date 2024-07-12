@@ -51,18 +51,18 @@ public class PharmacyService(
     public async Task InviteAsync(EmailDto emailDto)
     {
         var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmacyAdmin, IdentityData.PharmacyStaff]);
-
-        var existingPharmacyStaff = await pharmacyStaffService.GetByExternalIdAsync(user.Id);
-        if (existingPharmacyStaff is not null)
-            throw new InvalidOperationException("USER_ALREADY_EXISTS");
         
-        var pharmacy = await pharmacyRepository.InsertAsync(new Pharmacy { OwnerId = user.Id });
-        await pharmacyStaffService.CreateAsync(new CreatePharmacyStaffDto
+        var existingPharmacyStaff = await pharmacyStaffService.GetByExternalIdAsync(user.Id);
+        if (existingPharmacyStaff is null)
         {
-            Email = user.Email!,
-            ExternalId = user.Id,
-            PharmacyId = pharmacy.Id
-        });
+            var pharmacy = await pharmacyRepository.InsertAsync(new Pharmacy { OwnerId = user.Id });
+            await pharmacyStaffService.CreateAsync(new CreatePharmacyStaffDto
+            {
+                Email = user.Email!,
+                ExternalId = user.Id,
+                PharmacyId = pharmacy.Id
+            });
+        }
 
         await SendInvitationEmailAsync(user);
     }
