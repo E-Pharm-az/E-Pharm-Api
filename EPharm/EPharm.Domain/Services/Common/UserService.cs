@@ -42,19 +42,17 @@ public class UserService(
     {
         var user = await userManager.FindByEmailAsync(initializeUserDto.Email);
         if (user is null)
-            throw new InvalidOperationException("User with this email does not exist.");
+            throw new Exception("USER_NOT_FOUND");
 
         if (user.Code != initializeUserDto.Code)
-            throw new InvalidOperationException("The code provided is not valid.");
+            throw new Exception("INVALID_CODE");
 
         mapper.Map(initializeUserDto, user);
-
         user.PasswordHash = passwordHasher.HashPassword(user, initializeUserDto.Password);
 
         var result = await userManager.UpdateAsync(user);
         if (!result.Succeeded)
-            throw new InvalidOperationException(
-                $"Failed to update user. Details: {string.Join("; ", result.Errors.Select(e => e.Description))}");
+            throw new Exception("USER_UPDATE_FAILED");
     }
 
     public async Task<GetUserDto> CreateAdminAsync(EmailDto emailDto)

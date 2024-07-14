@@ -24,6 +24,7 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService)
         return NotFound("Pharmaceutical company managers not found.");
     }
     
+    // TODO
     [HttpGet("{pharmacyId:int}/{id:int}")]
     [Authorize(Roles = IdentityData.PharmacyAdmin)]
     [PharmacyOwner]

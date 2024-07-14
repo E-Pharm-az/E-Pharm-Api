@@ -85,14 +85,28 @@ public class PharmacyService(
     
     public async Task<GetPharmacyDto> CreateAsync(string userId, CreatePharmacyDto createPharmacyDto)
     {
-        var user = await userManager.FindByIdAsync(userId);
+        var userTask = userManager.FindByIdAsync(userId);
+        var pharmacyTask = pharmacyRepository.GetByOwnerId(userId);
+
+        await Task.WhenAll(userTask, pharmacyTask);
+
+        var user = await userTask;
         if (user is null)
-            throw new InvalidOperationException("USER_NOT_FOUND");
-        
-        var pharmacy = await CreatePharmacyAsync(createPharmacyDto, userId);
+            throw new Exception("USER_NOT_FOUND");
+
+        var pharmacy = await pharmacyTask;
+        if (pharmacy is null)
+            throw new Exception("PHARMACY_NOT_FOUND");
+
+        mapper.Map(createPharmacyDto, pharmacy);
+
         user.IsAccountSetup = true;
-        await userManager.UpdateAsync(user);
-        
+
+        await Task.WhenAll(
+            pharmacyRepository.SaveChangesAsync(),
+            userManager.UpdateAsync(user)
+        );
+
         return mapper.Map<GetPharmacyDto>(pharmacy);
     }
 

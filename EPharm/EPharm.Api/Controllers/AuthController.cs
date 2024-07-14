@@ -24,8 +24,8 @@ public class AuthController(
     private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
 
     [HttpPost]
-    [Route("login/store")]
-    public async Task<IActionResult> LoginStore([FromBody] AuthRequest request)
+    [Route("store/login")]
+    public async Task<IActionResult> StoreLogin([FromBody] AuthRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -43,8 +43,8 @@ public class AuthController(
     }
 
     [HttpPost]
-    [Route("login/pharma")]
-    public async Task<IActionResult> LoginPharm([FromBody] AuthRequest request)
+    [Route("pharmacy/login")]
+    public async Task<IActionResult> PharmacyLogin([FromBody] AuthRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -62,8 +62,8 @@ public class AuthController(
     }
 
     [HttpPost]
-    [Route("login/admin")]
-    public async Task<IActionResult> LoginAdmin([FromBody] AuthRequest request)
+    [Route("admin/login")]
+    public async Task<IActionResult> AdminLogin([FromBody] AuthRequest request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -197,14 +197,7 @@ public class AuthController(
             var response = tokenService.CreateToken(user, roles.ToList());
             response.RefreshToken = user.RefreshToken;
 
-            HttpContext.Response.Cookies.Append("token", response.Token, new CookieOptions
-            {
-                HttpOnly = true,
-                Secure = true,
-                IsEssential = true,
-                SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
-            });
+            SetTokenCookie("token", response.Token, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
 
             return Ok(response);
         }
@@ -247,29 +240,26 @@ public class AuthController(
         var auth = tokenService.CreateToken(user, roles);
 
         user.RefreshToken = tokenService.RefreshToken();
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         auth.RefreshToken = user.RefreshToken;
+        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"]));
 
         await userManager.UpdateAsync(user);
-
-        HttpContext.Response.Cookies.Append("token", auth.Token, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            IsEssential = true,
-            SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"]))
-        });
-
-        HttpContext.Response.Cookies.Append("refreshToken", user.RefreshToken, new CookieOptions
-        {
-            HttpOnly = true,
-            Secure = true,
-            IsEssential = true,
-            SameSite = SameSiteMode.None,
-            Expires = user.RefreshTokenExpiryTime
-        });
+        
+        SetTokenCookie("token", auth.Token, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
+        SetTokenCookie("refreshToken", user.RefreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"])));
 
         return auth;
+    }
+
+    private void SetTokenCookie(string key, string value, DateTime expires)
+    {
+        HttpContext.Response.Cookies.Append(key, value, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            IsEssential = true,
+            SameSite = SameSiteMode.None,
+            Expires = expires
+        });    
     }
 }

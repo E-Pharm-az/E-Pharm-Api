@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using EPharm.Domain.Dtos.PharmacyDtos;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.PharmaContracts;
@@ -91,22 +92,28 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
         }
     }
 
-    [HttpPost("{userId}")]
-    [PharmacyOwner]
-    public async Task<IActionResult> Create(string userId, [FromBody] CreatePharmacyDto request)
+    [HttpPost]
+    [Authorize(Roles = IdentityData.PharmacyAdmin)]
+    public async Task<IActionResult> Create([FromBody] CreatePharmacyDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         try
         {
             await pharmacyService.CreateAsync(userId, request);
             return Ok();
         }
+        catch (Exception ex) when (ex.Message is "USER_NOT_FOUND" or "PHARMACY_NOT_FOUND")
+        {
+            return NotFound(ex.Message);
+        }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error initializing pharma company.");
-            return BadRequest("Error initializing pharmaceutical company.");
+            Log.Error(ex, "Error initializing pharmacy for user {UserId}.", userId);
+            return BadRequest("Error initializing pharmacy.");
         }
     }
 

@@ -58,8 +58,8 @@ public class UserController(IUserService userService, IConfiguration configurati
     }
 
     [HttpPost]
-    [Route("initialize-user")]
-    public async Task<IActionResult> InitializeUser([FromBody] InitializeUserDto request)
+    [Route("initialize")]
+    public async Task<IActionResult> Initialize([FromBody] InitializeUserDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
@@ -69,10 +69,20 @@ public class UserController(IUserService userService, IConfiguration configurati
             await userService.InitializeUserAsync(request);
             return Ok();
         }
+        catch (Exception ex) when (ex.Message == "USER_NOT_FOUND")
+        {
+            Log.Warning(ex, "User initialization failed: User not found");
+            return NotFound(new { error = "User not found", code = "USER_NOT_FOUND" });
+        }
+        catch (Exception ex) when (ex.Message == "USER_UPDATE_FAILED")
+        {
+            Log.Error(ex, "User initialization failed: Unable to update user");
+            return StatusCode(500, new { error = "Failed to update user", code = "USER_UPDATE_FAILED" });
+        }
         catch (Exception ex)
         {
-            Log.Error("Error initializing user, {Error}", ex.Message);
-            return BadRequest("Error initializing user.");
+            Log.Error(ex, "Unexpected error during user initialization");
+            return StatusCode(500, new { error = "An unexpected error occurred", code = "INTERNAL_SERVER_ERROR" });
         }
     }
 

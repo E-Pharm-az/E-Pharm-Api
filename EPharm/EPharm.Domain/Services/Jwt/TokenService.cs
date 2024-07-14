@@ -14,15 +14,11 @@ public class TokenService(
     ITokenRefreshService tokenRefreshService,
     IConfiguration configuration) : ITokenService
 {
-    public AuthResponse CreateToken(AppIdentityUser user, List<string> roles)
-    {
-        return tokenCreationService.CreateToken(user, roles);
-    }
+    public AuthResponse CreateToken(AppIdentityUser user, List<string> roles) =>
+        tokenCreationService.CreateToken(user, roles);
 
-    public string RefreshToken()
-    {
-        return tokenRefreshService.RefreshToken();
-    }
+    public string RefreshToken() =>
+        tokenRefreshService.RefreshToken();
 
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
     {

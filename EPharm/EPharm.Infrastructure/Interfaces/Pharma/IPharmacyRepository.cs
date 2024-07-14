@@ -5,4 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.Pharma;
 
 public interface IPharmacyRepository : IRepository<Pharmacy>
 {
+    public Task<Pharmacy?> GetByOwnerId(string id);
 }
