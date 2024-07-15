@@ -37,7 +37,7 @@ public class AuthController(
         }
         catch (Exception ex)
         {
-            Log.Error("Error logging in, Error: {Error}", ex.Message);
+            Log.Error(ex, "Error logging in.");
             return BadRequest("An unexpected error occurred while logging in");
         }
     }
@@ -56,7 +56,7 @@ public class AuthController(
         }
         catch (Exception ex)
         {
-            Log.Error("Error logging in, Error: {Error}", ex.Message);
+            Log.Error(ex, "Error logging in.");
             return BadRequest("An unexpected error occurred while logging in");
         }
     }
@@ -74,7 +74,7 @@ public class AuthController(
         }
         catch (Exception ex)
         {
-            Log.Error("Error logging in, Error: {Error}", ex.Message);
+            Log.Error(ex, "Error logging in.");
             return BadRequest("An unexpected error occurred while logging in");
         }
     }
@@ -94,7 +94,7 @@ public class AuthController(
         }
         catch (Exception ex)
         {
-            Log.Error("Error sending email, Error: {Error}", ex.Message);
+            Log.Error(ex, "Error sending email.");
             return StatusCode(500, "An unexpected error occurred");
         }
     }
@@ -157,7 +157,7 @@ public class AuthController(
         {
             var request = new TokenModel
             {
-                Token = HttpContext.Request.Cookies["token"],
+                Token = HttpContext.Request.Cookies["accessToken"],
                 RefreshToken = HttpContext.Request.Cookies["refreshToken"]
             };
 
@@ -197,7 +197,8 @@ public class AuthController(
             var response = tokenService.CreateToken(user, roles.ToList());
             response.RefreshToken = user.RefreshToken;
 
-            SetTokenCookie("token", response.Token, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
+            SetTokenCookie("accessToken", response.Token, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
+            SetTokenCookie("refreshToken", user.RefreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"])));
 
             return Ok(response);
         }
@@ -212,7 +213,7 @@ public class AuthController(
     [Route("logout")]
     public async Task<IActionResult> Logout()
     {
-        HttpContext.Response.Cookies.Delete("token");
+        HttpContext.Response.Cookies.Delete("accessToken");
         HttpContext.Response.Cookies.Delete("refreshToken");
 
         return Ok();
@@ -221,21 +222,19 @@ public class AuthController(
     private async Task<AuthResponse> ProcessLogin(AuthRequest request, string requiredRole)
     {
         var user = await userManager.FindByEmailAsync(request.Email);
-
         if (user == null)
-            throw new ArgumentException("Bad credentials");
+            throw new Exception("EMAIL_NOT_FOUND");
 
         var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
-
         if (!isPasswordValid)
-            throw new ArgumentException("Bad credentials");
+            throw new Exception("BAD_CREDENTIALS");
 
         if (!user.EmailConfirmed)
-            throw new ArgumentException("Email not confirmed, please check your email for confirmation.");
+            throw new Exception("EMAIL_NOT_CONFIRMED");
 
         var roles = (await userManager.GetRolesAsync(user)).ToList();
         if (!roles.Contains(requiredRole))
-            throw new ArgumentException("Bad credentials");
+            throw new Exception("BAD_CREDENTIALS");
 
         var auth = tokenService.CreateToken(user, roles);
 
@@ -245,7 +244,7 @@ public class AuthController(
 
         await userManager.UpdateAsync(user);
         
-        SetTokenCookie("token", auth.Token, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
+        SetTokenCookie("accessToken", auth.Token, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
         SetTokenCookie("refreshToken", user.RefreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"])));
 
         return auth;
@@ -258,7 +257,7 @@ public class AuthController(
             HttpOnly = true,
             Secure = true,
             IsEssential = true,
-            SameSite = SameSiteMode.None,
+            SameSite = SameSiteMode.Strict,
             Expires = expires
         });    
     }

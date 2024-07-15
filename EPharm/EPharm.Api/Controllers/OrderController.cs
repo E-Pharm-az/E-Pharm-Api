@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class OrderController(IOrderService orderService, IPharmacyService pharmacyService) : Controller
+public class OrderController(IOrderService orderService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -60,8 +60,6 @@ public class OrderController(IOrderService orderService, IPharmacyService pharma
         return NotFound("Orders not found.");
     }
 
-    // TODO: Needs some API design, problem with different use of structure.
-    // TODO: Fix error handling
     [HttpPost]
     public async Task<ActionResult<GetOrderDto>> CreateOrder([FromBody] CreateOrderDto orderDto)
     {
