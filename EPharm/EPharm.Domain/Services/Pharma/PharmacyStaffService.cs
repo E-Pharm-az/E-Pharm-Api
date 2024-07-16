@@ -26,13 +26,13 @@ public class PharmacyStaffService(
 {
     public async Task<IEnumerable<GetPharmacyStaffDto>> GetAllAsync(int companyId)
     {
-        var pharmaCompanyManagers = await pharmacyStaffRepository.GetAllPharmaCompanyManagersAsync(companyId);
+        var pharmaCompanyManagers = await pharmacyStaffRepository.GetAllAsync(companyId);
         return mapper.Map<IEnumerable<GetPharmacyStaffDto>>(pharmaCompanyManagers);
     }
 
     public async Task<GetPharmacyStaffDto?> GetByExternalIdAsync(string externalId)
     {
-        var pharmaCompanyManager = await pharmacyStaffRepository.GetPharmaCompanyManagerByExternalIdAsync(externalId);
+        var pharmaCompanyManager = await pharmacyStaffRepository.GetByExternalIdAsync(externalId);
         return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManager);
     }
 

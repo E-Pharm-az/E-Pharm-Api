@@ -5,6 +5,6 @@ namespace EPharm.Infrastructure.Interfaces.Pharma;
 
 public interface IPharmacyStaffRepository : IRepository<PharmacyStaff>
 {
-    public Task<IEnumerable<PharmacyStaff>> GetAllPharmaCompanyManagersAsync(int companyId);
-    public Task<PharmacyStaff?> GetPharmaCompanyManagerByExternalIdAsync(string externalId);
+    public Task<IEnumerable<PharmacyStaff>> GetAllAsync(int companyId);
+    public Task<PharmacyStaff?> GetByExternalIdAsync(string externalId);
 }

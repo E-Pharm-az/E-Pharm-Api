@@ -6,6 +6,7 @@ using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
 using EPharm.Domain.Models.Jwt;
 using EPharm.Infrastructure.Entities.Identity;
+using EPharm.Infrastructure.Interfaces.Pharma;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -17,6 +18,8 @@ namespace EPharmApi.Controllers;
 public class AuthController(
     IConfiguration configuration,
     UserManager<AppIdentityUser> userManager,
+    IPharmacyRepository pharmacyRepository,
+    IPharmacyStaffRepository pharmacyStaffRepository,
     ITokenService tokenService,
     IUserService userService) : ControllerBase
 {
@@ -52,6 +55,13 @@ public class AuthController(
         try
         {
             var response = await ProcessLogin(request, IdentityData.PharmacyStaff);
+            var user = await userManager.FindByEmailAsync(request.Email);
+            
+            var roles = (await userManager.GetRolesAsync(user)).ToList();
+            
+            foreach (var role in roles)
+                Console.WriteLine(role);
+            
             return Ok(response);
         }
         catch (Exception ex)
@@ -192,13 +202,13 @@ public class AuthController(
                 return BadRequest("Invalid access token or refresh token");
             }
 
-            var roles = await userManager.GetRolesAsync(user);
+            var roles = (await userManager.GetRolesAsync(user)).ToList();
 
-            var response = tokenService.CreateToken(user, roles.ToList());
+            var response = await CreateTokenBasedOnRole(user, roles);
             response.RefreshToken = user.RefreshToken;
-
-            SetTokenCookie("accessToken", response.Token, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
-            SetTokenCookie("refreshToken", user.RefreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"])));
+            
+            SetAccessTokenCookie(response.Token);
+            SetRefreshTokenCookie(user.RefreshToken);
 
             return Ok(response);
         }
@@ -236,7 +246,7 @@ public class AuthController(
         if (!roles.Contains(requiredRole))
             throw new Exception("BAD_CREDENTIALS");
 
-        var auth = tokenService.CreateToken(user, roles);
+        var auth = await CreateTokenBasedOnRole(user, roles);
 
         user.RefreshToken = tokenService.RefreshToken();
         auth.RefreshToken = user.RefreshToken;
@@ -244,13 +254,40 @@ public class AuthController(
 
         await userManager.UpdateAsync(user);
         
-        SetTokenCookie("accessToken", auth.Token, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
-        SetTokenCookie("refreshToken", user.RefreshToken, DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"])));
+        SetAccessTokenCookie(auth.Token);
+        SetRefreshTokenCookie(user.RefreshToken);
 
         return auth;
     }
 
-    private void SetTokenCookie(string key, string value, DateTime expires)
+    private async Task<AuthResponse> CreateTokenBasedOnRole(AppIdentityUser user, List<string> roles)
+    {
+        if (roles.Contains(IdentityData.PharmacyAdmin))
+        {
+            var pharmacy = await pharmacyRepository.GetByOwnerId(user.Id);
+            if (pharmacy == null)
+                throw new Exception("PHARMACY_NOT_FOUND");
+            return tokenService.CreateToken(user, roles, pharmacy.Id);
+        }
+
+        if (roles.Contains(IdentityData.PharmacyStaff))
+        {
+            var staff = await pharmacyStaffRepository.GetByExternalIdAsync(user.Id);
+            if (staff == null)
+                throw new Exception("PHARMACY_STAFF_NOT_FOUND");
+            return tokenService.CreateToken(user, roles, staff.PharmacyId);
+        }
+
+        return tokenService.CreateToken(user, roles);
+    }
+
+    private void SetAccessTokenCookie(string value) =>
+        SetCookie("accessToken", value, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
+    
+    private void SetRefreshTokenCookie(string value) =>
+        SetCookie("refreshToken", value, DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"])));
+
+    private void SetCookie(string key, string value, DateTime expires)
     {
         HttpContext.Response.Cookies.Append(key, value, new CookieOptions
         {
@@ -259,6 +296,6 @@ public class AuthController(
             IsEssential = true,
             SameSite = SameSiteMode.Strict,
             Expires = expires
-        });    
+        });
     }
 }

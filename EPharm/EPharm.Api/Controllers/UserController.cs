@@ -74,6 +74,11 @@ public class UserController(IUserService userService, IConfiguration configurati
             Log.Warning(ex, "User initialization failed: User not found");
             return NotFound(new { error = "User not found", code = "USER_NOT_FOUND" });
         }
+        catch (Exception ex) when (ex.Message == "USER_ALREADY_INITIALIZED")
+        {
+            Log.Warning(ex, "User initialization failed: User already initialized");
+            return BadRequest(new { error = "User already initialized", code = "USER_ALREADY_INITIALIZED" });
+        }
         catch (Exception ex) when (ex.Message == "USER_UPDATE_FAILED")
         {
             Log.Error(ex, "User initialization failed: Unable to update user");

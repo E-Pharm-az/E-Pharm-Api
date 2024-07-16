@@ -1,5 +1,7 @@
+using System.Globalization;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Jwt;
@@ -9,16 +11,49 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace EPharm.Domain.Services.Jwt;
 
-public class TokenService(
-    ITokenCreationService tokenCreationService,
-    ITokenRefreshService tokenRefreshService,
-    IConfiguration configuration) : ITokenService
+public class TokenService(IConfiguration configuration) : ITokenService
 {
-    public AuthResponse CreateToken(AppIdentityUser user, List<string> roles) =>
-        tokenCreationService.CreateToken(user, roles);
+    public AuthResponse CreateToken(AppIdentityUser user, List<string> roles, int? pharmacyId = null)
+    {
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Jti, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email),
+            new(JwtRegisteredClaimNames.Sub, user.FirstName),
+        };
+        
+        if (pharmacyId.HasValue)
+        {
+            claims.Add(new Claim("PharmacyId", pharmacyId.Value.ToString()));
+        } 
 
-    public string RefreshToken() =>
-        tokenRefreshService.RefreshToken();
+        claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
+        var token = new JwtSecurityToken(
+            issuer: configuration["JwtSettings:Issuer"]!,
+            audience: configuration["JwtSettings:Audience"]!,
+            claims: claims,
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])),
+            signingCredentials: new SigningCredentials(
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JwtSettings:Key"]!)),
+                SecurityAlgorithms.HmacSha256));
+
+        var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return new AuthResponse
+        {
+            Token = tokenString,
+            ValidTo = token.ValidTo.ToString(CultureInfo.InvariantCulture)
+        }; 
+    }
+
+    public string RefreshToken()
+    {
+        var randomNumber = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber); 
+    }
 
     public ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
     {

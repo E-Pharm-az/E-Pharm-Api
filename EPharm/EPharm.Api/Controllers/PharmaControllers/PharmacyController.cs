@@ -3,8 +3,10 @@ using EPharm.Domain.Dtos.PharmacyDtos;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
@@ -83,7 +85,7 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
         }
         catch (Exception ex) when (ex.Message == "INVALID_INVITATION")
         {
-            return BadRequest("Invalid invitation");
+            return NotFound("Invalid invitation");
         }
         catch (Exception ex)
         {
@@ -100,7 +102,7 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
             return BadRequest(ModelState);
 
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
+        
         try
         {
             await pharmacyService.CreateAsync(userId, request);

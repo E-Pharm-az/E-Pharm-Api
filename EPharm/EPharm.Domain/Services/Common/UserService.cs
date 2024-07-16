@@ -44,7 +44,10 @@ public class UserService(
         if (user is null)
             throw new Exception("USER_NOT_FOUND");
 
-        if (user.Code != initializeUserDto.Code)
+        if (user.IsAccountSetup == true)
+            throw new Exception("USER_ALREADY_INITIALIZED");
+
+        if (user.Code != initializeUserDto.Code || user.CodeExpiryTime < DateTime.UtcNow)
             throw new Exception("INVALID_CODE");
 
         mapper.Map(initializeUserDto, user);
