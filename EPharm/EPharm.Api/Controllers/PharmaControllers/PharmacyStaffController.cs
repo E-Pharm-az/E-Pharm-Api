@@ -10,12 +10,11 @@ using Serilog;
 namespace EPharmApi.Controllers.PharmaControllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/pharmacy-staff")]
 public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService) : ControllerBase
 {
     [HttpGet("{pharmacyId:int}")]
     [Authorize(Roles = IdentityData.PharmacyAdmin)]
-    [PharmacyOwner]
     public async Task<ActionResult<IEnumerable<GetPharmacyStaffDto>>> GetAllPharmacyStaff(int pharmacyId)
     {
         var result = await pharmacyStaffService.GetAllAsync(pharmacyId);
@@ -27,7 +26,6 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService)
     // TODO
     [HttpGet("{pharmacyId:int}/{id:int}")]
     [Authorize(Roles = IdentityData.PharmacyAdmin)]
-    [PharmacyOwner]
     public async Task<ActionResult<GetPharmacyStaffDto>> GetPharmacyStaffById(int pharmacyId, int id)
     {
         var result = await pharmacyStaffService.GetByIdAsync(id);
@@ -36,25 +34,26 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService)
         return NotFound($"Pharmaceutical company manager with ID: {id} not found.");
     }
 
-    [HttpPost]
-    [Route("{pharmacyId:int}/invite")]
+    [HttpPost("invite")]
     [Authorize(Roles = IdentityData.PharmacyAdmin)]
-    [PharmacyOwner]
-    public async Task<IActionResult> InvitePharmacyStaff(int pharmacyId, [FromBody] BulkEmailDto request)
+    [RequirePharmacyId]
+    public async Task<IActionResult> InvitePharmacyStaff([FromBody] BulkEmailDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+
+        var pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
         
         try
         {
             await pharmacyStaffService.BulkInviteAsync(pharmacyId, request);
-            return Ok(new { Message = "Pharmacy staff invited successfully." });
+            return Ok();
         }
-        catch (ApplicationException ex) when (ex.Message == "FAILED_TO_SEND_INVITATION_EMAIL")
+        catch (Exception ex) when (ex.Message == "FAILED_TO_SEND_INVITATION_EMAIL")
         {
             return StatusCode(500, new { Error = "Failed to send invitation email. Please try again later." });
         }
-        catch (ApplicationException ex) when (ex.Message.StartsWith("Failed to invite staff member:"))
+        catch (Exception ex) when (ex.Message.StartsWith("Failed to invite staff member:"))
         {
             return BadRequest(new { Error = ex.Message });
         }
@@ -68,7 +67,6 @@ public class PharmacyStaffController(IPharmacyStaffService pharmacyStaffService)
     [HttpPost]
     [Route("register/{companyId:int}/pharma/")]
     [Authorize(Roles = IdentityData.PharmacyAdmin)]
-    [PharmacyOwner]
     public async Task<IActionResult> RegisterPharmacyManager(int companyId, [FromBody] EmailDto request)
     {
         if (!ModelState.IsValid)

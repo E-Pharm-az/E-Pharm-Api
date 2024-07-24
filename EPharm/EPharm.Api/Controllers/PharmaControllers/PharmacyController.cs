@@ -3,10 +3,7 @@ using EPharm.Domain.Dtos.PharmacyDtos;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
-using EPharm.Infrastructure.Entities.Identity;
-using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
@@ -101,7 +98,7 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userId = User.FindFirstValue(JwtRegisteredClaimNames.Jti);
         
         try
         {

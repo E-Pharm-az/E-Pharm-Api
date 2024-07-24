@@ -108,10 +108,9 @@ public class PharmacyStaffService(
 
         var emailTemplate = emailService.GetEmail("pharmacy-staff-invitation");
         if (emailTemplate is null)
-            throw new KeyNotFoundException("EMAIL_NOT_FOUND");
+            throw new Exception("EMAIL_NOT_FOUND");
 
-        emailTemplate = emailTemplate.Replace("{url}",
-            $"{configuration["AppUrls:PharmaPortalClient"]}/onboarding?token={encodedToken}&userId={user.Id}");
+        emailTemplate = emailTemplate.Replace("{url}", $"{configuration["AppUrls:PharmaPortalClient"]}/onboarding?token={encodedToken}&userId={user.Id}");
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {

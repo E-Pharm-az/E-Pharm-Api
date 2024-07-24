@@ -55,13 +55,6 @@ public class AuthController(
         try
         {
             var response = await ProcessLogin(request, IdentityData.PharmacyStaff);
-            var user = await userManager.FindByEmailAsync(request.Email);
-            
-            var roles = (await userManager.GetRolesAsync(user)).ToList();
-            
-            foreach (var role in roles)
-                Console.WriteLine(role);
-            
             return Ok(response);
         }
         catch (Exception ex)
@@ -123,7 +116,7 @@ public class AuthController(
 
         // Checks if lockout duration ended
         if (user.LockoutEnd > DateTime.UtcNow)
-            return BadRequest("Too many attempts, please try again later.");
+            return BadRequest( "Too many attempts, please try again later.");
 
         if (user.CodeVerificationFailedAttempts >= MaxFailedLoginAttempts)
         {
@@ -172,35 +165,21 @@ public class AuthController(
             };
 
             if (string.IsNullOrEmpty(request.Token) || string.IsNullOrEmpty(request.RefreshToken))
-            {
-                Log.Warning("Token or refreshToken is missing in the request");
                 return BadRequest("Token or refreshToken is missing");
-            }
 
             var principal = tokenService.GetPrincipalFromExpiredToken(request.Token);
-
             if (principal == null)
-            {
-                Log.Warning("Invalid client request: Principal is null");
                 return BadRequest("Invalid client request");
-            }
 
             var emailClaim = principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
 
             if (string.IsNullOrEmpty(emailClaim))
-            {
-                Log.Warning("Invalid client request: Email claim is missing");
                 return BadRequest("Invalid client request");
-            }
 
             var user = await userManager.FindByEmailAsync(emailClaim);
 
-            if (user == null || user.RefreshToken != request.RefreshToken ||
-                user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-            {
-                Log.Warning("Invalid access token or refresh token");
+            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
                 return BadRequest("Invalid access token or refresh token");
-            }
 
             var roles = (await userManager.GetRolesAsync(user)).ToList();
 
@@ -267,6 +246,7 @@ public class AuthController(
             var pharmacy = await pharmacyRepository.GetByOwnerId(user.Id);
             if (pharmacy == null)
                 throw new Exception("PHARMACY_NOT_FOUND");
+            
             return tokenService.CreateToken(user, roles, pharmacy.Id);
         }
 
@@ -275,6 +255,7 @@ public class AuthController(
             var staff = await pharmacyStaffRepository.GetByExternalIdAsync(user.Id);
             if (staff == null)
                 throw new Exception("PHARMACY_STAFF_NOT_FOUND");
+            
             return tokenService.CreateToken(user, roles, staff.PharmacyId);
         }
 
@@ -282,7 +263,7 @@ public class AuthController(
     }
 
     private void SetAccessTokenCookie(string value) =>
-        SetCookie("accessToken", value, DateTime.UtcNow.AddMinutes(Convert.ToInt32(configuration["JwtSettings:ExpirationMinutes"])));
+        SetCookie("accessToken", value, DateTime.MaxValue);
     
     private void SetRefreshTokenCookie(string value) =>
         SetCookie("refreshToken", value, DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"])));
