@@ -42,8 +42,7 @@ public class PharmacyStaffService(
         return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManager);
     }
 
-    public async Task<GetPharmacyStaffDto> CreateAsync(
-        CreatePharmacyStaffDto pharmacyStaffDto)
+    public async Task<GetPharmacyStaffDto> CreateAsync(CreatePharmacyStaffDto pharmacyStaffDto)
     {
         var pharmaCompanyManagerEntity = mapper.Map<PharmacyStaff>(pharmacyStaffDto);
         var pharmaCompanyManger = await pharmacyStaffRepository.InsertAsync(pharmaCompanyManagerEntity);
@@ -51,15 +50,11 @@ public class PharmacyStaffService(
         return mapper.Map<GetPharmacyStaffDto>(pharmaCompanyManger);
     }
 
-    public async Task<AppIdentityUser> CreateAsync(int pharmaCompanyId, EmailDto emailDto)
+    public async Task<AppIdentityUser> CreateAsync(int pharmacyId, EmailDto emailDto)
     {
         var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmacyStaff]);
-
-        var pharmaCompanyManagerEntity = mapper.Map<CreatePharmacyStaffDto>(user);
-        pharmaCompanyManagerEntity.ExternalId = user.Id;
-        pharmaCompanyManagerEntity.PharmacyId = pharmaCompanyId;
-
-        await CreateAsync(pharmaCompanyManagerEntity);
+        await CreateAsync(new CreatePharmacyStaffDto{ExternalId = user.Id, Email = user.Email!, PharmacyId = pharmacyId});
+        
         return user;
     }
 

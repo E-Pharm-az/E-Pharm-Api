@@ -58,8 +58,8 @@ public class PharmacyService(
             var pharmacy = await pharmacyRepository.InsertAsync(new Pharmacy { OwnerId = user.Id });
             await pharmacyStaffService.CreateAsync(new CreatePharmacyStaffDto
             {
-                Email = user.Email!,
                 ExternalId = user.Id,
+                Email = user.Email!,
                 PharmacyId = pharmacy.Id
             });
         }

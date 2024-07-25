@@ -10,7 +10,7 @@ public interface IPharmacyStaffService
     public Task<GetPharmacyStaffDto?> GetByIdAsync(int pharmaCompanyManagerId);
     public Task<GetPharmacyStaffDto?> GetByExternalIdAsync(string externalId);
     public Task<GetPharmacyStaffDto> CreateAsync(CreatePharmacyStaffDto pharmacyStaffDto);
-    public Task<AppIdentityUser> CreateAsync(int pharmaCompanyId, EmailDto emailDto);
+    public Task<AppIdentityUser> CreateAsync(int pharmacyId, EmailDto emailDto);
     public Task<bool> UpdateAsync(int id, CreatePharmacyStaffDto pharmacyStaffDto);
     public Task<bool> DeleteAsync(int pharmaCompanyManagerId);
     public Task BulkInviteAsync(int pharmaCompanyId, BulkEmailDto bulkEmailDto);

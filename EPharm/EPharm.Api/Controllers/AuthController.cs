@@ -165,27 +165,27 @@ public class AuthController(
             };
 
             if (string.IsNullOrEmpty(request.Token) || string.IsNullOrEmpty(request.RefreshToken))
-                return BadRequest("Token or refreshToken is missing");
+                return BadRequest("Your session has expired. Please log in again.");
 
             var principal = tokenService.GetPrincipalFromExpiredToken(request.Token);
             if (principal == null)
-                return BadRequest("Invalid client request");
+                return BadRequest("Unable to verify your session. Please try logging in again.");
 
             var emailClaim = principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
 
             if (string.IsNullOrEmpty(emailClaim))
-                return BadRequest("Invalid client request");
+                return BadRequest("Unable to verify your identity. Please log in again.");
 
             var user = await userManager.FindByEmailAsync(emailClaim);
 
             if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-                return BadRequest("Invalid access token or refresh token");
+                return BadRequest("Your session has expired or is invalid. Please log in again to continue.");
 
             var roles = (await userManager.GetRolesAsync(user)).ToList();
 
             var response = await CreateTokenBasedOnRole(user, roles);
             response.RefreshToken = user.RefreshToken;
-            
+        
             SetAccessTokenCookie(response.Token);
             SetRefreshTokenCookie(user.RefreshToken);
 
@@ -193,12 +193,12 @@ public class AuthController(
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "An error occurred while refreshing token");
-            return StatusCode(500, "An unexpected error occurred");
+            Log.Error(ex, "An error occurred while refreshing token.");
+            return StatusCode(500, "An unexpected error occurred.");
         }
     }
 
-    [HttpGet]
+    [HttpPost]
     [Route("logout")]
     public async Task<IActionResult> Logout()
     {
