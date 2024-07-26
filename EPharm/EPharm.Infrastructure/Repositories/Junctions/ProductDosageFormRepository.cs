@@ -9,7 +9,7 @@ namespace EPharm.Infrastructure.Repositories.Junctions;
 public class ProductDosageFormRepository(AppDbContext context, IDosageFormRepository dosageFormRepository)
     : Repository<ProductDosageForm>(context), IProductDosageFormRepository
 {
-    public async Task InsertProductDosageFormAsync(int productId, int[] dosageFormsIds)
+    public async Task InsertAsync(int productId, int[] dosageFormsIds)
     {
         foreach (var dosageFormsId in dosageFormsIds)
         {

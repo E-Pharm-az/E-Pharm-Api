@@ -9,7 +9,7 @@ namespace EPharm.Infrastructure.Repositories.Junctions;
 public class ProductRouteOfAdministrationRepository(AppDbContext context, IRouteOfAdministrationRepository routeOfAdministrationRepository)
     : Repository<ProductRouteOfAdministration>(context), IProductRouteOfAdministrationRepository
 {
-    public async Task InsertProductRouteOfAdministrationAsync(int productId, int[] routeOfAdministrationsIds)
+    public async Task InsertAsync(int productId, int[] routeOfAdministrationsIds)
     {
         foreach (var routeOfAdministrationsId in routeOfAdministrationsIds)
         {

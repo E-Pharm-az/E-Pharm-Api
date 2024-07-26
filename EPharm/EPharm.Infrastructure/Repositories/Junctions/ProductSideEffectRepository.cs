@@ -9,7 +9,7 @@ namespace EPharm.Infrastructure.Repositories.Junctions;
 public class ProductSideEffectRepository(AppDbContext context, ISideEffectRepository sideEffectRepository)
     : Repository<ProductSideEffect>(context), IProductSideEffectRepository
 {
-    public async Task InsertProductSideEffectAsync(int productId, int[] sideEffectsIds)
+    public async Task InsertAsync(int productId, int[] sideEffectsIds)
     {
         foreach (var sideEffectsId in sideEffectsIds)
         {

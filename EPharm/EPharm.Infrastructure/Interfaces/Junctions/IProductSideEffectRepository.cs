@@ -5,5 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.Junctions;
 
 public interface IProductSideEffectRepository : IRepository<ProductSideEffect>
 {
-    public Task InsertProductSideEffectAsync(int productId, int[] sideEffectsIds);
+    public Task InsertAsync(int productId, int[] sideEffectsIds);
 }

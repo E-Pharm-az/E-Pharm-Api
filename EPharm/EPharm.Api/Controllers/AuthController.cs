@@ -33,16 +33,7 @@ public class AuthController(
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        try
-        {
-            var response = await ProcessLogin(request, IdentityData.Customer);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error logging in.");
-            return BadRequest("An unexpected error occurred while logging in");
-        }
+        return await ProcessLoginAndHandleErrors(request, IdentityData.Customer);
     }
 
     [HttpPost]
@@ -52,16 +43,7 @@ public class AuthController(
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        try
-        {
-            var response = await ProcessLogin(request, IdentityData.PharmacyStaff);
-            return Ok(response);
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error logging in.");
-            return BadRequest("An unexpected error occurred while logging in");
-        }
+        return await ProcessLoginAndHandleErrors(request, IdentityData.PharmacyStaff);
     }
 
     [HttpPost]
@@ -70,15 +52,33 @@ public class AuthController(
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
+
+        return await ProcessLoginAndHandleErrors(request, IdentityData.Admin);
+    }
+
+    private async Task<IActionResult> ProcessLoginAndHandleErrors(AuthRequest request, string requiredRole)
+    {
         try
         {
-            var response = await ProcessLogin(request, IdentityData.Admin);
+            var response = await ProcessLogin(request, requiredRole);
             return Ok(response);
+        }
+        catch (Exception ex) when (ex.Message == "EMAIL_NOT_FOUND")
+        {
+            return BadRequest("Invalid email or password.");
+        }
+        catch (Exception ex) when (ex.Message == "BAD_CREDENTIALS")
+        {
+            return BadRequest("Invalid email or password.");
+        }
+        catch (Exception ex) when (ex.Message == "EMAIL_NOT_CONFIRMED")
+        {
+            return BadRequest("Invalid email or password.");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error logging in.");
-            return BadRequest("An unexpected error occurred while logging in");
+            Log.Error(ex, "Unexpected error during login for email: {Email}", request.Email);
+            return BadRequest("An unexpected error occurred. Please try again later.");
         }
     }
 

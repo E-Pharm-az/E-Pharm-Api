@@ -5,5 +5,5 @@ namespace EPharm.Infrastructure.Interfaces.Junctions;
 
 public interface IProductRouteOfAdministrationRepository : IRepository<ProductRouteOfAdministration>
 {
-    public Task InsertProductRouteOfAdministrationAsync(int productId, int[] routeOfAdministrationsIds);
+    public Task InsertAsync(int productId, int[] routeOfAdministrationsIds);
 }

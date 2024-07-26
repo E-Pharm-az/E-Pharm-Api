@@ -90,7 +90,7 @@ public class ProductService(
 
             foreach (var stock in productDto.Stocks)
             {
-                await warehouseProductRepository.InsertWarehouseProductAsync(new WarehouseProduct
+                await warehouseProductRepository.InsertAsync(new WarehouseProduct
                 {
                     ProductId = product.Id,
                     WarehouseId = stock.WarehouseId,
@@ -98,15 +98,13 @@ public class ProductService(
                 });
             }
 
-            await productActiveIngredientRepository.InsertProductActiveIngredientAsync(product.Id,
-                productDto.ActiveIngredientsIds);
-            await productAllergyRepository.InsertProductAllergyAsync(product.Id, productDto.AllergiesIds);
-            await productDosageFormRepository.InsertProductDosageFormAsync(product.Id, productDto.DosageFormsIds);
-            await indicationProductRepository.InsertIndicationProductAsync(product.Id, productDto.IndicationsIds);
-            await productRouteOfAdministrationRepository.InsertProductRouteOfAdministrationAsync(product.Id,
-                productDto.RouteOfAdministrationsIds);
-            await productSideEffectRepository.InsertProductSideEffectAsync(product.Id, productDto.SideEffectsIds);
-            await productUsageWarningRepository.InsertProductUsageWarningAsync(product.Id, productDto.UsageWarningsIds);
+            await productActiveIngredientRepository.InsertAsync(product.Id, productDto.ActiveIngredientsIds);
+            await productAllergyRepository.InsertAsync(product.Id, productDto.AllergiesIds);
+            await productDosageFormRepository.InsertAsync(product.Id, productDto.DosageFormsIds);
+            await indicationProductRepository.InsertAsync(product.Id, productDto.IndicationsIds);
+            await productRouteOfAdministrationRepository.InsertAsync(product.Id, productDto.RouteOfAdministrationsIds);
+            await productSideEffectRepository.InsertAsync(product.Id, productDto.SideEffectsIds);
+            await productUsageWarningRepository.InsertAsync(product.Id, productDto.UsageWarningsIds);
 
             await unitOfWork.CommitTransactionAsync();
             await unitOfWork.SaveChangesAsync();
@@ -120,25 +118,32 @@ public class ProductService(
         }
     }
 
-    public async Task<bool> UpdateProductAsync(int id, CreateProductDto productDto)
+    public async Task<bool> UpdateProductAsync(int pharmacyId, int id, CreateProductDto productDto)
     {
         var product = await productRepository.GetByIdAsync(id);
 
         if (product is null)
             return false;
+        
+        if (product.PharmacyId != pharmacyId)
+            return false;
 
         mapper.Map(productDto, product);
+        product.IsApproved = false;
         productRepository.Update(product);
 
         var result = await productRepository.SaveChangesAsync();
         return result > 0;
     }
 
-    public async Task<bool> DeleteProductAsync(int productId)
+    public async Task<bool> DeleteProductAsync(int pharmacyId, int productId)
     {
         var product = await productRepository.GetByIdAsync(productId);
 
         if (product is null)
+            return false;
+        
+        if (product.PharmacyId != pharmacyId)
             return false;
 
         productRepository.Delete(product);

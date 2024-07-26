@@ -10,6 +10,6 @@ public interface IProductService
     public Task<GetFullProductDto?> GetProductByIdAsync(int productId);
     public Task ApproveProductAsync(string adminId, int productId);
     public Task<GetMinimalProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto);
-    public Task<bool> UpdateProductAsync(int id, CreateProductDto productDto);
-    public Task<bool> DeleteProductAsync(int productId);
+    public Task<bool> UpdateProductAsync(int pharmacyId, int id, CreateProductDto productDto);
+    public Task<bool> DeleteProductAsync(int pharmacyId, int productId);
 }

@@ -2,6 +2,7 @@ using EPharm.Domain.Dtos.ProductDtos;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
+using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -13,12 +14,12 @@ namespace EPharmApi.Controllers.ProductControllers;
 [Route("api/[controller]")]
 public class ProductController(
     IProductService productService,
-    IPharmacyService pharmacyService,
-    IPharmacyStaffService pharmacyStaffService) : ControllerBase
+    IPharmacyService pharmacyService
+) : ControllerBase
 {
-    [HttpGet("all/{page:int}")]
+    [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllProducts(int page)
+    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllProducts([FromQuery] int page)
     {
         try
         {
@@ -29,62 +30,11 @@ public class ProductController(
         }
         catch (Exception ex)
         {
-            Log.Error("Internal server error occured. Detail: {error}", ex);
-            return StatusCode(500, "Internal server error occured.");
+            Log.Error(ex, "Internal server error occured");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-
-    [HttpGet("search/{parameter}/{page:int}")]
-    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> SearchProduct(string parameter, int page)
-    {
-        try
-        {
-            var result = await productService.SearchProduct(parameter, page);
-            if (result.Any()) return Ok(result);
-
-            return NotFound("Products not found.");
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Internal server error occurred. Detail: {error}", ex);
-            return StatusCode(500, "Internal server error occurred.");
-        }
-    }
-
-    [HttpGet("pharma-company/{pharmaCompanyId:int}/[controller]/{page:int}")]
-    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllPharmaCompanyProducts(int pharmaCompanyId, int page)
-    {
-        try
-        {
-            var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
-            if (company is null)
-                return NotFound("Pharmaceutical company not found.");
-            
-            if (!User.IsInRole(IdentityData.Admin))
-            {
-                var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-                var companyUser = await pharmacyStaffService.GetByExternalIdAsync(userId);
-                
-                ArgumentNullException.ThrowIfNull(companyUser);
-
-                if (company.Id != companyUser.PharmacyId)
-                    return Forbid();
-            }
-
-            var result = await productService.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page);
-            if (result.Any()) return Ok(result);
-
-            return NotFound("Pharma company products not found.");
-        }
-        catch (Exception ex)
-        {
-            Log.Error("Internal server error occurred. Detail: {error}", ex);
-            return StatusCode(500, "Internal server error occurred.");
-        }
-    }
-
+    
     [HttpGet("{id:int}", Name = "getProductById")]
     public async Task<ActionResult<GetMinimalProductDto>> GetProductById(int id)
     {
@@ -97,8 +47,59 @@ public class ProductController(
         }
         catch (Exception ex)
         {
-            Log.Error("Internal server error occurred. Detail: {error}", ex);
-            return StatusCode(500, "Internal server error occurred.");
+            Log.Error(ex, "Internal server error occurred.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
+    }
+
+    [HttpGet("search/{query}")]
+    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> SearchProduct([FromQuery] int page, string query)
+    {
+        try
+        {
+            var result = await productService.SearchProduct(query, page);
+            if (result.Any()) return Ok(result);
+
+            return NotFound("Products not found.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Internal server error occurred");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
+    }
+
+    [HttpGet("pharmacy")]
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
+    [RequirePharmacyId]
+    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllPharmacyProducts(int page, [FromQuery] int? pharmacyId = null)
+    {
+        if (User.IsInRole(IdentityData.Admin))
+        {
+            if (pharmacyId is null)
+                return BadRequest("PharmacyId is required.");
+            
+            var pharmacy = await pharmacyService.GetPharmacyByIdAsync(pharmacyId.Value);
+
+            if (pharmacy is null)
+                return NotFound("Pharmacy not found.");
+        }
+        else
+        {
+            pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
+        }
+        
+        try
+        {
+            var result = await productService.GetAllPharmaCompanyProductsAsync(pharmacyId.Value, page);
+            if (result.Any()) return Ok(result);
+
+            return NotFound("Pharma company products not found.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Internal server error occurred.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
 
@@ -115,61 +116,44 @@ public class ProductController(
         }
         catch (Exception ex)
         {
-            Log.Error("Error approving product with id: {id}, by admin with id: {adminId}. Details: {ex}", productId, adminId, ex.Message);
-            return BadRequest("Error approving product.");
+            Log.Error(ex, "Error approving product with id: {Id}, by admin with id: {AdminId}.", productId, adminId);
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
     
-    [HttpPost("pharma-company/{pharmaCompanyId:int}/[controller]")]
+    [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
-    public async Task<ActionResult<GetMinimalProductDto>> CreateProduct(int pharmaCompanyId, [FromBody] CreateProductDto productDto)
+    [RequirePharmacyId]
+    public async Task<ActionResult<GetMinimalProductDto>> CreateProduct([FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
+        
+        var pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
 
         try
         {
-            var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
-            if (company is null)
-                return NotFound("Pharmaceutical company not found.");
-
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-
-            if (company.Owner.Id != userId)
-                return Forbid();
-
-            var result = await productService.CreateProductAsync(pharmaCompanyId, productDto);
+            var result = await productService.CreateProductAsync(pharmacyId, productDto);
             return Ok(result);
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating product, {Error}", ex.Message);
+            Log.Error(ex, "Error creating product.");
             return BadRequest("Error creating a product.");
         }
     }
 
-    [HttpPut("pharma-company/{pharmaCompanyId:int}/[controller]/{id:int}")]
-    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
-    public async Task<ActionResult> UpdateProduct(int pharmaCompanyId, int id, [FromBody] CreateProductDto productDto)
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
+    [RequirePharmacyId]
+    public async Task<ActionResult> UpdateProduct(int id, [FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
+        
+        var pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
 
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-
-        if (!User.IsInRole(IdentityData.Admin))
-        {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            
-            if (company.Owner.Id != userId)
-                return Forbid();
-        }
-
-        var result = await productService.UpdateProductAsync(id, productDto);
+        var result = await productService.UpdateProductAsync(pharmacyId, id, productDto);
 
         if (result) return Ok("Product updated with success.");
 
@@ -177,28 +161,25 @@ public class ProductController(
         return BadRequest("Error updating product.");
     }
 
-    [HttpDelete("pharma-company/{pharmaCompanyId:int}/[Controller]/{productId:int}")]
+    [HttpDelete("{productId:int}")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
-    public async Task<ActionResult> DeleteProduct(int pharmaCompanyId, int productId)
+    public async Task<ActionResult> DeleteProduct(int productId, [FromQuery] int? pharmacyId = null)
     {
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-
-        if (!User.IsInRole(IdentityData.Admin))
+        if (User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            
-            if (company.Owner.Id != userId)
-                return Forbid();
+            if (pharmacyId is null)
+                return BadRequest("PharmacyId is required.");
         }
-
-        var result = await productService.DeleteProductAsync(productId);
+        else
+        {
+            pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
+        }
+        
+        var result = await productService.DeleteProductAsync(pharmacyId.Value, productId);
 
         if (result) return NoContent();
 
-        Log.Error("Error deleting product ID: {productId}", productId);
+        Log.Error("Error deleting product ID: {ProductId}", productId);
         return BadRequest($"Product with ID: {productId} could not be deleted.");
     }
 }

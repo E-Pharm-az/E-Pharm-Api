@@ -9,7 +9,7 @@ namespace EPharm.Infrastructure.Repositories.Junctions;
 public class ProductAllergyRepository(AppDbContext context, IAllergyRepository allergyRepository)
     : Repository<ProductAllergy>(context), IProductAllergyRepository
 {
-    public async Task InsertProductAllergyAsync(int productId, int[] allergiesIds)
+    public async Task InsertAsync(int productId, int[] allergiesIds)
     {
         foreach (var allergiesId in allergiesIds)
         {

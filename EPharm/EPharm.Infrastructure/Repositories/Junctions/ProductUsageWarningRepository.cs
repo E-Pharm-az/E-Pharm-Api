@@ -9,7 +9,7 @@ namespace EPharm.Infrastructure.Repositories.Junctions;
 public class ProductUsageWarningRepository(AppDbContext context, IUsageWarningRepository usageWarningRepository)
     : Repository<ProductUsageWarning>(context), IProductUsageWarningRepository
 {
-    public async Task InsertProductUsageWarningAsync(int productId, int[] usageWarningsIds)
+    public async Task InsertAsync(int productId, int[] usageWarningsIds)
     {
         foreach (var usageWarningsId in usageWarningsIds)
         {

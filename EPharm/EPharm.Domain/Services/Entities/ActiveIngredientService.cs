@@ -27,21 +27,13 @@ public class ActiveIngredientService(IActiveIngredientRepository activeIngredien
         return mapper.Map<GetActiveIngredientDto>(activeIngredient);
     }
 
-    public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(int pharmaCompanyId,
-        CreateActiveIngredientDto createActiveIngredientDto)
+    public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(int pharmaCompanyId, CreateActiveIngredientDto createActiveIngredientDto)
     {
-        try
-        {
-            var activeIngredientEntity = mapper.Map<ActiveIngredient>(createActiveIngredientDto);
-            activeIngredientEntity.PharmacyId = pharmaCompanyId;
-            var activeIngredient = await activeIngredientRepository.InsertAsync(activeIngredientEntity);
+        var activeIngredientEntity = mapper.Map<ActiveIngredient>(createActiveIngredientDto);
+        activeIngredientEntity.PharmacyId = pharmaCompanyId;
+        var activeIngredient = await activeIngredientRepository.InsertAsync(activeIngredientEntity);
 
-            return mapper.Map<GetActiveIngredientDto>(activeIngredient);
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Failed to create active ingredient. Details: {ex.Message}");
-        }
+        return mapper.Map<GetActiveIngredientDto>(activeIngredient);
     }
 
     public async Task<bool> UpdateActiveIngredientAsync(int id, CreateActiveIngredientDto createActiveIngredientDto)

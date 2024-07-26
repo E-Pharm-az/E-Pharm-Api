@@ -1,3 +1,4 @@
+using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
@@ -7,6 +8,11 @@ public class RequirePharmacyIdAttribute : Attribute, IActionFilter
 {
     public void OnActionExecuting(ActionExecutingContext context)
     {
+        var user = context.HttpContext.User;
+
+        if (user.IsInRole(IdentityData.Admin))
+            return;
+        
         var pharmacyIdClaim = context.HttpContext.User.FindFirst("PharmacyId");
         if (pharmacyIdClaim == null || !int.TryParse(pharmacyIdClaim.Value, out var pharmacyId))
         {

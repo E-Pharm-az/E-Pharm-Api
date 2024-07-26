@@ -1,17 +1,16 @@
 using EPharm.Domain.Dtos.ActiveIngredientDto;
-using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
+using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
 namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/active-ingredient")]
-public class ActiveIngredientController(IActiveIngredientService activeIngredientService, IPharmacyService pharmacyService) : ControllerBase
+public class ActiveIngredientController(IActiveIngredientService activeIngredientService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetActiveIngredientDto>>> GetAllActiveIngredients()
@@ -23,24 +22,24 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
     }
     
     [Authorize(Roles = IdentityData.PharmacyStaff)]
-    [HttpGet("pharma-company/{pharmaCompanyId:int}/active-ingredients")]
-    public async Task<ActionResult<IEnumerable<GetActiveIngredientDto>>> GetAllCompanyActiveIngredients(int pharmaCompanyId)
+    [HttpGet("pharmacy")]
+    [RequirePharmacyId]
+    public async Task<ActionResult<IEnumerable<GetActiveIngredientDto>>> GetAllPharmacyActiveIngredients()
     {
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-        
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
+        var pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
 
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-        
-        if (company.Owner.Id != userId)
-            return Forbid(); 
-        
-        var result = await activeIngredientService.GetAllCompanyActiveIngredientsAsync(pharmaCompanyId);
-        
-        if (result.Any()) return Ok(result);
+        try
+        {
+            var result = await activeIngredientService.GetAllCompanyActiveIngredientsAsync(pharmacyId);
+            if (result.Any()) return Ok(result);
 
-        return NotFound("Active ingredients not found.");
+            return NotFound("Active ingredients not found.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An unexpected error occurred while getting active ingredients for pharmacy.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
     }
 
     [HttpGet("{id:int}", Name = "getActiveIngredientById")]
@@ -53,85 +52,49 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
         return NotFound($"Active ingredient with ID: {id} not found.");
     }
 
-    [HttpPost("pharma-company/{pharmaCompanyId:int}/active-ingredients")]
+    [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
-    public async Task<ActionResult<GetActiveIngredientDto>> CreateActiveIngredient(int pharmaCompanyId, [FromBody] CreateActiveIngredientDto activeIngredientDto)
+    public async Task<ActionResult<GetActiveIngredientDto>> CreateActiveIngredient([FromBody] CreateActiveIngredientDto activeIngredientDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
-
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-    
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-    
-        if (company.Owner.Id != userId)
-            return Forbid();
+        
+        var pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
 
         try
         {
-            var activeIngredient = await activeIngredientService.CreateActiveIngredientAsync(pharmaCompanyId, activeIngredientDto);
+            var activeIngredient = await activeIngredientService.CreateActiveIngredientAsync(pharmacyId, activeIngredientDto);
             return CreatedAtRoute("getActiveIngredientById", new {id = activeIngredient.Id}, activeIngredient);
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating active ingredient, {Error}", ex.Message);
-            return BadRequest("Error creating active ingredient.");
+            Log.Error(ex, "An unexpected error occurred while creating active ingredient.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
 
-    [HttpPut("pharma-company/{pharmaCompanyId:int}/active-ingredients/{id:int}")]
-    [Authorize(Roles = IdentityData.PharmacyStaff)]
-    public async Task<ActionResult> UpdateActiveIngredient(int pharmaCompanyId, int id, [FromBody] CreateActiveIngredientDto activeIngredientDto)
+    [HttpPut("{id:int}")]
+    [Authorize(Roles = IdentityData.Admin)]
+    public async Task<ActionResult> UpdateActiveIngredient(int id, [FromBody] CreateActiveIngredientDto activeIngredientDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
         
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-        
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-        
-        if (!User.IsInRole(IdentityData.Admin))
-        {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            
-            if (company.Owner.Id != userId)
-                return Forbid();
-        } 
-        
         var result = await activeIngredientService.UpdateActiveIngredientAsync(id, activeIngredientDto);
-
-        if (result) return Ok("Active ingredient updated with success.");
-
-        Log.Error("Error updating active ingredient");
-        return BadRequest("Error updating active ingredient.");
+        if (result) return Ok();
+        
+        Log.Error("An unexpected error occurred while updating active ingredient.");
+        return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
     }
 
-    [HttpDelete("pharma-company/{pharmaCompanyId:int}/active-ingredients/{id:int}")]
-    [Authorize(Roles = IdentityData.PharmacyStaff)]
-    public async Task<ActionResult> DeleteActiveIngredient(int pharmaCompanyId, int id)
+    [HttpDelete("{id:int}")]
+    [Authorize(Roles = IdentityData.Admin)]
+    public async Task<ActionResult> DeleteActiveIngredient(int id)
     {
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-        
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-        
-        if (!User.IsInRole(IdentityData.Admin))
-        {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            
-            if (company.Owner.Id != userId)
-                return Forbid();
-        }  
-        
         var result = await activeIngredientService.DeleteActiveIngredientAsync(id);
-
         if (result) return NoContent();
 
-        Log.Error("Error deleting active ingredient");
-        return BadRequest("Error deleting active ingredient.");
+        Log.Error("An unexpected error occurred while deleting active ingredient.");
+        return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
     }
 }
