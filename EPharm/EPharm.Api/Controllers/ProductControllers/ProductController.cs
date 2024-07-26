@@ -72,7 +72,7 @@ public class ProductController(
     [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     [RequirePharmacyId]
-    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllPharmacyProducts(int page, [FromQuery] int? pharmacyId = null)
+    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllPharmacyProducts([FromQuery] int page, [FromQuery] int? pharmacyId = null)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
