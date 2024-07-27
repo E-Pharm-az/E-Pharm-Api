@@ -41,9 +41,9 @@ public class AllergyController(IAllergyService allergyService) : ControllerBase
             var result = await allergyService.CreateAllergyAsync(allergyDto);
             return Ok(result);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error("Error creating allergy, {Error}", e.Message);
+            Log.Error(ex, "Error creating allergy.");
             return BadRequest("Error creating allergy.");
         }
     }

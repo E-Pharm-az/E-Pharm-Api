@@ -18,7 +18,7 @@ public class WarehouseConfig : IEntityTypeConfiguration<Warehouse>
         
         builder.HasOne(w => w.Pharmacy)
             .WithMany(p => p.Warehouses)
-            .HasForeignKey(w => w.PharmaCompanyId)
+            .HasForeignKey(w => w.PharmacyId)
             .IsRequired();
         
         builder.Property(w => w.CreatedAt)

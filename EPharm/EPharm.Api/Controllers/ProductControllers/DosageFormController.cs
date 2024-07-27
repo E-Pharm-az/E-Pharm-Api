@@ -41,10 +41,10 @@ public class DosageFormController(IDosageFormService dosageFormService) : Contro
             var result = await dosageFormService.CreateDosageFormAsync(dosageFormDto);
             return Ok(result);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error("Error creating dosage form, {Error}", e.Message);
-            return BadRequest("Error creating dosage form.");
+            Log.Error(ex, "An unexpected error occurred while creating dosage form.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
 
@@ -57,7 +57,8 @@ public class DosageFormController(IDosageFormService dosageFormService) : Contro
         
         var result = await dosageFormService.UpdateDosageFormAsync(id, dosageFormDto);
         if (result) return Ok();
-        
+
+        Log.Error("An unexpected error occurred while updating dosage form.");
         return BadRequest($"Dosage form with ID: {id} could not be updated.");
     }
     
@@ -68,6 +69,7 @@ public class DosageFormController(IDosageFormService dosageFormService) : Contro
         var result = await dosageFormService.DeleteDosageFormAsync(id);
         if (result) return Ok();
         
+        Log.Error("An unexpected error occurred while deleting dosage form.");
         return BadRequest($"Dosage form with ID: {id} could not be deleted.");
     }
 }

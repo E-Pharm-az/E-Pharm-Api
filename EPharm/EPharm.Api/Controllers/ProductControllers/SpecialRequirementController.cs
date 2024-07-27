@@ -2,6 +2,7 @@ using EPharm.Domain.Dtos.SpecialRequirementsDto;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
+using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -10,82 +11,111 @@ using Serilog;
 namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
-[Route("api/[controller]/{pharmaCompanyId:int}/[controller]")]
+[Route("api/[controller]")]
 public class SpecialRequirementController(ISpecialRequirementService specialRequirementService, IPharmacyService pharmacyService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetSpecialRequirementDto>>> GetAllCompanySpecialRequirements(
-        int pharmaCompanyId)
+    [RequirePharmacyId]
+    public async Task<ActionResult<IEnumerable<GetSpecialRequirementDto>>> GetAllPharmacySpecialRequirements([FromQuery] int? pharmacyId = null)
     {
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-
-        if (!User.IsInRole(IdentityData.Admin))
+        if (User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            if (pharmacyId is null)
+                return BadRequest("PharmacyId is required.");
             
-            if (company.Owner.Id != userId)
-                return Forbid();
+            var pharmacy = await pharmacyService.GetPharmacyByIdAsync(pharmacyId.Value);
+
+            if (pharmacy is null)
+                return NotFound("Pharmacy not found.");
+        }
+        else
+        {
+            pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
         }
 
-        var result = await specialRequirementService.GetAllCompanySpecialRequirementsAsync(pharmaCompanyId);
-        if (result.Any()) return Ok(result);
+        try
+        {
+            var result = await specialRequirementService.GetAllPharmacySpecialRequirementsAsync(pharmacyId.Value);
+            if (result.Any()) return Ok(result);
 
-        return NotFound("Special requirements not found.");
+            return NotFound("Special requirements not found.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An unexpected error occurred while getting special requirements for pharmacy.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
     }
 
     [HttpGet("{id:int}")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
-    public async Task<ActionResult<GetSpecialRequirementDto>> GetSpecialRequirementById(int pharmaCompanyId, int id)
+    public async Task<ActionResult<GetSpecialRequirementDto>> GetSpecialRequirementById(int id, [FromQuery] int? pharmacyId = null)
     {
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-
-        if (!User.IsInRole(IdentityData.Admin))
+        if (User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            if (pharmacyId is null)
+                return BadRequest("PharmacyId is required.");
             
-            if (company.Owner.Id != userId)
-                return Forbid();
+            var pharmacy = await pharmacyService.GetPharmacyByIdAsync(pharmacyId.Value);
+
+            if (pharmacy is null)
+                return NotFound("Pharmacy not found.");
         }
-
-        var result = await specialRequirementService.GetSpecialRequirementByIdAsync(id);
-        if (result is not null) return Ok(result);
-
-        return NotFound($"Special requirement with ID: {id} not found.");
-    }
-
-    [HttpPost]
-    [Authorize(Roles = IdentityData.PharmacyStaff)]
-    public async Task<ActionResult<GetSpecialRequirementDto>> CreateSpecialRequirement(int pharmaCompanyId, [FromBody] CreateSpecialRequirementDto specialRequirementDto)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest("Model not valid.");
-
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-        
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-        
-        if (company.Owner.Id != userId)
-            return Forbid();
+        else
+        {
+            pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
+        }
 
         try
         {
-            var result = await specialRequirementService.AddCompanySpecialRequirementAsync(pharmaCompanyId, specialRequirementDto);
+            var result = await specialRequirementService.GetSpecialRequirementByIdAsync(id);
+            if (result is null)
+                return NotFound($"Special requirement with ID: {id} not found.");
+            
+            if (result.PharmacyId != pharmacyId.Value)
+                return Forbid();
+            
             return Ok(result);
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating special requirement, {Error}", ex.Message);
-            return BadRequest("Error creating special requirement.");
+            Log.Error(ex, "An unexpected error occurred while getting special requirement.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
+        }
+    }
+
+    [HttpPost]
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
+    public async Task<ActionResult<GetSpecialRequirementDto>> CreateSpecialRequirement([FromBody] CreateSpecialRequirementDto specialRequirementDto, [FromQuery] int? pharmacyId = null)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest("Model not valid.");
+
+        if (User.IsInRole(IdentityData.Admin))
+        {
+            if (pharmacyId is null)
+                return BadRequest("PharmacyId is required.");
+            
+            var pharmacy = await pharmacyService.GetPharmacyByIdAsync(pharmacyId.Value);
+
+            if (pharmacy is null)
+                return NotFound("Pharmacy not found.");
+        }
+        else
+        {
+            pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
+        }
+
+        try
+        {
+            var result = await specialRequirementService.AddPharmacySpecialRequirementAsync(pharmacyId.Value, specialRequirementDto);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An unexpected error occurred while creating special requirement for pharmacy.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
 
@@ -109,7 +139,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
                 return Forbid();
         }
 
-        var result = await specialRequirementService.UpdateCompanySpecialRequirementAsync(id, specialRequirement);
+        var result = await specialRequirementService.UpdatePharmacySpecialRequirementAsync(id, specialRequirement);
         if (result) return Ok();
         
         return BadRequest("Failed to update special requirement.");
@@ -132,7 +162,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
                 return Forbid();
         }
         
-        var result = await specialRequirementService.DeleteCompanySpecialRequirementAsync(id);
+        var result = await specialRequirementService.DeletePharmacySpecialRequirementAsync(id);
         if (result) return Ok();
         
         return BadRequest("Failed to delete special requirement.");

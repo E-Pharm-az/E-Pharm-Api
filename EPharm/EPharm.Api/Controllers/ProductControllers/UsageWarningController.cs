@@ -43,8 +43,8 @@ public class UsageWarningController(IUsageWarningService usageWarningService) : 
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating usage warning, {Error}", ex.Message);
-            return BadRequest("Error creating usage warning.");
+            Log.Error(ex, "An unexpected error occurred while creating usage warning.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
 

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EPharm.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240710143926_PharmacyNullChanges")]
-    partial class PharmacyNullChanges
+    [Migration("20240727092051_InitialMigration")]
+    partial class InitialMigration
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -809,12 +809,12 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("PharmaCompanyId")
+                    b.Property<int>("PharmacyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PharmaCompanyId");
+                    b.HasIndex("PharmacyId");
 
                     b.ToTable("Warehouses");
                 });
@@ -1132,7 +1132,7 @@ namespace EPharm.Infrastructure.Migrations
                 {
                     b.HasOne("EPharm.Infrastructure.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("Warehouses")
-                        .HasForeignKey("PharmaCompanyId")
+                        .HasForeignKey("PharmacyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

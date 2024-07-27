@@ -43,8 +43,8 @@ public class RouteOfAdministrationController(IRouteOfAdministrationService route
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating route of administration, {Error}", ex.Message);
-            return BadRequest("Error creating route of administration.");
+            Log.Error(ex, "An unexpected error occurred while creating route of administration.");
+            return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
 

@@ -806,12 +806,12 @@ namespace EPharm.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
-                    b.Property<int>("PharmaCompanyId")
+                    b.Property<int>("PharmacyId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PharmaCompanyId");
+                    b.HasIndex("PharmacyId");
 
                     b.ToTable("Warehouses");
                 });
@@ -1129,7 +1129,7 @@ namespace EPharm.Infrastructure.Migrations
                 {
                     b.HasOne("EPharm.Infrastructure.Entities.PharmaEntities.Pharmacy", "Pharmacy")
                         .WithMany("Warehouses")
-                        .HasForeignKey("PharmaCompanyId")
+                        .HasForeignKey("PharmacyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

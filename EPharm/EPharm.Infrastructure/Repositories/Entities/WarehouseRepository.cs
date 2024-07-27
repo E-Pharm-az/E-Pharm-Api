@@ -9,5 +9,5 @@ namespace EPharm.Infrastructure.Repositories.Entities;
 public class WarehouseRepository(AppDbContext context) : Repository<Warehouse>(context), IWarehouseRepository
 {
     public async Task<IEnumerable<Warehouse>> GetAllCompanyWarehousesAsync(int companyId) =>
-        await Entities.Where(w => w.PharmaCompanyId == companyId).ToListAsync();
+        await Entities.Where(w => w.PharmacyId == companyId).ToListAsync();
 }

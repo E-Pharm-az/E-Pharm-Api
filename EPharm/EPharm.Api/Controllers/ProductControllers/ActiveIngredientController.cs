@@ -54,6 +54,7 @@ public class ActiveIngredientController(IActiveIngredientService activeIngredien
 
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
+    [RequirePharmacyId]
     public async Task<ActionResult<GetActiveIngredientDto>> CreateActiveIngredient([FromBody] CreateActiveIngredientDto activeIngredientDto)
     {
         if (!ModelState.IsValid)

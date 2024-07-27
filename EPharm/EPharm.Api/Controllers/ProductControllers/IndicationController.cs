@@ -41,9 +41,9 @@ public class IndicationController(IIndicationService indicationService) : Contro
             var result = await indicationService.CreateIndicationAsync(indicationDto);
             return Ok(result);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error("Error creating indication, {Error}", e.Message);
+            Log.Error(ex, "Error creating indication.");
             return BadRequest("Error creating indication.");
         }
     }

@@ -8,7 +8,7 @@ public class Warehouse : BaseEntity
 {
     public string Name { get; set; }
     public string Address { get; set; }
-    public int PharmaCompanyId { get; set; }
+    public int PharmacyId { get; set; }
     public Pharmacy Pharmacy { get; set; }
     public ICollection<WarehouseProduct> WarehouseProducts { get; set; }
     public ICollection<OrderProduct> OrderProducts;

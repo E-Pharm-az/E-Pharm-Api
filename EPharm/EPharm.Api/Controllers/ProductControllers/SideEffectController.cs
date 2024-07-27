@@ -43,7 +43,7 @@ public class SideEffectController(ISideEffectService sideEffectService) : Contro
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating side effect, {Error}", ex.Message);
+            Log.Error(ex, "Error creating side effect.");
             return BadRequest("Error creating side effect.");
         }
     }

@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EPharm.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class PharmacyNullChanges : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -299,15 +299,15 @@ namespace EPharm.Infrastructure.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
                     Address = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
-                    PharmaCompanyId = table.Column<int>(type: "integer", nullable: false),
+                    PharmacyId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Warehouses", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Warehouses_Pharmacy_PharmaCompanyId",
-                        column: x => x.PharmaCompanyId,
+                        name: "FK_Warehouses_Pharmacy_PharmacyId",
+                        column: x => x.PharmacyId,
                         principalTable: "Pharmacy",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -749,9 +749,9 @@ namespace EPharm.Infrastructure.Migrations
                 column: "WarehouseId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Warehouses_PharmaCompanyId",
+                name: "IX_Warehouses_PharmacyId",
                 table: "Warehouses",
-                column: "PharmaCompanyId");
+                column: "PharmacyId");
         }
 
         /// <inheritdoc />

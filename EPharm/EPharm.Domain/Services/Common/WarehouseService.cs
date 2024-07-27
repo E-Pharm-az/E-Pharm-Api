@@ -25,7 +25,7 @@ public class WarehouseService(IWarehouseRepository warehouseRepository, IMapper 
         try
         {
             var warehouseEntity = mapper.Map<Warehouse>(warehouseDto);
-            warehouseEntity.PharmaCompanyId = pharmaCompanyId;
+            warehouseEntity.PharmacyId = pharmaCompanyId;
             var warehouse = await warehouseRepository.InsertAsync(warehouseEntity);
 
             return mapper.Map<GetWarehouseDto>(warehouse);

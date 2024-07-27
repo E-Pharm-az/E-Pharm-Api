@@ -9,7 +9,7 @@ namespace EPharm.Domain.Services.Entities;
 public class SpecialRequirementService(ISpecialRequirementRepository specialRequirementRepository, IMapper mapper)
     : ISpecialRequirementService
 {
-    public async Task<IEnumerable<GetSpecialRequirementDto>> GetAllCompanySpecialRequirementsAsync(int pharmaCompanyId)
+    public async Task<IEnumerable<GetSpecialRequirementDto>> GetAllPharmacySpecialRequirementsAsync(int pharmaCompanyId)
     {
         var specialRequirements =
             await specialRequirementRepository.GetAllCompanySpecialRequirementsAsync(pharmaCompanyId);
@@ -22,7 +22,7 @@ public class SpecialRequirementService(ISpecialRequirementRepository specialRequ
         return mapper.Map<GetSpecialRequirementDto>(specialRequirement);
     }
 
-    public async Task<GetSpecialRequirementDto> AddCompanySpecialRequirementAsync(int pharmaCompanyId,
+    public async Task<GetSpecialRequirementDto> AddPharmacySpecialRequirementAsync(int pharmaCompanyId,
         CreateSpecialRequirementDto specialRequirementDto)
     {
         try
@@ -39,7 +39,7 @@ public class SpecialRequirementService(ISpecialRequirementRepository specialRequ
         }
     }
 
-    public async Task<bool> UpdateCompanySpecialRequirementAsync(int specialRequirementId,
+    public async Task<bool> UpdatePharmacySpecialRequirementAsync(int specialRequirementId,
         CreateSpecialRequirementDto specialRequirement)
     {
         var specialRequirementEntity = await specialRequirementRepository.GetByIdAsync(specialRequirementId);
@@ -54,7 +54,7 @@ public class SpecialRequirementService(ISpecialRequirementRepository specialRequ
         return result > 0;
     }
 
-    public async Task<bool> DeleteCompanySpecialRequirementAsync(int specialRequirementId)
+    public async Task<bool> DeletePharmacySpecialRequirementAsync(int specialRequirementId)
     {
         var specialRequirement = await specialRequirementRepository.GetByIdAsync(specialRequirementId);
 

@@ -4,14 +4,14 @@ namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface ISpecialRequirementService
 {
-    Task<IEnumerable<GetSpecialRequirementDto>> GetAllCompanySpecialRequirementsAsync(int pharmaCompanyId);
+    Task<IEnumerable<GetSpecialRequirementDto>> GetAllPharmacySpecialRequirementsAsync(int pharmaCompanyId);
     Task<GetSpecialRequirementDto?> GetSpecialRequirementByIdAsync(int specialRequirementId);
 
-    Task<GetSpecialRequirementDto> AddCompanySpecialRequirementAsync(int pharmaCompanyId,
+    Task<GetSpecialRequirementDto> AddPharmacySpecialRequirementAsync(int pharmaCompanyId,
         CreateSpecialRequirementDto specialRequirementDto);
 
-    Task<bool> UpdateCompanySpecialRequirementAsync(int specialRequirementId,
+    Task<bool> UpdatePharmacySpecialRequirementAsync(int specialRequirementId,
         CreateSpecialRequirementDto specialRequirement);
 
-    Task<bool> DeleteCompanySpecialRequirementAsync(int specialRequirementId);
+    Task<bool> DeletePharmacySpecialRequirementAsync(int specialRequirementId);
 }
