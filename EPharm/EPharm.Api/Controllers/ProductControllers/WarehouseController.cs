@@ -14,7 +14,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 [Route("api/[controller]")]
 public class WarehouseController(IWarehouseService warehouseService, IPharmacyService pharmacyService) : ControllerBase
 {
-    [HttpGet]
+    [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     [RequirePharmacyId]
     public async Task<ActionResult<IEnumerable<GetWarehouseDto>>> GetAllCompanyWarehouses([FromQuery] int? pharmacyId = null)

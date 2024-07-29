@@ -88,6 +88,7 @@ public class RegulatoryInformationController(IRegulatoryInformationService regul
 
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
+    [RequirePharmacyId]
     public async Task<ActionResult<GetRegulatoryInformationDto>> CreateRegulatoryInformation([FromBody] CreateRegulatoryInformationDto regulatoryInformationDto, [FromQuery] int? pharmacyId = null)
     {
         if (!ModelState.IsValid)

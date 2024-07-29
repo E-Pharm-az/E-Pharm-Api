@@ -30,18 +30,23 @@ public class ProductImageService : IProductImageService
         _s3Client = new AmazonS3Client(credentials, config);
     }
 
-    public async Task<string> UploadProductImageAsync(IFormFile image)
+    public async Task<string> UploadProductImageAsync(byte[] imageData)
     {
-        await using var memoryStream = new MemoryStream();
-        await image.CopyToAsync(memoryStream);
+        if (imageData == null || imageData.Length == 0)
+        {
+            throw new ArgumentException("Image data is null or empty", nameof(imageData));
+        }
+
+        using var memoryStream = new MemoryStream(imageData);
 
         var request = new PutObjectRequest
         {
             BucketName = _configuration["AwsConfig:ImageBucket"],
             Key = "product-images/" + Guid.NewGuid(),
             InputStream = memoryStream,
-            ContentType = "image/jpeg"
+            ContentType = "image/jpeg" // Note: You might want to determine this dynamically based on the actual image type
         };
+
         var response = await _s3Client.PutObjectAsync(request);
 
         if (response.HttpStatusCode == HttpStatusCode.OK)
@@ -49,7 +54,6 @@ public class ProductImageService : IProductImageService
 
         throw new InvalidOperationException("Failed to upload image");
     }
-
     public async Task<bool> DeleteProductImageAsync(string imageUrl)
     {
         var request = new DeleteObjectRequest

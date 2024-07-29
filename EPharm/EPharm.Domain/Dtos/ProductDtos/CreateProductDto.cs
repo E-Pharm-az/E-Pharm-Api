@@ -8,7 +8,7 @@ public class CreateProductDto
     public string Name { get; set; }
     public string Description { get; set; }
 
-    public IFormFile? Image { get; set; }
+    public byte[]? Image { get; set; }
     public string? ImageURL { get; set; }
     public decimal StrengthMg { get; set; }
     public int? MaxDayFrequency { get; set; }
@@ -16,7 +16,7 @@ public class CreateProductDto
     public string? ContraindicationsDescription { get; set; }
     public string? StorageConditionDescription { get; set; }
     public int? SpecialRequirementsId { get; set; }
-    public int? ManufacturerId { get; set; }
+    public int ManufacturerId { get; set; }
     public int? RegulatoryInformationId { get; set; }
 
     public int[] ActiveIngredientsIds { get; set; }
@@ -35,6 +35,6 @@ public class CreateProductDto
     public IEnumerable<CreateStockDto> Stocks { get; set; }
 
     public string BatchNumber { get; set; }
-    public string Barcode { get; set; }
+    public string? Barcode { get; set; }
     public decimal PackagingWeight { get; set; }
 }

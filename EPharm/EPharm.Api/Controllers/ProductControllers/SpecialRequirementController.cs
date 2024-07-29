@@ -87,6 +87,7 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
 
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
+    [RequirePharmacyId]
     public async Task<ActionResult<GetSpecialRequirementDto>> CreateSpecialRequirement([FromBody] CreateSpecialRequirementDto specialRequirementDto, [FromQuery] int? pharmacyId = null)
     {
         if (!ModelState.IsValid)
