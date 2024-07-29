@@ -99,12 +99,21 @@ public class ProductService(
             }
 
             await productActiveIngredientRepository.InsertAsync(product.Id, productDto.ActiveIngredientsIds);
-            await productAllergyRepository.InsertAsync(product.Id, productDto.AllergiesIds);
+            if (productDto.AllergiesIds is not null)
+                await productAllergyRepository.InsertAsync(product.Id, productDto.AllergiesIds);
+            
             await productDosageFormRepository.InsertAsync(product.Id, productDto.DosageFormsIds);
-            await indicationProductRepository.InsertAsync(product.Id, productDto.IndicationsIds);
+
+            if (productDto.IndicationsIds is not null)
+                await indicationProductRepository.InsertAsync(product.Id, productDto.IndicationsIds);
+            
             await productRouteOfAdministrationRepository.InsertAsync(product.Id, productDto.RouteOfAdministrationsIds);
-            await productSideEffectRepository.InsertAsync(product.Id, productDto.SideEffectsIds);
-            await productUsageWarningRepository.InsertAsync(product.Id, productDto.UsageWarningsIds);
+            
+            if (productDto.SideEffectsIds is not null)
+                await productSideEffectRepository.InsertAsync(product.Id, productDto.SideEffectsIds);
+            
+            if (productDto.UsageWarningsIds is not null)
+                await productUsageWarningRepository.InsertAsync(product.Id, productDto.UsageWarningsIds);
 
             await unitOfWork.CommitTransactionAsync();
             await unitOfWork.SaveChangesAsync();
