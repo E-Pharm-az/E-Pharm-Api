@@ -6,9 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace EPharm.Infrastructure.Repositories.Entities;
 
-public class ProductRepository(AppDbContext context) : Repository<Infrastructure.Entities.ProductEntities.Product>(context), IProductRepository
+public class ProductRepository(AppDbContext context) : Repository<Product>(context), IProductRepository
 {
-    public async Task<ICollection<Infrastructure.Entities.ProductEntities.Product>> GetAlLProductsAsync(int page, int pageSize)
+    public async Task<ICollection<Product>> GetAlLProductsAsync(int page, int pageSize)
     {
         var skip = (page - 1) * pageSize;
 
@@ -21,7 +21,7 @@ public class ProductRepository(AppDbContext context) : Repository<Infrastructure
             .ToListAsync();
     }
 
-    public async Task<ICollection<Infrastructure.Entities.ProductEntities.Product>> GetAlLApprovedProductsAsync(int page, int pageSize)
+    public async Task<ICollection<Product>> GetAlLApprovedProductsAsync(int page, int pageSize)
     {
         var skip = (page - 1) * pageSize;
 
@@ -35,10 +35,9 @@ public class ProductRepository(AppDbContext context) : Repository<Infrastructure
             .ToListAsync();
     }
 
-    public async Task<Infrastructure.Entities.ProductEntities.Product?> GetApprovedProductDetailAsync(int productId) =>
-        await Entities
-            .Where(product => product.Id == productId)
-            .Where(product => product.IsApproved)
+    public async Task<Product?> GetFullByIdAsync(int id) =>
+        await Entities 
+            .Where(product => product.Id == id)
             .Include(product => product.Pharmacy)
             .Include(product => product.SpecialRequirement)
             .Include(product => product.Manufacturer)
@@ -50,13 +49,11 @@ public class ProductRepository(AppDbContext context) : Repository<Infrastructure
             .Include(product => product.SideEffects).ThenInclude(product => product.SideEffect)
             .Include(product => product.UsageWarnings).ThenInclude(product => product.UsageWarning)
             .Include(product => product.Allergies).ThenInclude(product => product.Allergy)
-            .Include(product => product.Allergies).ThenInclude(product => product.Allergy)
-            .Include(product => product.Allergies).ThenInclude(product => product.Allergy)
+            .Include(product => product.Indications).ThenInclude(product => product.Indication)
             .AsNoTracking()
             .SingleOrDefaultAsync();
 
-    public async Task<IEnumerable<Infrastructure.Entities.ProductEntities.Product>> GetApprovedAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page,
-        int pageSize)
+    public async Task<IEnumerable<Product>> GetApprovedAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page, int pageSize)
     {
         var skip = (page - 1) * pageSize;
 
@@ -68,7 +65,7 @@ public class ProductRepository(AppDbContext context) : Repository<Infrastructure
             .AsNoTracking().ToListAsync();
     }
 
-    public async Task<IEnumerable<Infrastructure.Entities.ProductEntities.Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page,
+    public async Task<IEnumerable<Product>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page,
         int pageSize)
     {
         var skip = (page - 1) * pageSize;
@@ -80,9 +77,8 @@ public class ProductRepository(AppDbContext context) : Repository<Infrastructure
             .AsNoTracking().ToListAsync();
     }
 
-    public async Task<IEnumerable<Infrastructure.Entities.ProductEntities.Product>> GetApprovedProductsByIdAsync(int[] productIds) =>
+    public async Task<IEnumerable<Product>> GetApprovedProductsByIdAsync(int[] productIds) =>
         await Entities
             .Where(product => productIds.Contains(product.Id) && product.IsApproved)
             .AsNoTracking().ToListAsync();
-
 }

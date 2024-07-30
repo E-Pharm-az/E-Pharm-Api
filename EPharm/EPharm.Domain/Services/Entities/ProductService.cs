@@ -55,7 +55,7 @@ public class ProductService(
 
     public async Task<GetFullProductDto?> GetProductByIdAsync(int productId)
     {
-        var product = await productRepository.GetApprovedProductDetailAsync(productId);
+        var product = await productRepository.GetFullByIdAsync(productId);
         return mapper.Map<GetFullProductDto>(product);
     }
 
@@ -64,12 +64,14 @@ public class ProductService(
         var user = await userManager.FindByIdAsync(adminId);
         ArgumentNullException.ThrowIfNull(user);
 
-        var product = await GetProductByIdAsync(productId);
+        var product = await productRepository.GetByIdAsync(productId);
         ArgumentNullException.ThrowIfNull(product);
 
-        var productEntity = mapper.Map<Product>(product);
-        productEntity.IsApproved = true;
-        productEntity.ApprovedByAdminId = adminId;
+        product.IsApproved = true;
+        product.ApprovedByAdminId = adminId;
+        
+        productRepository.Update(product);
+        await productRepository.SaveChangesAsync();
     }
 
     public async Task<GetMinimalProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)

@@ -5,6 +5,7 @@ using EPharm.Domain.Models.Identity;
 using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
@@ -40,10 +41,28 @@ public class ProductController(
     {
         try
         {
-            var result = await productService.GetProductByIdAsync(id);
-            if (result is not null) return Ok(result);
+            var product = await productService.GetProductByIdAsync(id);
+            
+            if (product is null)
+                return NotFound($"Product with ID: {id} not found.");
 
-            return NotFound($"Product with ID: {id} not found.");
+            if (product.IsApproved)
+                return Ok(product);
+            
+            var user = HttpContext.User;
+
+            if (user.IsInRole(IdentityData.Admin))
+                return Ok(product);
+        
+            var pharmacyIdClaim = HttpContext.User.FindFirst("PharmacyId");
+            if (pharmacyIdClaim == null || !int.TryParse(pharmacyIdClaim.Value, out var pharmacyId))
+                return BadRequest("Invalid or missing PharmacyId");
+
+            if (product.Pharmacy.Id != pharmacyId)
+                return Forbid();
+
+            return Ok(product);
+
         }
         catch (Exception ex)
         {
