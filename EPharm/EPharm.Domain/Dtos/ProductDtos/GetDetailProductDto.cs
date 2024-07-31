@@ -8,22 +8,15 @@ using EPharm.Domain.Dtos.RegulatoryInformationDto;
 using EPharm.Domain.Dtos.RouteOfAdministrationDto;
 using EPharm.Domain.Dtos.SideEffectDto;
 using EPharm.Domain.Dtos.SpecialRequirementsDto;
-using EPharm.Domain.Dtos.StockDto;
 using EPharm.Domain.Dtos.UsageWarningDto;
 
 namespace EPharm.Domain.Dtos.ProductDtos;
 
-public class GetFullProductDto
+public class GetDetailProductDto : GetProductDto
 {
-    public int Id { get; set; }
     public GetPharmacyDto Pharmacy { get; set; }
 
-    public string Name { get; set; }
-    public string Description { get; set; }
-    public string? ImageUrl { get; set; }
-    public bool IsApproved { get; set; }
     public string? ApprovedByAdminId { get; set; }
-    public decimal StrengthMg { get; set; }
     public int MaxDayFrequency { get; set; }
     public int MaxSupplyInDaysDays { get; set; }
     public string ContraindicationsDescription { get; set; }
@@ -33,19 +26,13 @@ public class GetFullProductDto
     public GetManufacturerDto Manufacturer { get; set; }
     public GetRegulatoryInformationDto RegulatoryInformation { get; set; }
 
-    public ICollection<GetActiveIngredientDto> ActiveIngredients { get; set; }
+    public ICollection<GetProductActiveIngredientDto> ActiveIngredients { get; set; }
     public ICollection<GetDosageFormDto> DosageForms { get; set; }
     public ICollection<GetRouteOfAdministrationDto> RouteOfAdministrations { get; set; }
     public ICollection<GetSideEffectDto> SideEffects { get; set; }
     public ICollection<GetUsageWarningDto> UsageWarnings { get; set; }
     public ICollection<GetAllergyDto> Allergies { get; set; }
     public ICollection<GetIndicationDto> Indications { get; set; }
-
-    public DateTime ManufacturingDate { get; set; }
-    public DateTime ExpiryDate { get; set; }
-
-    public int Price { get; set; }
-    public ICollection<GetStockDto> Stock { get; set; }
 
     public string BatchNumber { get; set; }
     public string Barcode { get; set; }

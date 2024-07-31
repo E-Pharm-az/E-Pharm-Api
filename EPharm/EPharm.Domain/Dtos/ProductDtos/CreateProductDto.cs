@@ -20,7 +20,7 @@ public class CreateProductDto
     public int? RegulatoryInformationId { get; set; }
 
     public int[] ActiveIngredientsIds { get; set; }
-    public int[]? AllergiesIds { get; set; }
+    public int[]? AllergiesIds { get; set; } // TODO: Change to DTO collection and include quantity 
     public int[] DosageFormsIds { get; set; }
     public int[]? IndicationsIds { get; set; }
     public int[] RouteOfAdministrationsIds { get; set; }

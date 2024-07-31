@@ -29,13 +29,13 @@ public class ProductService(
     IWarehouseProductRepository warehouseProductRepository,
     IMapper mapper) : IProductService
 {
-    public async Task<IEnumerable<GetMinimalProductDto>> GetAllProductsAsync(int page)
+    public async Task<IEnumerable<GetProductDto>> GetAllProductsAsync(int page)
     {
         var products = await productRepository.GetAlLProductsAsync(page, pageSize: 30);
-        return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
+        return mapper.Map<IEnumerable<GetProductDto>>(products);
     }
 
-    public async Task<IEnumerable<GetMinimalProductDto>> SearchProduct(string parameter, int page)
+    public async Task<IEnumerable<GetProductDto>> SearchProduct(string parameter, int page)
     {
         var allProducts = await productRepository.GetAlLApprovedProductsAsync(page, pageSize: 30);
 
@@ -44,19 +44,19 @@ public class ProductService(
             product.Description.Contains(parameter, StringComparison.OrdinalIgnoreCase)
         );
 
-        return mapper.Map<IEnumerable<GetMinimalProductDto>>(filteredProducts);
+        return mapper.Map<IEnumerable<GetProductDto>>(filteredProducts);
     }
 
-    public async Task<IEnumerable<GetMinimalProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page)
+    public async Task<IEnumerable<GetProductDto>> GetAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page)
     {
         var products = await productRepository.GetAllPharmaCompanyProductsAsync(pharmaCompanyId, page, pageSize: 30);
-        return mapper.Map<IEnumerable<GetMinimalProductDto>>(products);
+        return mapper.Map<IEnumerable<GetProductDto>>(products);
     }
 
-    public async Task<GetFullProductDto?> GetProductByIdAsync(int productId)
+    public async Task<GetDetailProductDto?> GetProductByIdAsync(int productId)
     {
-        var product = await productRepository.GetFullByIdAsync(productId);
-        return mapper.Map<GetFullProductDto>(product);
+        var product = await productRepository.GetDetailProductByIdAsync(productId);
+        return mapper.Map<GetDetailProductDto>(product);
     }
 
     public async Task ApproveProductAsync(string adminId, int productId)
@@ -74,7 +74,8 @@ public class ProductService(
         await productRepository.SaveChangesAsync();
     }
 
-    public async Task<GetMinimalProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)
+    // TODO: Fix data leak issue
+    public async Task<GetProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)
     {
         try
         {
@@ -105,7 +106,7 @@ public class ProductService(
                 await productAllergyRepository.InsertAsync(product.Id, productDto.AllergiesIds);
             
             await productDosageFormRepository.InsertAsync(product.Id, productDto.DosageFormsIds);
-
+            
             if (productDto.IndicationsIds is not null)
                 await indicationProductRepository.InsertAsync(product.Id, productDto.IndicationsIds);
             
@@ -120,7 +121,7 @@ public class ProductService(
             await unitOfWork.CommitTransactionAsync();
             await unitOfWork.SaveChangesAsync();
 
-            return mapper.Map<GetMinimalProductDto>(product);
+            return mapper.Map<GetProductDto>(product);
         }
         catch (Exception)
         {

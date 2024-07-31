@@ -11,6 +11,8 @@ public class UsageWarningProfile : Profile
     {
         CreateMap<CreateUsageWarningDto, UsageWarning>();
         CreateMap<UsageWarning, GetUsageWarningDto>();
-        CreateMap<ProductUsageWarning, GetUsageWarningDto>().IncludeMembers(src => src.UsageWarning);
+        CreateMap<ProductUsageWarning, GetUsageWarningDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Product))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Product.Name));
     }
 }

@@ -9,10 +9,9 @@ public class ProductProfile : Profile
     public ProductProfile()
     {
         CreateMap<CreateProductDto, Product>()
-            .ForMember(dest => dest.ManufacturingDate,
-                opt => opt.MapFrom(src => src.ManufacturingDate.ToUniversalTime()))
+            .ForMember(dest => dest.ManufacturingDate, opt => opt.MapFrom(src => src.ManufacturingDate.ToUniversalTime()))
             .ForMember(dest => dest.ExpiryDate, opt => opt.MapFrom(src => src.ExpiryDate.ToUniversalTime()));
-        CreateMap<Product, GetMinimalProductDto>();
-        CreateMap<Product, GetFullProductDto>();
+        CreateMap<Product, GetProductDto>();
+        CreateMap<Product, GetDetailProductDto>();
     }
 }

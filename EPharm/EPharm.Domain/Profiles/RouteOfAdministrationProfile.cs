@@ -12,6 +12,7 @@ public class RouteOfAdministrationProfile : Profile
         CreateMap<CreateRouteOfAdministrationDto, RouteOfAdministration>();
         CreateMap<RouteOfAdministration, GetRouteOfAdministrationDto>();
         CreateMap<ProductRouteOfAdministration, GetRouteOfAdministrationDto>()
-            .IncludeMembers(src => src.RouteOfAdministration);
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.RouteOfAdministration.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.RouteOfAdministration.Name));
     }
 }

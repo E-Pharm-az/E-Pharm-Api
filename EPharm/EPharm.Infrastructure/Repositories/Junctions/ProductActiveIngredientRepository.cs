@@ -3,12 +3,20 @@ using EPharm.Infrastructure.Entities.Junctions;
 using EPharm.Infrastructure.Interfaces.Junctions;
 using EPharm.Infrastructure.Interfaces.Entities;
 using EPharm.Infrastructure.Repositories.Base;
+using Microsoft.EntityFrameworkCore;
 
 namespace EPharm.Infrastructure.Repositories.Junctions;
 
 public class ProductActiveIngredientRepository(AppDbContext context, IActiveIngredientRepository activeIngredientRepository)
     : Repository<ProductActiveIngredient>(context), IProductActiveIngredientRepository
 {
+    public async Task<IEnumerable<ProductActiveIngredient>> GetAllAsync(int productId) =>
+        await Entities
+            .Where(x => x.ProductId == productId)
+            .Include(x => x.ActiveIngredient)
+            .AsNoTracking()
+            .ToListAsync();
+
     public async Task InsertAsync(int productId, int[] activeIngredientsIds)
     {
         foreach (var activeIngredientsId in activeIngredientsIds)
@@ -29,4 +37,5 @@ public class ProductActiveIngredientRepository(AppDbContext context, IActiveIngr
         
         await base.SaveChangesAsync();
     }
+    
 }

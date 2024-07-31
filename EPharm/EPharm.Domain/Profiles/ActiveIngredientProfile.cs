@@ -11,6 +11,10 @@ public class ActiveIngredientProfile : Profile
     {
         CreateMap<CreateActiveIngredientDto, ActiveIngredient>();
         CreateMap<ActiveIngredient, GetActiveIngredientDto>();
-        CreateMap<ProductActiveIngredient, GetActiveIngredientDto>().IncludeMembers(src => src.ActiveIngredient);
+        CreateMap<ProductActiveIngredient, GetProductActiveIngredientDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ActiveIngredient.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.ActiveIngredient.Name))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.ActiveIngredient.Description))
+            .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.ActiveIngredient.PharmacyId));
     }
 }

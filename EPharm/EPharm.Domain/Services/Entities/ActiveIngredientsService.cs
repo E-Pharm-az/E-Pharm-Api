@@ -3,11 +3,15 @@ using EPharm.Domain.Dtos.ActiveIngredientDto;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
+using EPharm.Infrastructure.Interfaces.Junctions;
 
 namespace EPharm.Domain.Services.Entities;
 
-public class ActiveIngredientService(IActiveIngredientRepository activeIngredientRepository, IMapper mapper)
-    : IActiveIngredientService
+public class ActiveIngredientsService(
+    IActiveIngredientRepository activeIngredientRepository,
+    IProductActiveIngredientRepository productActiveIngredientRepository,
+    IMapper mapper)
+    : IActiveIngredientsService
 {
     public async Task<IEnumerable<GetActiveIngredientDto>> GetAllActiveIngredientsAsync()
     {
@@ -21,16 +25,22 @@ public class ActiveIngredientService(IActiveIngredientRepository activeIngredien
         return mapper.Map<List<GetActiveIngredientDto>>(activeIngredients);
     }
 
+    public async Task<IEnumerable<GetProductActiveIngredientDto>> GetAllProductActiveIngredientsAsync(int productId)
+    {
+        var productActiveIngredients = await productActiveIngredientRepository.GetAllAsync(productId);
+        return mapper.Map<List<GetProductActiveIngredientDto>>(productActiveIngredients);
+    }
+
     public async Task<GetActiveIngredientDto?> GetActiveIngredientByIdAsync(int id)
     {
         var activeIngredient = await activeIngredientRepository.GetByIdAsync(id);
         return mapper.Map<GetActiveIngredientDto>(activeIngredient);
     }
 
-    public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(int pharmaCompanyId, CreateActiveIngredientDto createActiveIngredientDto)
+    public async Task<GetActiveIngredientDto> CreateActiveIngredientAsync(int pharmacyId, CreateActiveIngredientDto createActiveIngredientDto)
     {
         var activeIngredientEntity = mapper.Map<ActiveIngredient>(createActiveIngredientDto);
-        activeIngredientEntity.PharmacyId = pharmaCompanyId;
+        activeIngredientEntity.PharmacyId = pharmacyId;
         var activeIngredient = await activeIngredientRepository.InsertAsync(activeIngredientEntity);
 
         return mapper.Map<GetActiveIngredientDto>(activeIngredient);

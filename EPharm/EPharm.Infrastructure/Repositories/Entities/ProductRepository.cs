@@ -35,7 +35,7 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
             .ToListAsync();
     }
 
-    public async Task<Product?> GetFullByIdAsync(int id) =>
+    public async Task<Product?> GetDetailProductByIdAsync(int id) =>
         await Entities 
             .Where(product => product.Id == id)
             .Include(product => product.Pharmacy)

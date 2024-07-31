@@ -5,7 +5,6 @@ using EPharm.Domain.Models.Identity;
 using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
@@ -20,7 +19,7 @@ public class ProductController(
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllProducts([FromQuery] int page)
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllProducts([FromQuery] int page)
     {
         try
         {
@@ -37,7 +36,7 @@ public class ProductController(
     }
     
     [HttpGet("{id:int}", Name = "getProductById")]
-    public async Task<ActionResult<GetMinimalProductDto>> GetProductById(int id)
+    public async Task<ActionResult<GetDetailProductDto>> GetProductById(int id)
     {
         try
         {
@@ -72,7 +71,7 @@ public class ProductController(
     }
 
     [HttpGet("search/{query}")]
-    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> SearchProduct([FromQuery] int page, string query)
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct([FromQuery] int page, string query)
     {
         try
         {
@@ -91,7 +90,7 @@ public class ProductController(
     [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     [RequirePharmacyId]
-    public async Task<ActionResult<IEnumerable<GetMinimalProductDto>>> GetAllPharmacyProducts([FromQuery] int page, [FromQuery] int? pharmacyId = null)
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllPharmacyProducts([FromQuery] int page, [FromQuery] int? pharmacyId = null)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
@@ -143,7 +142,7 @@ public class ProductController(
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
     [RequirePharmacyId]
-    public async Task<ActionResult<GetMinimalProductDto>> CreateProduct([FromBody] CreateProductDto productDto)
+    public async Task<ActionResult<GetProductDto>> CreateProduct([FromBody] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");

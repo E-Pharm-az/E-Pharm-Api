@@ -11,6 +11,8 @@ public class DosageFormProfile : Profile
     {
         CreateMap<CreateDosageFormDto, DosageForm>();
         CreateMap<DosageForm, GetDosageFormDto>();
-        CreateMap<ProductDosageForm, GetDosageFormDto>().IncludeMembers(src => src.DosageForm);
+        CreateMap<ProductDosageForm, GetDosageFormDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.DosageForm.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.DosageForm.Name));
     }
 }

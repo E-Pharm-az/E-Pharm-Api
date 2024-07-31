@@ -11,6 +11,9 @@ public class SideEffectProfile : Profile
     {
         CreateMap<CreateSideEffectDto, SideEffect>();
         CreateMap<SideEffect, GetSideEffectDto>();
-        CreateMap<ProductSideEffect, GetSideEffectDto>().IncludeMembers(src => src.SideEffect);
+        CreateMap<ProductSideEffect, GetSideEffectDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.SideEffect.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.SideEffect.Name))
+            .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.SideEffect.Description));
     }
 }

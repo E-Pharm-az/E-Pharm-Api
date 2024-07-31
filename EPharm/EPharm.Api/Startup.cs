@@ -187,7 +187,7 @@ public class Startup(IConfiguration configuration)
 
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IManufacturerService, ManufacturerService>();
-        services.AddScoped<IActiveIngredientService, ActiveIngredientService>();
+        services.AddScoped<IActiveIngredientsService, ActiveIngredientsService>();
         services.AddScoped<ISpecialRequirementService, SpecialRequirementService>();
         services.AddScoped<IRegulatoryInformationService, RegulatoryInformationService>();
         services.AddScoped<IAllergyService, AllergyService>();

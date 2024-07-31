@@ -2,7 +2,7 @@ using EPharm.Domain.Dtos.StockDto;
 
 namespace EPharm.Domain.Dtos.ProductDtos;
 
-public class GetMinimalProductDto
+public class GetProductDto
 {
     public int Id { get; set; }
     public int PharmacyId { get; set; }

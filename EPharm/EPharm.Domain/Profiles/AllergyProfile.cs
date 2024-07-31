@@ -11,6 +11,8 @@ public class AllergyProfile : Profile
     {
         CreateMap<CreateAllergyDto, Allergy>();
         CreateMap<Allergy, GetAllergyDto>();
-        CreateMap<ProductAllergy, GetAllergyDto>().IncludeMembers(src => src.Allergy);
+        CreateMap<ProductAllergy, GetAllergyDto>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Allergy.Id))
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Allergy.Name));
     }
 }
