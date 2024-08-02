@@ -1,6 +1,6 @@
-using EPharm.Domain.Dtos.SpecialRequirementsDto;
+using EPharm.Domain.Dtos.WarehouseDto;
+using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
-using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
 using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -12,12 +12,12 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class SpecialRequirementController(ISpecialRequirementService specialRequirementService, IPharmacyService pharmacyService) : ControllerBase
+public class WarehousesController(IWarehouseService warehouseService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     [RequirePharmacyId]
-    public async Task<ActionResult<IEnumerable<GetSpecialRequirementDto>>> GetAllPharmacySpecialRequirements([FromQuery] int? pharmacyId = null)
+    public async Task<ActionResult<IEnumerable<GetWarehouseDto>>> GetAllCompanyWarehouses([FromQuery] int? pharmacyId = null)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
@@ -36,21 +36,22 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
 
         try
         {
-            var result = await specialRequirementService.GetAllPharmacySpecialRequirementsAsync(pharmacyId.Value);
+            var result = await warehouseService.GetAllCompanyWarehousesAsync(pharmacyId.Value);
             if (result.Any()) return Ok(result);
 
-            return NotFound("Special requirements not found.");
+            return NotFound("Warehouses not found.");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "An unexpected error occurred while getting special requirements for pharmacy.");
+            Log.Error(ex, "An unexpected error occurred while getting warehouses for pharmacy.");
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-
+    
     [HttpGet("{id:int}")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
-    public async Task<ActionResult<GetSpecialRequirementDto>> GetSpecialRequirementById(int id, [FromQuery] int? pharmacyId = null)
+    [RequirePharmacyId]
+    public async Task<ActionResult<GetWarehouseDto>> GetWarehouseById(int id, [FromQuery] int? pharmacyId = null)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
@@ -66,12 +67,12 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         {
             pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
         }
-
+        
         try
         {
-            var result = await specialRequirementService.GetSpecialRequirementByIdAsync(id);
+            var result = await warehouseService.GetWarehouseByIdAsync(id);
             if (result is null)
-                return NotFound($"Special requirement with ID: {id} not found.");
+                return NotFound($"Warehouse with ID: {id} not found.");
             
             if (result.PharmacyId != pharmacyId.Value)
                 return Forbid();
@@ -80,19 +81,19 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "An unexpected error occurred while getting special requirement.");
+            Log.Error(ex, "An unexpected error occurred while getting warehouse.");
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-
+    
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
     [RequirePharmacyId]
-    public async Task<ActionResult<GetSpecialRequirementDto>> CreateSpecialRequirement([FromBody] CreateSpecialRequirementDto specialRequirementDto, [FromQuery] int? pharmacyId = null)
+    public async Task<ActionResult<GetWarehouseDto>> CreateWarehouse([FromBody] CreateWarehouseDto warehouseDto, [FromQuery] int? pharmacyId = null)
     {
         if (!ModelState.IsValid)
-            return BadRequest("Model not valid.");
-
+            return BadRequest("Model not valid");
+        
         if (User.IsInRole(IdentityData.Admin))
         {
             if (pharmacyId is null)
@@ -107,65 +108,59 @@ public class SpecialRequirementController(ISpecialRequirementService specialRequ
         {
             pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
         }
-
+        
         try
         {
-            var result = await specialRequirementService.AddPharmacySpecialRequirementAsync(pharmacyId.Value, specialRequirementDto);
+            var result = await warehouseService.CreateWarehouseAsync(pharmacyId.Value, warehouseDto);
             return Ok(result);
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "An unexpected error occurred while creating special requirement for pharmacy.");
+            Log.Error(ex, "An unexpected error occurred while creating warehouse.");
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-
+    
     [HttpPut("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
-    public async Task<ActionResult> UpdateSpecialRequirement(int pharmaCompanyId, int id, [FromBody] CreateSpecialRequirementDto specialRequirement)
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
+    public async Task<ActionResult> UpdateWarehouse(int pharmaCompanyId, int id, CreateWarehouseDto warehouseDto)
     {
         if (!ModelState.IsValid)
-            return BadRequest("Model not valid.");
-
+            return BadRequest("Model not valid");
+        
         var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
+        
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
-
-        if (!User.IsInRole(IdentityData.Admin))
-        {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            
-            if (company.Owner.Id != userId)
-                return Forbid();
-        }
-
-        var result = await specialRequirementService.UpdatePharmacySpecialRequirementAsync(id, specialRequirement);
+        
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+        
+        if (company.Owner.Id != userId)
+            return Forbid();
+        
+        var result = await warehouseService.UpdateWarehouseAsync(id, warehouseDto);
         if (result) return Ok();
         
-        return BadRequest("Failed to update special requirement.");
+        return BadRequest($"Warehouse with ID: {id} could not be updated.");
     }
-
+    
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
-    public async Task<ActionResult> DeleteSpecialRequirement(int pharmaCompanyId, int id)
+    [Authorize(Roles = IdentityData.PharmacyStaff)]
+    public async Task<ActionResult> DeleteWarehouse(int pharmaCompanyId, int id)
     {
         var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-
+        
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
-
-        if (!User.IsInRole(IdentityData.Admin))
-        {
-            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-            
-            if (company.Owner.Id != userId)
-                return Forbid();
-        }
         
-        var result = await specialRequirementService.DeletePharmacySpecialRequirementAsync(id);
+        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+         
+        if (company.Owner.Id != userId)
+            return Forbid();
+        
+        var result = await warehouseService.DeleteWarehouseAsync(id);
         if (result) return Ok();
-        
-        return BadRequest("Failed to delete special requirement.");
+
+        return BadRequest($"Warehouse with ID: {id} could not be deleted.");
     }
 }

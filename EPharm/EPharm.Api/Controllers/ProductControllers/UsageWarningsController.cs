@@ -8,8 +8,8 @@ using Serilog;
 namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class UsageWarningController(IUsageWarningService usageWarningService) : ControllerBase
+[Route("api/usage-warnings")]
+public class UsageWarningsController(IUsageWarningService usageWarningService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetUsageWarningDto>>> GetAllUsageWarnings()

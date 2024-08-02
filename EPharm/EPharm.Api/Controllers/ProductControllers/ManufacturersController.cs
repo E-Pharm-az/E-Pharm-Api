@@ -1,6 +1,6 @@
-using EPharm.Domain.Dtos.WarehouseDto;
-using EPharm.Domain.Interfaces.CommonContracts;
+using EPharm.Domain.Dtos.ManufacturerDto;
 using EPharm.Domain.Interfaces.PharmaContracts;
+using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
 using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
@@ -12,12 +12,14 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class WarehouseController(IWarehouseService warehouseService, IPharmacyService pharmacyService) : ControllerBase
+public class ManufacturersController(IManufacturerService manufacturerService, IPharmacyService pharmacyService) : ControllerBase
 {
+    // TODO: Add get all manufacturers without duplicates method (PUBLIC)
+    
     [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     [RequirePharmacyId]
-    public async Task<ActionResult<IEnumerable<GetWarehouseDto>>> GetAllCompanyWarehouses([FromQuery] int? pharmacyId = null)
+    public async Task<ActionResult<IEnumerable<GetManufacturerDto>>> GetAllPharmacyManufacturers([FromQuery] int? pharmacyId = null)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
@@ -36,22 +38,24 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
 
         try
         {
-            var result = await warehouseService.GetAllCompanyWarehousesAsync(pharmacyId.Value);
-            if (result.Any()) return Ok(result);
+            var result = await manufacturerService.GetAllCompanyManufacturersAsync(pharmacyId.Value);
 
-            return NotFound("Warehouses not found.");
+            if (result.Any())
+                return Ok(result);
+
+            return NotFound("Manufacturers not found.");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "An unexpected error occurred while getting warehouses for pharmacy.");
+            Log.Error(ex, "An unexpected error occurred while getting manufacturers for pharmacy.");
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-    
+
     [HttpGet("{id:int}")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     [RequirePharmacyId]
-    public async Task<ActionResult<GetWarehouseDto>> GetWarehouseById(int id, [FromQuery] int? pharmacyId = null)
+    public async Task<ActionResult<GetManufacturerDto>> GetManufacturerById(int id, [FromQuery] int? pharmacyId = null)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
@@ -67,12 +71,12 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
         {
             pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
         }
-        
+
         try
         {
-            var result = await warehouseService.GetWarehouseByIdAsync(id);
+            var result = await manufacturerService.GetManufacturerByIdAsync(id);
             if (result is null)
-                return NotFound($"Warehouse with ID: {id} not found.");
+                return NotFound("Manufacturer not found.");
             
             if (result.PharmacyId != pharmacyId.Value)
                 return Forbid();
@@ -81,18 +85,18 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "An unexpected error occurred while getting warehouse.");
+            Log.Error(ex, "An unexpected error occurred while getting manufacturer.");
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-    
+
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
     [RequirePharmacyId]
-    public async Task<ActionResult<GetWarehouseDto>> CreateWarehouse([FromBody] CreateWarehouseDto warehouseDto, [FromQuery] int? pharmacyId = null)
+    public async Task<ActionResult<GetManufacturerDto>> CreateManufacturer([FromBody] CreateManufacturerDto manufacturerDto, [FromQuery] int? pharmacyId = null)
     {
         if (!ModelState.IsValid)
-            return BadRequest("Model not valid");
+            return BadRequest("Model not valid.");
         
         if (User.IsInRole(IdentityData.Admin))
         {
@@ -111,56 +115,63 @@ public class WarehouseController(IWarehouseService warehouseService, IPharmacySe
         
         try
         {
-            var result = await warehouseService.CreateWarehouseAsync(pharmacyId.Value, warehouseDto);
+            var result = await manufacturerService.CreateManufacturerAsync(pharmacyId.Value, manufacturerDto);
             return Ok(result);
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
-            Log.Error(ex, "An unexpected error occurred while creating warehouse.");
+            Log.Error(ex, "An unexpected error occurred while creating manufacturer.");
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-    
+
     [HttpPut("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmacyStaff)]
-    public async Task<ActionResult> UpdateWarehouse(int pharmaCompanyId, int id, CreateWarehouseDto warehouseDto)
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
+    public async Task<ActionResult> UpdateManufacturer(int pharmaCompanyId, int id, [FromBody] CreateManufacturerDto manufacturerDto)
     {
         if (!ModelState.IsValid)
-            return BadRequest("Model not valid");
+            return BadRequest("Model not valid.");
         
         var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
         
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+        if (!User.IsInRole(IdentityData.Admin))
+        {
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            if (company.Owner.Id != userId)
+                return Forbid();
+        }
+
+        var result = await manufacturerService.UpdateManufacturerAsync(id, manufacturerDto);
         
-        if (company.Owner.Id != userId)
-            return Forbid();
-        
-        var result = await warehouseService.UpdateWarehouseAsync(id, warehouseDto);
-        if (result) return Ok();
-        
-        return BadRequest($"Warehouse with ID: {id} could not be updated.");
+        if (result) return Ok("Manufacturer updated successfully.");
+
+        Log.Error("Error updating manufacturer with ID: {Id}", id);
+        return NotFound($"Error updating manufacturer with ID: {id}");
     }
-    
+
     [HttpDelete("{id:int}")]
-    [Authorize(Roles = IdentityData.PharmacyStaff)]
-    public async Task<ActionResult> DeleteWarehouse(int pharmaCompanyId, int id)
+    [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
+    public async Task<ActionResult> DeleteManufacturer(int pharmaCompanyId, int id)
     {
         var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
         
         if (company is null)
             return NotFound("Pharmaceutical company not found.");
         
-        var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-         
-        if (company.Owner.Id != userId)
-            return Forbid();
+        if (!User.IsInRole(IdentityData.Admin))
+        {
+            var userId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+            
+            if (company.Owner.Id != userId)
+                return Forbid();
+        } 
         
-        var result = await warehouseService.DeleteWarehouseAsync(id);
-        if (result) return Ok();
+        var result = await manufacturerService.DeleteManufacturerAsync(id);
+        if (result) return NoContent();
 
-        return BadRequest($"Warehouse with ID: {id} could not be deleted.");
+        return NotFound($"Manufacturer with ID: {id} not found.");
     }
 }

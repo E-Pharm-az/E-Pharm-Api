@@ -9,7 +9,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AllergyController(IAllergyService allergyService) : ControllerBase
+public class AllergiesController(IAllergyService allergyService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetAllergyDto>>> GetAllAllergies()

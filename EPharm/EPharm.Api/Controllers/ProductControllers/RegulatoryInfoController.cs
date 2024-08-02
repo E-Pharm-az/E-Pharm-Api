@@ -11,8 +11,8 @@ using Serilog;
 namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class RegulatoryInformationController(IRegulatoryInformationService regulatoryInformationService, IPharmacyService pharmacyService) : ControllerBase
+[Route("api/regulatory-info")]
+public class RegulatoryInfoController(IRegulatoryInformationService regulatoryInformationService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]

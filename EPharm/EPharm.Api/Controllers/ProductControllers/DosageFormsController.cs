@@ -9,7 +9,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class DosageFormController(IDosageFormService dosageFormService) : ControllerBase
+public class DosageFormsController(IDosageFormService dosageFormService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetDosageFormDto>>> GetAllDosageForms()

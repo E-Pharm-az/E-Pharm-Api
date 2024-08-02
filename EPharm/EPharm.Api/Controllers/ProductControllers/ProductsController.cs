@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProductController(
+public class ProductsController(
     IProductService productService,
     IPharmacyService pharmacyService
 ) : ControllerBase

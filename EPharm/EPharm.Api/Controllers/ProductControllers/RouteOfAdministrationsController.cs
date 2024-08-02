@@ -8,8 +8,8 @@ using Serilog;
 namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class RouteOfAdministrationController(IRouteOfAdministrationService routeOfAdministrationService) : ControllerBase
+[Route("api/roa")]
+public class RouteOfAdministrationsController(IRouteOfAdministrationService routeOfAdministrationService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetRouteOfAdministrationDto>>> GetAllRouteOfAdministrations()

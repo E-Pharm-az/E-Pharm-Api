@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-public class OrderController(IOrderService orderService, IPharmacyService pharmacyService) : ControllerBase
+public class OrdersController(IOrderService orderService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]

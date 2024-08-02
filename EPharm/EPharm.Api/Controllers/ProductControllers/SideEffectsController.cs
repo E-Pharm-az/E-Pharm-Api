@@ -8,8 +8,8 @@ using Serilog;
 namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
-[Route("api/[controller]")]
-public class SideEffectController(ISideEffectService sideEffectService) : ControllerBase
+[Route("api/side-effects")]
+public class SideEffectsController(ISideEffectService sideEffectService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetSideEffectDto>>> GetAllSideEffects()

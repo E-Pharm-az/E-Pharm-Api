@@ -9,7 +9,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class IndicationController(IIndicationService indicationService) : ControllerBase
+public class IndicationsController(IIndicationService indicationService) : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult<IEnumerable<GetIndicationDto>>> GetAllIndications()
