@@ -152,14 +152,14 @@ public class PharmacyService(
         return result > 0;
     }
 
-    public async Task<bool> DeleteAsync(int pharmaCompanyId)
+    public async Task<bool> DeleteAsync(int pharmacyId)
     {
-        var pharmaCompany = await pharmacyRepository.GetByIdAsync(pharmaCompanyId);
+        var pharmacy = await pharmacyRepository.GetByIdAsync(pharmacyId);
 
-        if (pharmaCompany is null)
+        if (pharmacy is null)
             return false;
         
-        var pharmacyStaff = await pharmacyStaffRepository.GetAllAsync(pharmaCompany.Id);
+        var pharmacyStaff = await pharmacyStaffRepository.GetAllAsync(pharmacy.Id);
 
         try
         {
@@ -171,16 +171,17 @@ public class PharmacyService(
                 await userService.DeleteUserAsync(staff.ExternalId);
             }
 
-            pharmacyRepository.Delete(pharmaCompany);
+            pharmacyRepository.Delete(pharmacy);
 
-            await unitOfWork.CommitTransactionAsync();
             await unitOfWork.SaveChangesAsync();
+            await unitOfWork.CommitTransactionAsync();
+            
             return true;
         }
         catch
         {
             await unitOfWork.RollbackTransactionAsync();
-            throw;
+            return false;
         }
     }
 

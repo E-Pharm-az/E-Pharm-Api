@@ -13,5 +13,5 @@ public interface IPharmacyService
     public Task<GetPharmacyDto> Register(CreatePharmaDto createPharmaDto);
     public Task<GetPharmacyDto> CreateAsync(string userId, CreatePharmacyDto createPharmacyDto);
     public Task<bool> UpdateAsync(int id, CreatePharmacyDto pharmacyDto);
-    public Task<bool> DeleteAsync(int pharmaCompanyId);
+    public Task<bool> DeleteAsync(int pharmacyId);
 }

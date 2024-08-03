@@ -9,7 +9,7 @@ using Serilog;
 namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
-[Route("api/active-ingredient")]
+[Route("api/active-ingredients")]
 public class ActiveIngredientsController(IActiveIngredientsService activeIngredientsService, IProductService productService) : ControllerBase
 {
     [HttpGet]
