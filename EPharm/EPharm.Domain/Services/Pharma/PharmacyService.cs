@@ -49,14 +49,20 @@ public class PharmacyService(
         return mapper.Map<IEnumerable<GetPharmacyDto>>(pharmaCompanies);
     }
 
-    public async Task InviteAsync(EmailDto emailDto)
+    public async Task InviteAsync(InvitePharmacyDto invitePharmacyDto)
     {
-        var user = await userService.CreateUserAsync(emailDto, [IdentityData.PharmacyAdmin, IdentityData.PharmacyStaff]);
+        var user = await userService.CreateUserAsync(invitePharmacyDto, [IdentityData.PharmacyAdmin, IdentityData.PharmacyStaff]);
         
         var existingPharmacyStaff = await pharmacyStaffService.GetByExternalIdAsync(user.Id);
         if (existingPharmacyStaff is null)
         {
-            var pharmacy = await pharmacyRepository.InsertAsync(new Pharmacy { OwnerId = user.Id });
+            var pharmacy = await pharmacyRepository.InsertAsync(new Pharmacy
+            {
+                OwnerId = user.Id,
+                Name = invitePharmacyDto.PharmacyName,
+                OwnerEmail = invitePharmacyDto.Email
+            });
+            
             await pharmacyStaffService.CreateAsync(new CreatePharmacyStaffDto
             {
                 ExternalId = user.Id,

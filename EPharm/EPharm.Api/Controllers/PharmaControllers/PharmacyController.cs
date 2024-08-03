@@ -50,7 +50,7 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
     [HttpPost]
     [Route("invite")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<IActionResult> Invite([FromBody] EmailDto request)
+    public async Task<IActionResult> Invite([FromBody] InvitePharmacyDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
