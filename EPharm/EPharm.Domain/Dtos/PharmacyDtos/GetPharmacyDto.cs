@@ -13,4 +13,5 @@ public class GetPharmacyDto
     public string Phone { get; set; }
     public string Website { get; set; }
     public string Address { get; set; }
+    public bool IsActive { get; set; }
 }

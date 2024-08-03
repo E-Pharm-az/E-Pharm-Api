@@ -101,6 +101,7 @@ public class PharmacyService(
             throw new Exception("PHARMACY_NOT_FOUND");
 
         mapper.Map(createPharmacyDto, pharmacy);
+        pharmacy.IsActive = true;
         pharmacyRepository.Update(pharmacy);
         await pharmacyRepository.SaveChangesAsync();
 
@@ -165,7 +166,10 @@ public class PharmacyService(
             await unitOfWork.BeginTransactionAsync();
 
             foreach (var staff in pharmacyStaff)
+            {
                 pharmacyStaffRepository.Delete(staff);
+                await userService.DeleteUserAsync(staff.ExternalId);
+            }
 
             pharmacyRepository.Delete(pharmaCompany);
 

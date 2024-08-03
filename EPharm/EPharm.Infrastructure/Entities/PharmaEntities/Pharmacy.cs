@@ -27,5 +27,6 @@ public class Pharmacy : BaseEntity
     public ICollection<SpecialRequirement> SpecialRequirements { get; set; }
     public ICollection<UsageWarning> UsageWarnings { get; set; }
     
+    public bool IsActive { get; set; }
     public DateTime CreatedAt { get; set; } 
 }
