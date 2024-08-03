@@ -70,8 +70,8 @@ public class ProductsController(
         }
     }
 
-    [HttpGet("search/{query}")]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct([FromQuery] int page, string query)
+    [HttpGet("search")]
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct([FromQuery] string query, [FromQuery] int page)
     {
         try
         {
