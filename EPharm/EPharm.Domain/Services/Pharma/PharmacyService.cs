@@ -19,6 +19,7 @@ public class PharmacyService(
     IConfiguration config,
     IPharmacyRepository pharmacyRepository,
     IPharmacyStaffService pharmacyStaffService,
+    IPharmacyStaffRepository pharmacyStaffRepository,
     IUserService userService,
     UserManager<AppIdentityUser> userManager,
     IEmailSender emailSender,
@@ -150,11 +151,27 @@ public class PharmacyService(
 
         if (pharmaCompany is null)
             return false;
+        
+        var pharmacyStaff = await pharmacyStaffRepository.GetAllAsync(pharmaCompany.Id);
 
-        pharmacyRepository.Delete(pharmaCompany);
+        try
+        {
+            await unitOfWork.BeginTransactionAsync();
 
-        var result = await pharmacyRepository.SaveChangesAsync();
-        return result > 0;
+            foreach (var staff in pharmacyStaff)
+                pharmacyStaffRepository.Delete(staff);
+
+            pharmacyRepository.Delete(pharmaCompany);
+
+            await unitOfWork.CommitTransactionAsync();
+            await unitOfWork.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            await unitOfWork.RollbackTransactionAsync();
+            throw;
+        }
     }
 
     private async Task<GetPharmacyDto> CreatePharmacyAsync(CreatePharmacyDto pharmacyDto, string ownerId)

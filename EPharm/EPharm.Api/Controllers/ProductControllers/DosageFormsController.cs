@@ -8,7 +8,7 @@ using Serilog;
 namespace EPharmApi.Controllers.ProductControllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/dosage-forms")]
 public class DosageFormsController(IDosageFormService dosageFormService) : ControllerBase
 {
     [HttpGet]

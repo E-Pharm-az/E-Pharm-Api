@@ -24,9 +24,9 @@ public class PharmacyStaffService(
     IEmailSender emailSender,
     IMapper mapper) : IPharmacyStaffService
 {
-    public async Task<IEnumerable<GetPharmacyStaffDto>> GetAllAsync(int companyId)
+    public async Task<IEnumerable<GetPharmacyStaffDto>> GetAllAsync(int pharmacyId)
     {
-        var pharmaCompanyManagers = await pharmacyStaffRepository.GetAllAsync(companyId);
+        var pharmaCompanyManagers = await pharmacyStaffRepository.GetAllAsync(pharmacyId);
         return mapper.Map<IEnumerable<GetPharmacyStaffDto>>(pharmaCompanyManagers);
     }
 
