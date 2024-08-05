@@ -24,4 +24,5 @@ RUN dotnet publish "EPharm.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+COPY EPharm.Api/Emails /app/Emails
 ENTRYPOINT ["dotnet", "EPharm.Api.dll"]

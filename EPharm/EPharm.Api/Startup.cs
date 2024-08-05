@@ -135,8 +135,8 @@ public class Startup(IConfiguration configuration)
             );
 
             ops.AddPolicy("ApiCorsPolicy", policy =>
-                policy.WithOrigins("https://www.e-pharm.co", "https://www.pharma.e-pharm.co",
-                        "https://www.admin.pharma.e-pharm.co", "https://localhost:5270", "http://localhost:5270")
+                policy.WithOrigins("https://www.e-pharm.co", "https://www.pms.e-pharm.co",
+                        "https://www.admin.e-pharm.co", "https://localhost:5270")
                     .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
@@ -238,9 +238,9 @@ public class Startup(IConfiguration configuration)
         app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
         dbSeeder.SeedSuperAdminAsync().Wait();
+        emailService.CompileEmail("pharmacy-invitation", "Emails/pharmacy_invitation.html").Wait();
+        emailService.CompileEmail("pharmacy-staff-invitation", "Emails/pharmacy_staff_invitation.html").Wait();
+        emailService.CompileEmail("change-password", "Emails/change_password.html").Wait();
         emailService.CompileEmail("confirmation", "Emails/confirmation.html").Wait();
-        emailService.CompileEmail("change-password", "Emails/change-password.html").Wait();
-        emailService.CompileEmail("pharmacy-invitation", "Emails/pharmacy-invitation.html").Wait();
-        emailService.CompileEmail("pharmacy-staff-invitation", "Emails/pharmacy-staff-invitation.html").Wait();
     }
 }
