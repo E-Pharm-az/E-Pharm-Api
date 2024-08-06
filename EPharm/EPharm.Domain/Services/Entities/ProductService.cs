@@ -74,7 +74,6 @@ public class ProductService(
         await productRepository.SaveChangesAsync();
     }
 
-    // TODO: Fix data leak issue
     public async Task<GetProductDto> CreateProductAsync(int pharmaCompanyId, CreateProductDto productDto)
     {
         try
@@ -84,8 +83,6 @@ public class ProductService(
 
             if (productDto.Image is { Length: > 0 })
                 productEntity.ImageUrl = await productImageService.UploadProductImageAsync(productDto.Image);
-
-            productEntity.ImageUrl = productDto.ImageURL;
 
             await unitOfWork.BeginTransactionAsync();
 

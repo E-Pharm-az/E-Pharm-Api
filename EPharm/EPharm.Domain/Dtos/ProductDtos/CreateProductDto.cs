@@ -9,7 +9,6 @@ public class CreateProductDto
     public string Description { get; set; }
 
     public byte[]? Image { get; set; }
-    public string? ImageURL { get; set; }
     public decimal StrengthMg { get; set; }
     public int? MaxDayFrequency { get; set; }
     public int? MaxSupplyInDaysDays { get; set; }

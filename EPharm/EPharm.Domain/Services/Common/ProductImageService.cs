@@ -1,69 +1,32 @@
-using System.Net;
-using Amazon.Runtime;
-using Amazon.S3;
-using Amazon.S3.Model;
 using EPharm.Domain.Interfaces.CommonContracts;
-using Microsoft.AspNetCore.Http;
+using Imagekit.Sdk;
 using Microsoft.Extensions.Configuration;
 
 namespace EPharm.Domain.Services.Common;
 
-public class ProductImageService : IProductImageService
+public class ProductImageService(IConfiguration configuration) : IProductImageService
 {
-    private readonly IConfiguration _configuration;
-    private readonly AmazonS3Client _s3Client;
-
-    public ProductImageService(IConfiguration configuration)
-    {
-        _configuration = configuration;
-
-        var credentials = new BasicAWSCredentials(
-            _configuration["AwsConfig:AccessKey"],
-            _configuration["AwsConfig:SecretKey"]
-        );
-
-        var config = new AmazonS3Config
-        {
-            RegionEndpoint = Amazon.RegionEndpoint.EUCentral1
-        };
-
-        _s3Client = new AmazonS3Client(credentials, config);
-    }
-
+    private readonly ImagekitClient _imagekitClient = new (configuration["ImageKit:PublicKey"], configuration["ImageKit:PrivateKey"], configuration["ImageKit:UrlEndPoint"]);
+    
     public async Task<string> UploadProductImageAsync(byte[] imageData)
     {
         if (imageData == null || imageData.Length == 0)
-        {
             throw new ArgumentException("Image data is null or empty", nameof(imageData));
-        }
 
         using var memoryStream = new MemoryStream(imageData);
 
-        var request = new PutObjectRequest
+        var ob = new FileCreateRequest
         {
-            BucketName = _configuration["AwsConfig:ImageBucket"],
-            Key = "product-images/" + Guid.NewGuid(),
-            InputStream = memoryStream,
-            ContentType = "image/jpeg" // Note: You might want to determine this dynamically based on the actual image type
+            file = imageData,
+            fileName = Guid.NewGuid().ToString()
         };
 
-        var response = await _s3Client.PutObjectAsync(request);
-
-        if (response.HttpStatusCode == HttpStatusCode.OK)
-            return $"https://{_configuration["AwsConfig:ImageBucket"]}.s3.eu-central-1.amazonaws.com/{request.Key}";
-
-        throw new InvalidOperationException("Failed to upload image");
+        var result = await _imagekitClient.UploadAsync(ob);
+        return result.url;
     }
+
     public async Task<bool> DeleteProductImageAsync(string imageUrl)
     {
-        var request = new DeleteObjectRequest
-        {
-            BucketName = _configuration["AwsConfig:ImageBucket"],
-            Key = imageUrl.Split("/").Last()
-        };
-
-        var response = await _s3Client.DeleteObjectAsync(request);
-
-        return response.HttpStatusCode == HttpStatusCode.OK;
+        throw new NotImplementedException();
     }
 }

@@ -200,10 +200,19 @@ public class AuthController(
 
     [HttpPost]
     [Route("logout")]
-    public async Task<IActionResult> Logout()
+    public IActionResult Logout()
     {
-        HttpContext.Response.Cookies.Delete("accessToken");
-        HttpContext.Response.Cookies.Delete("refreshToken");
+        var cookieOptions = new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            IsEssential = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(-1)
+        };
+
+        Response.Cookies.Delete("accessToken", cookieOptions);
+        Response.Cookies.Delete("refreshToken", cookieOptions);
 
         return Ok();
     }
@@ -275,8 +284,9 @@ public class AuthController(
             HttpOnly = true,
             Secure = true,
             IsEssential = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = expires
+            SameSite = SameSiteMode.None,
+            Expires = expires,
+            Domain = ".e-pharm.co"
         });
     }
 }
