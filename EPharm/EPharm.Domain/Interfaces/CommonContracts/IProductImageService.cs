@@ -4,6 +4,6 @@ namespace EPharm.Domain.Interfaces.CommonContracts;
 
 public interface IProductImageService
 {
-    public Task<string> UploadProductImageAsync(byte[] imageData);
+    public Task<string> UploadProductImageAsync(IFormFile imageData);
     public Task<bool> DeleteProductImageAsync(string imageUrl);
 }

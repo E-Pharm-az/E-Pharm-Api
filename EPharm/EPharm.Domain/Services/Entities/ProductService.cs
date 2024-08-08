@@ -97,7 +97,7 @@ public class ProductService(
                     Quantity = stock.Quantity
                 });
             }
-
+            
             await productActiveIngredientRepository.InsertAsync(product.Id, productDto.ActiveIngredientsIds);
             if (productDto.AllergiesIds is not null)
                 await productAllergyRepository.InsertAsync(product.Id, productDto.AllergiesIds);

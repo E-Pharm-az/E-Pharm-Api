@@ -286,7 +286,6 @@ public class AuthController(
             IsEssential = true,
             SameSite = SameSiteMode.None,
             Expires = expires,
-            Domain = ".e-pharm.co"
         });
     }
 }

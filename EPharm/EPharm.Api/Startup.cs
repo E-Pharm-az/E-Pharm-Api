@@ -4,7 +4,6 @@ using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Services.Common;
-using EPharm.Domain.Services.Jwt;
 using EPharm.Domain.Services.Pharma;
 using EPharm.Domain.Services.Entities;
 using EPharm.Infrastructure.Context;
@@ -24,6 +23,7 @@ using EPharmApi.Services;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -141,6 +141,11 @@ public class Startup(IConfiguration configuration)
                     .AllowAnyMethod()
                     .WithHeaders("Content-Type", "Authorization")
             );
+        });
+        
+        services.Configure<FormOptions>(options =>
+        {
+            options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
         });
 
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());

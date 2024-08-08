@@ -142,7 +142,7 @@ public class ProductsController(
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
     [RequirePharmacyId]
-    public async Task<ActionResult<GetProductDto>> CreateProduct([FromBody] CreateProductDto productDto)
+    public async Task<ActionResult<GetProductDto>> CreateProduct([FromForm] CreateProductDto productDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");

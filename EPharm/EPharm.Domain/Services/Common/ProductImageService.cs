@@ -1,5 +1,6 @@
 using EPharm.Domain.Interfaces.CommonContracts;
 using Imagekit.Sdk;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
 namespace EPharm.Domain.Services.Common;
@@ -8,16 +9,18 @@ public class ProductImageService(IConfiguration configuration) : IProductImageSe
 {
     private readonly ImagekitClient _imagekitClient = new (configuration["ImageKit:PublicKey"], configuration["ImageKit:PrivateKey"], configuration["ImageKit:UrlEndPoint"]);
     
-    public async Task<string> UploadProductImageAsync(byte[] imageData)
+    public async Task<string> UploadProductImageAsync(IFormFile imageData)
     {
         if (imageData == null || imageData.Length == 0)
             throw new ArgumentException("Image data is null or empty", nameof(imageData));
 
-        using var memoryStream = new MemoryStream(imageData);
+        using var memoryStream = new MemoryStream();
+        await imageData.CopyToAsync(memoryStream);
+        var fileBytes = memoryStream.ToArray();
 
         var ob = new FileCreateRequest
         {
-            file = imageData,
+            file = fileBytes,
             fileName = Guid.NewGuid().ToString()
         };
 
