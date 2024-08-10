@@ -37,7 +37,7 @@ public class AuthService(
             throw new Exception("EMAIL_NOT_CONFIRMED");
 
         var roles = (await userManager.GetRolesAsync(user)).ToList();
-        if (!roles.Contains(role))
+        if (!roles.Contains(role.ToUpper()))
             throw new Exception("INVALID_ROLE");
 
         var response = await CreateTokenBasedOnRole(user, roles);
@@ -113,7 +113,7 @@ public class AuthService(
 
         var roles = (await userManager.GetRolesAsync(user)).ToList();
         
-        if (!roles.Contains(role))
+        if (!roles.Contains(role.ToUpper()))
             throw new Exception("INVALID_ROLE");
 
         var response = await CreateTokenBasedOnRole(user, roles);

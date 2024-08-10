@@ -13,10 +13,7 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(
-    IUserService userService,
-    UserManager<AppIdentityUser> userManager,
-    IConfiguration configuration) : ControllerBase
+public class UserController(IUserService userService, UserManager<AppIdentityUser> userManager) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
