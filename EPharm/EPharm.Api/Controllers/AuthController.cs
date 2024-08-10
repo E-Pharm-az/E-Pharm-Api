@@ -1,13 +1,6 @@
-using System.Security.Claims;
 using EPharm.Domain.Dtos.AuthDto;
-using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
-using EPharm.Domain.Interfaces.JwtContracts;
-using EPharm.Domain.Models.Identity;
 using EPharm.Domain.Models.Jwt;
-using EPharm.Infrastructure.Entities.Identity;
-using EPharm.Infrastructure.Interfaces.Pharma;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -15,181 +8,100 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AuthController(
-    IConfiguration configuration,
-    UserManager<AppIdentityUser> userManager,
-    IPharmacyRepository pharmacyRepository,
-    IPharmacyStaffRepository pharmacyStaffRepository,
-    ITokenService tokenService,
-    IUserService userService) : ControllerBase
+public class AuthController(IAuthService authService) : ControllerBase
 {
-    private const int MaxFailedLoginAttempts = 5;
-    private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
-
-    [HttpPost]
-    [Route("store/login")]
-    public async Task<IActionResult> StoreLogin([FromBody] AuthRequest request)
+    [HttpPost("{role}/login")]
+    public async Task<IActionResult> Login([FromBody] AuthRequest request, [FromRoute] string role)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        return await ProcessLoginAndHandleErrors(request, IdentityData.Customer);
-    }
-
-    [HttpPost]
-    [Route("pharmacy/login")]
-    public async Task<IActionResult> PharmacyLogin([FromBody] AuthRequest request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        return await ProcessLoginAndHandleErrors(request, IdentityData.PharmacyStaff);
-    }
-
-    [HttpPost]
-    [Route("admin/login")]
-    public async Task<IActionResult> AdminLogin([FromBody] AuthRequest request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        return await ProcessLoginAndHandleErrors(request, IdentityData.Admin);
-    }
-
-    private async Task<IActionResult> ProcessLoginAndHandleErrors(AuthRequest request, string requiredRole)
-    {
         try
         {
-            var response = await ProcessLogin(request, requiredRole);
+            var response = await authService.ProcessLoginAsync(request, role);
+            SetAuthCookies(response);
             return Ok(response);
         }
-        catch (Exception ex) when (ex.Message == "EMAIL_NOT_FOUND")
-        {
-            return BadRequest("Invalid email or password.");
-        }
-        catch (Exception ex) when (ex.Message == "BAD_CREDENTIALS")
+        catch (Exception ex) when (ex.Message == "INVALID_CREDENTIALS")
         {
             return BadRequest("Invalid email or password.");
         }
         catch (Exception ex) when (ex.Message == "EMAIL_NOT_CONFIRMED")
         {
-            return BadRequest("Invalid email or password.");
+            return BadRequest("Email not confirmed.");
+        }
+        catch (Exception ex) when (ex.Message == "INVALID_ROLE")
+        {
+            return StatusCode(403, "Invalid role for this user.");
         }
         catch (Exception ex)
         {
             Log.Error(ex, "Unexpected error during login for email: {Email}", request.Email);
-            return BadRequest("An unexpected error occurred. Please try again later.");
+            return StatusCode(500, "An unexpected error occurred. Please try again later.");
         }
     }
 
-    [HttpPost]
-    [Route("resend-confirmation-email")]
-    public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailDto request)
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto request)
     {
-        var user = await userManager.FindByEmailAsync(request.Email);
-        if (user == null)
-            return BadRequest("User not found");
-
         try
         {
-            await userService.SendEmailConfirmationAsync(user);
-            return Ok();
+            await authService.ConfirmEmailAsync(request);
+            return Ok("Email confirmed successfully");
+        }
+        catch (Exception ex) when (ex.Message == "INVALID_CODE")
+        {
+            return BadRequest("Invalid code.");
+        }
+        catch (Exception ex) when (ex.Message == "CODE_EXPIRED")
+        {
+            return BadRequest("Code expired.");
+        }
+        catch (Exception ex) when (ex.Message == "USER_NOT_FOUND")
+        {
+            return BadRequest("User not found.");
+        }
+        catch (Exception ex) when (ex.Message == "TOO_MANY_ATTEMPTS")
+        {
+            return BadRequest("Too many attempts.");
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error sending email.");
+            Log.Error(ex, "Unexpected error during email confirmation");
             return StatusCode(500, "An unexpected error occurred");
         }
     }
 
-    [HttpPost]
-    [Route("confirm-email")]
-    public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto request)
-    {
-        if (string.IsNullOrEmpty(request.Email))
-            return BadRequest("Invalid request parameters");
-
-        var user = await userManager.FindByEmailAsync(request.Email);
-
-        if (user == null)
-            return BadRequest("User not found");
-
-        // Checks if lockout duration ended
-        if (user.LockoutEnd > DateTime.UtcNow)
-            return BadRequest( "Too many attempts, please try again later.");
-
-        if (user.CodeVerificationFailedAttempts >= MaxFailedLoginAttempts)
-        {
-            // If failed attempts count is larger than max count, then if the lockout end expired, reset the count to 0. Else lock the user.
-            if (user.LockoutEnd < DateTime.UtcNow)
-            {
-                user.CodeVerificationFailedAttempts = 0;
-                await userManager.UpdateAsync(user);
-            }
-            else
-            {
-                user.LockoutEnd = DateTime.UtcNow.Add(LockoutDuration);
-                await userManager.UpdateAsync(user);
-                return BadRequest("To many tries, please try again later.");
-            }
-        }
-
-        if (user.Code == request.Code)
-        {
-            if (user.CodeExpiryTime > DateTime.UtcNow)
-            {
-                user.EmailConfirmed = true;
-                await userManager.UpdateAsync(user);
-                return Ok("Email confirmed successfully");
-            }
-
-            return BadRequest("Code expired. Please generate a new one.");
-        }
-
-        user.CodeVerificationFailedAttempts++;
-        await userManager.UpdateAsync(user);
-
-        return BadRequest("Invalid code.");
-    }
-
-    [HttpGet]
-    [Route("refresh-token")]
-    public async Task<IActionResult> RefreshToken()
+    [HttpGet("{role}/refresh-token")]
+    public async Task<IActionResult> RefreshToken([FromRoute] string role)
     {
         try
         {
-            var request = new TokenModel
-            {
-                Token = HttpContext.Request.Cookies["accessToken"],
-                RefreshToken = HttpContext.Request.Cookies["refreshToken"]
-            };
-
-            if (string.IsNullOrEmpty(request.Token) || string.IsNullOrEmpty(request.RefreshToken))
-                return BadRequest("Your session has expired. Please log in again.");
-
-            var principal = tokenService.GetPrincipalFromExpiredToken(request.Token);
-            if (principal == null)
-                return BadRequest("Unable to verify your session. Please try logging in again.");
-
-            var emailClaim = principal.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email)?.Value;
-
-            if (string.IsNullOrEmpty(emailClaim))
-                return BadRequest("Unable to verify your identity. Please log in again.");
-
-            var user = await userManager.FindByEmailAsync(emailClaim);
-
-            if (user == null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
-                return BadRequest("Your session has expired or is invalid. Please log in again to continue.");
-
-            var roles = (await userManager.GetRolesAsync(user)).ToList();
-
-            var response = await CreateTokenBasedOnRole(user, roles);
-            response.RefreshToken = user.RefreshToken;
-        
-            SetAccessTokenCookie(response.Token);
-            SetRefreshTokenCookie(user.RefreshToken);
-
+            var accessToken = HttpContext.Request.Cookies["accessToken"];
+            var refreshToken = HttpContext.Request.Cookies["refreshToken"];
+            
+            if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
+                return BadRequest("Token not found.");
+                
+            var response = await authService.RefreshTokenAsync(accessToken, refreshToken, role);
+            SetAuthCookies(response);
             return Ok(response);
+        }
+        catch (Exception ex) when (ex.Message == "INVALID_TOKEN")
+        {
+            return BadRequest("Invalid token.");
+        }
+        catch (Exception ex) when (ex.Message == "INVALID_ROLE")
+        {
+            return StatusCode(403, "Invalid role for this user.");
+        }
+        catch (Exception ex) when (ex.Message == "PHARMACY_NOT_FOUND")
+        {
+            return BadRequest("Pharmacy not found.");
+        }
+        catch (Exception ex) when (ex.Message == "PHARMACY_STAFF_NOT_FOUND")
+        {
+            return BadRequest("Pharmacy staff not found.");
         }
         catch (Exception ex)
         {
@@ -198,9 +110,20 @@ public class AuthController(
         }
     }
 
-    [HttpPost]
-    [Route("logout")]
+    [HttpPost("logout")]
     public IActionResult Logout()
+    {
+        RemoveAuthCookies();
+        return Ok();
+    }
+
+    private void SetAuthCookies(AuthResponse response)
+    {
+        SetCookie("accessToken", response.Token, DateTime.MaxValue);
+        SetCookie("refreshToken", response.RefreshToken, DateTime.UtcNow.AddDays(7));
+    }
+
+    private void RemoveAuthCookies()
     {
         var cookieOptions = new CookieOptions
         {
@@ -213,69 +136,7 @@ public class AuthController(
 
         Response.Cookies.Delete("accessToken", cookieOptions);
         Response.Cookies.Delete("refreshToken", cookieOptions);
-
-        return Ok();
     }
-
-    private async Task<AuthResponse> ProcessLogin(AuthRequest request, string requiredRole)
-    {
-        var user = await userManager.FindByEmailAsync(request.Email);
-        if (user == null)
-            throw new Exception("EMAIL_NOT_FOUND");
-
-        var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
-        if (!isPasswordValid)
-            throw new Exception("BAD_CREDENTIALS");
-
-        if (!user.EmailConfirmed)
-            throw new Exception("EMAIL_NOT_CONFIRMED");
-
-        var roles = (await userManager.GetRolesAsync(user)).ToList();
-        if (!roles.Contains(requiredRole))
-            throw new Exception("BAD_CREDENTIALS");
-
-        var auth = await CreateTokenBasedOnRole(user, roles);
-
-        user.RefreshToken = tokenService.RefreshToken();
-        auth.RefreshToken = user.RefreshToken;
-        user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"]));
-
-        await userManager.UpdateAsync(user);
-        
-        SetAccessTokenCookie(auth.Token);
-        SetRefreshTokenCookie(user.RefreshToken);
-
-        return auth;
-    }
-
-    private async Task<AuthResponse> CreateTokenBasedOnRole(AppIdentityUser user, List<string> roles)
-    {
-        if (roles.Contains(IdentityData.PharmacyAdmin))
-        {
-            var pharmacy = await pharmacyRepository.GetByOwnerId(user.Id);
-            if (pharmacy == null)
-                throw new Exception("PHARMACY_NOT_FOUND");
-            
-            return tokenService.CreateToken(user, roles, pharmacy.Id);
-        }
-
-        if (roles.Contains(IdentityData.PharmacyStaff))
-        {
-            var staff = await pharmacyStaffRepository.GetByExternalIdAsync(user.Id);
-            if (staff == null)
-                throw new Exception("PHARMACY_STAFF_NOT_FOUND");
-            
-            return tokenService.CreateToken(user, roles, staff.PharmacyId);
-        }
-
-        return tokenService.CreateToken(user, roles);
-    }
-
-    private void SetAccessTokenCookie(string value) =>
-        SetCookie("accessToken", value, DateTime.MaxValue);
-    
-    private void SetRefreshTokenCookie(string value) =>
-        SetCookie("refreshToken", value, DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"])));
 
     private void SetCookie(string key, string value, DateTime expires)
     {

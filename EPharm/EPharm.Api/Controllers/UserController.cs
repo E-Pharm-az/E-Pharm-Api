@@ -3,7 +3,9 @@ using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Identity;
+using EPharm.Infrastructure.Entities.Identity;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -11,7 +13,10 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UserController(IUserService userService, IConfiguration configuration) : ControllerBase
+public class UserController(
+    IUserService userService,
+    UserManager<AppIdentityUser> userManager,
+    IConfiguration configuration) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -47,12 +52,12 @@ public class UserController(IUserService userService, IConfiguration configurati
         }
         catch (InvalidOperationException ex)
         {
-            Log.Error("Error creating user, {Error}", ex.Message);
+            Log.Error(ex, "Error creating user.");
             return StatusCode(StatusCodes.Status409Conflict, new { message = "User with this email already exists." });
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating user, {Error}", ex.Message);
+            Log.Error(ex, "Error creating user.");
             return BadRequest("Error creating user.");
         }
     }
@@ -90,6 +95,30 @@ public class UserController(IUserService userService, IConfiguration configurati
             return StatusCode(500, new { error = "An unexpected error occurred", code = "INTERNAL_SERVER_ERROR" });
         }
     }
+    
+    
+    [HttpPost("resend-confirmation-email")]
+    public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailDto request)
+    {
+        try
+        {
+            var user = await userManager.FindByEmailAsync(request.Email);
+            if (user is null)
+                return NotFound("User not found");
+
+            await userService.SendEmailConfirmationAsync(user);
+            return Ok();
+        }
+        catch (Exception ex) when (ex.Message == "USER_NOT_FOUND")
+        {
+            return BadRequest("User not found");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error sending email.");
+            return StatusCode(500, "An unexpected error occurred");
+        }
+    }
 
     [HttpPost]
     [Route("register/admin")]
@@ -106,7 +135,7 @@ public class UserController(IUserService userService, IConfiguration configurati
         }
         catch (Exception ex)
         {
-            Log.Error("Error creating admin, {Error}", ex.Message);
+            Log.Error(ex, "Error creating admin.");
             return BadRequest("Error creating admin.");
         }
     }
@@ -159,7 +188,7 @@ public class UserController(IUserService userService, IConfiguration configurati
 
         try
         {
-            await userService.InitiatePasswordChange(request, configuration["AppUrls:EpharmClient"]!);
+            await userService.InitiatePasswordChange(request);
             return Ok();
         }
         catch (ArgumentNullException)
@@ -168,12 +197,12 @@ public class UserController(IUserService userService, IConfiguration configurati
         }
         catch (KeyNotFoundException ex)
         {
-            Log.Warning("Warning creating email template, details: {Error}", ex);
+            Log.Warning(ex, "Warning creating email template.");
             return StatusCode(StatusCodes.Status500InternalServerError, new { message = "An unexpected error occurred. Please try again later." });
         }
         catch (Exception ex)
         {
-            Log.Error("Error initiating password change. Details: {Error}", ex);
+            Log.Error(ex, "Error initiating password change.");
             return BadRequest("Error initiating password change.");
         }
     }
@@ -192,7 +221,7 @@ public class UserController(IUserService userService, IConfiguration configurati
         }
         catch (Exception ex)
         {
-            Log.Error("Error changing password. Details: {Error}", ex);
+            Log.Error(ex, "Error changing password.");
             return BadRequest("Error changing password.");
         }
     }

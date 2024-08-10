@@ -91,7 +91,7 @@ public class UserService(
         return result.Succeeded;
     }
 
-    public async Task InitiatePasswordChange(InitiatePasswordChangeRequest passwordChangeRequest, string url)
+    public async Task InitiatePasswordChange(InitiatePasswordChangeRequest passwordChangeRequest)
     {
         var user = await userManager.FindByEmailAsync(passwordChangeRequest.Email);
         ArgumentNullException.ThrowIfNull(user);

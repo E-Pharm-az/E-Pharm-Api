@@ -207,7 +207,7 @@ public class PharmacyService(
         if (email is null)
             throw new KeyNotFoundException("EMAIL_NOT_FOUND");
 
-        email = email.Replace("{url}", $"{config["AppUrls:PharmaPortalClient"]}/onboarding/{user.Id}");
+        email = email.Replace("{url}", $"{config["AppUrls:PharmacyClient"]}/onboarding/{user.Id}");
 
         await emailSender.SendEmailAsync(new CreateEmailDto
         {

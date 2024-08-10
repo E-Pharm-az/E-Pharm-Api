@@ -212,6 +212,7 @@ public class Startup(IConfiguration configuration)
         services.AddSingleton<IEmailService, EmailService>();
 
         services.AddScoped<ITokenService, TokenService>();
+        services.AddScoped<IAuthService, AuthService>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder,
