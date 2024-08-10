@@ -84,6 +84,7 @@ public class AuthService(
             {
                 user.EmailConfirmed = true;
                 await userManager.UpdateAsync(user);
+                return;
             }
 
             throw new Exception("CODE_EXPIRED");

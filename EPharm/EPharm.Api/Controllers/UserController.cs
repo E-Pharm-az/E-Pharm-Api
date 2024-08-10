@@ -47,10 +47,9 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
             await userService.CreateCustomerAsync(request);
             return Ok();
         }
-        catch (InvalidOperationException ex)
+        catch (Exception ex) when (ex.Message == "USER_ALREADY_EXISTS")
         {
-            Log.Error(ex, "Error creating user.");
-            return StatusCode(StatusCodes.Status409Conflict, new { message = "User with this email already exists." });
+            return Conflict(new { message = "User with this email already exists." });
         }
         catch (Exception ex)
         {

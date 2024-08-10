@@ -41,9 +41,12 @@ public class AuthController(IAuthService authService) : ControllerBase
         }
     }
 
-    [HttpPost("confirm-email")]
+    [HttpPost("{role}/confirm-email")]
     public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto request)
     {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
         try
         {
             await authService.ConfirmEmailAsync(request);
@@ -110,7 +113,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         }
     }
 
-    [HttpPost("logout")]
+    [HttpPost("{role}/logout")]
     public IActionResult Logout()
     {
         RemoveAuthCookies();

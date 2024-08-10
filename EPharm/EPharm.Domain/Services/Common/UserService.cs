@@ -52,6 +52,7 @@ public class UserService(
 
         mapper.Map(initializeUserDto, user);
         user.PasswordHash = passwordHasher.HashPassword(user, initializeUserDto.Password);
+        user.IsAccountSetup = true;
 
         var result = await userManager.UpdateAsync(user);
         if (!result.Succeeded)
@@ -136,8 +137,8 @@ public class UserService(
         var existingUser = await userManager.FindByEmailAsync(user.Email);
         if (existingUser is not null)
         {
-            if (existingUser.EmailConfirmed)
-                throw new InvalidOperationException("USER_ALREADY_EXISTS");
+            if (existingUser.IsAccountSetup == true)
+                throw new Exception("USER_ALREADY_EXISTS");
 
             return existingUser;
         }
