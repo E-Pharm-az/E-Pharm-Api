@@ -1,10 +1,13 @@
 using EPharm.Infrastructure.Entities.Base;
+using EPharm.Infrastructure.Entities.PharmaEntities;
 using EPharm.Infrastructure.Entities.ProductEntities;
 
 namespace EPharm.Infrastructure.Entities.Junctions;
 
 public class OrderProduct : BaseEntity
 {
+    public int PharmacyId { get; set; }
+    public Pharmacy Pharmacy { get; set; }
     public int OrderId { get; set; }
     public Order Order { get; set; }
     public int ProductId { get; set; }

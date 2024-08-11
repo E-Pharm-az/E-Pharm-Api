@@ -31,8 +31,14 @@ public class OrderService(
 {
     public async Task<IEnumerable<GetOrderDto>> GetAllOrders()
     {
-        var orders = await orderRepository.GetAllOrdersAsync();
+        var orders = await orderRepository.GetAllAsync();
         return mapper.Map<IEnumerable<GetOrderDto>>(orders);
+    }
+    
+    public async Task<IEnumerable<GetOrderProductDto>> GetAllPharmacyOrders(int pharmacyId)
+    {
+        var orders = await orderRepository.GetAllPharmacyOrdersAsync(pharmacyId);
+        return mapper.Map<IEnumerable<GetOrderProductDto>>(orders);
     }
 
     public async Task<IEnumerable<GetOrderDto>> GetAllUserOrders(string userId)
@@ -49,7 +55,7 @@ public class OrderService(
 
     public async Task<GetOrderDto?> GetOrderByIdAsync(int orderId)
     {
-        var order = await orderRepository.GetOrderByIdAsync(orderId);
+        var order = await orderRepository.GetByIdAsync(orderId);
         return mapper.Map<GetOrderDto?>(order);
     }
 

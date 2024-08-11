@@ -3,6 +3,7 @@ using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
 using EPharm.Domain.Models.Identity;
+using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -24,26 +25,29 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
         return NotFound("Orders not found.");
     }
 
-    [HttpGet("pharma-company/{pharmaCompanyId:int}/{id:int}")]
+    [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmacyStaff)]
-    public async Task<ActionResult<GetOrderDto>> GetOrderById(int pharmaCompanyId, int id)
+    [RequirePharmacyId]
+    public async Task<ActionResult<IEnumerable<GetOrderProductDto>>> GetPharmacyOrders(int? pharmacyId)
     {
-        var company = await pharmacyService.GetPharmacyByIdAsync(pharmaCompanyId);
-        
-        if (company is null)
-            return NotFound("Pharmaceutical company not found.");
-        
-        if (!User.IsInRole(IdentityData.Admin))
+        if (User.IsInRole(IdentityData.Admin))
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (company.Owner.Id != userId)
-                return Forbid();
-        }
-        
-        var result = await orderService.GetOrderByIdAsync(id);
-        if (result is not null) return Ok(result);
+            if (pharmacyId is null)
+                return BadRequest("PharmacyId is required.");
+            
+            var pharmacy = await pharmacyService.GetPharmacyByIdAsync(pharmacyId.Value);
 
-        return NotFound($"Order with ID: {id} not found.");
+            if (pharmacy is null)
+                return NotFound("Pharmacy not found.");
+        }
+        else
+        {
+            pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
+        }        
+        var result = await orderService.GetAllPharmacyOrders(pharmacyId.Value);
+        if (result.Any()) return Ok(result);
+
+        return NotFound($"Orders not found.");
     }
     
     [HttpGet("user/{userId}")]

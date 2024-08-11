@@ -1,4 +1,5 @@
 using EPharm.Infrastructure.Entities.Base;
+using EPharm.Infrastructure.Entities.Junctions;
 using EPharm.Infrastructure.Entities.ProductEntities;
 
 namespace EPharm.Infrastructure.Entities.PharmaEntities;
@@ -16,6 +17,7 @@ public class Pharmacy : BaseEntity
     public ICollection<PharmacyStaff> PharmacyStaff { get; set; }
     public ICollection<Warehouse> Warehouses { get; set; }
     public ICollection<Product> Products { get; set; }
+    public ICollection<OrderProduct> OrderProducts { get; set; }
     public ICollection<ActiveIngredient> ActiveIngredients { get; set; }
     public ICollection<Allergy> Allergies { get; set; }
     public ICollection<DosageForm> DosageForms { get; set; }

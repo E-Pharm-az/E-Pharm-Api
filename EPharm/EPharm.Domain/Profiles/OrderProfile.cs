@@ -1,5 +1,6 @@
 using AutoMapper;
 using EPharm.Domain.Dtos.OrderDto;
+using EPharm.Infrastructure.Entities.Junctions;
 using EPharm.Infrastructure.Entities.ProductEntities;
 
 namespace EPharm.Domain.Profiles;
@@ -10,5 +11,6 @@ public class OrderProfile : Profile
     {
         CreateMap<CreateOrderDto, Order>();
         CreateMap<Order, GetOrderDto>();
+        CreateMap<OrderProduct, GetOrderProductDto>();
     }
 }
