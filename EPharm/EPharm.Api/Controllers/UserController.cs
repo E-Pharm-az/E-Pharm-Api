@@ -92,6 +92,23 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
         }
     }
     
+    [HttpPost("guest")]
+    public async Task<IActionResult> RegisterGuest([FromBody] CreateGuestDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        try
+        {
+            await userService.CreateUserAsync(request);
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error creating guest.");
+            return BadRequest("Error creating guest.");
+        }
+    }
     
     [HttpPost("resend-confirmation-email")]
     public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailDto request)

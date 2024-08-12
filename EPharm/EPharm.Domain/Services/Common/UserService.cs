@@ -132,7 +132,7 @@ public class UserService(
             throw new ArgumentException("Invalid or expired code. Please generate a new one.");
     }
 
-    public async Task<AppIdentityUser> CreateUserAsync<T>(T user, string[] identityRoles) where T: EmailDto
+    public async Task<AppIdentityUser> CreateUserAsync<T>(T user, string[]? identityRoles = null) where T: EmailDto
     {
         var existingUser = await userManager.FindByEmailAsync(user.Email);
         if (existingUser is not null)
@@ -148,6 +148,9 @@ public class UserService(
 
         var result = await userManager.CreateAsync(userEntity, configuration["UniqueKey"]!);
 
+        if (identityRoles == null)
+            return userEntity;
+        
         foreach (var role in identityRoles)
         {
             if (!await roleManager.RoleExistsAsync(role))

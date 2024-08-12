@@ -3,7 +3,6 @@ using AutoMapper;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Dtos.PayPalDtos;
 using EPharm.Domain.Dtos.PayPalDtos.Payload;
-using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Product;
 using EPharm.Infrastructure.Entities.Identity;
@@ -62,8 +61,6 @@ public class OrderService(
     // TODO: Cache user preferences for order delivery address.
     public async Task<GetOrderDto> CreateOrderAsync(CreateOrderDto orderDto)
     {
-        if (!string.IsNullOrEmpty(orderDto.Email))
-            throw new ArgumentException("MISSING_EMAIL_FOR_ORDER");
 
         var orderSummary = new OrderSummary();
         var productIds = orderDto.Products.Select(p => p.ProductId).ToArray();
@@ -74,14 +71,14 @@ public class OrderService(
         foreach (var product in products)
         {
             if (product is null)
-                throw new ArgumentException("PRODUCT_NOT_FOUND");
+                throw new Exception("PRODUCT_NOT_FOUND");
 
             var productStock = product.Stock.Sum(s => s.Quantity);
 
             orderProducts.TryGetValue(product.Id, out var orderProduct);
 
             if (productStock < orderProduct.Quantity)
-                throw new ArgumentException("STOCK_NOT_ENOUGH");
+                throw new Exception("STOCK_NOT_ENOUGH");
 
             orderSummary.TotalPrice += product.Price * orderProduct.Quantity;
             orderSummary.Products.Add(new ProductSummary
@@ -98,23 +95,17 @@ public class OrderService(
         var response = await CreatePayPalOrderAsync(accessToken, payload);
 
         if (!response.IsSuccessful)
-            throw new ArgumentException("FAILED_TO_CREATE_PAYPAL_ORDER");
+            throw new Exception("FAILED_TO_CREATE_PAYPAL_ORDER");
 
         var orderEntity = mapper.Map<Order>(orderDto);
 
         orderEntity.TrackingId = response.Data.Id;
         orderEntity.Status = OrderStatus.PendingPayment;
 
-        var user = await userManager.FindByEmailAsync(orderDto.Email);
+        var user = await userManager.FindByIdAsync(orderDto.UserId);
 
         if (user is null)
-        {
-            await userService.CreateCustomerAsync(new EmailDto { Email = orderDto.Email, });
-        }
-        else
-        {
-            orderEntity.UserId = user.Id;
-        }
+            throw new Exception("USER_NOT_FOUND");
 
         try
         {
@@ -298,8 +289,7 @@ public class OrderService(
         return payload;
     }
 
-    private async Task<RestResponse<CreateOrderResponse>> CreatePayPalOrderAsync(string accessToken,
-        PayPalOrderPayload payload)
+    private async Task<RestResponse<CreateOrderResponse>> CreatePayPalOrderAsync(string accessToken, PayPalOrderPayload payload)
     {
         var client = new RestClient(configuration["PayPalConfig:BaseUrl"]!);
         var request = new RestRequest("/v2/checkout/orders", Method.Post);

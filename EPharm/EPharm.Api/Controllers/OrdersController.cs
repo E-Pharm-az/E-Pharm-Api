@@ -12,7 +12,6 @@ namespace EPharmApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
 public class OrdersController(IOrderService orderService, IPharmacyService pharmacyService) : ControllerBase
 {
     [HttpGet]
@@ -47,7 +46,7 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
         var result = await orderService.GetAllPharmacyOrders(pharmacyId.Value);
         if (result.Any()) return Ok(result);
 
-        return NotFound($"Orders not found.");
+        return NotFound("Orders not found.");
     }
     
     [HttpGet("user/{userId}")]
@@ -75,25 +74,25 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
             var result = await orderService.CreateOrderAsync(orderDto);
             return Ok(result);
         }
-        catch (ArgumentException ex) when (ex.Message == "MISSING_EMAIL_FOR_ORDER")
+        catch (Exception ex) when (ex.Message == "MISSING_EMAIL_FOR_ORDER")
         {
             return BadRequest(new { Error = "Email is required for the order." });
         }
-        catch (ArgumentException ex) when (ex.Message == "PRODUCT_NOT_FOUND")
+        catch (Exception ex) when (ex.Message == "PRODUCT_NOT_FOUND")
         {
             return NotFound(new { Error = "One or more products in the order were not found." });
         }
-        catch (ArgumentException ex) when (ex.Message == "STOCK_NOT_ENOUGH")
+        catch (Exception ex) when (ex.Message == "STOCK_NOT_ENOUGH")
         {
             return BadRequest(new { Error = "Insufficient stock for one or more products." });
         }
-        catch (ArgumentException ex) when (ex.Message == "FAILED_TO_CREATE_PAYPAL_ORDER")
+        catch (Exception ex) when (ex.Message == "FAILED_TO_CREATE_PAYPAL_ORDER")
         {
             return BadRequest(new { Error = "Failed to create PayPal order." });
         }
         catch (Exception ex)
         {
-            Log.Error("An error occurred while creating order. Details: {@ex}", ex);
+            Log.Error(ex, "An error occurred while creating order.");
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
