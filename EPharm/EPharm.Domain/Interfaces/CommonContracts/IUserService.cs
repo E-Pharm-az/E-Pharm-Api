@@ -17,6 +17,7 @@ public interface IUserService
     public Task InitiatePasswordChange(InitiatePasswordChangeRequest passwordChangeRequest);
     public Task<AppIdentityUser> CreateUserAsync<T>(T user, string[]? identityRoles = null) where T : EmailDto;
     public Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest);
+    public Task ConfirmEmailAsync(ConfirmEmailDto request);
     public Task SendEmailConfirmationAsync(AppIdentityUser user);
     public Task<bool> DeleteUserAsync(string userId);
 }

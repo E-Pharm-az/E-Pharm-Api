@@ -110,6 +110,41 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
         }
     }
     
+    
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto request)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+        
+        try
+        {
+            await userService.ConfirmEmailAsync(request);
+            return Ok("Email confirmed successfully");
+        }
+        catch (Exception ex) when (ex.Message == "INVALID_CODE")
+        {
+            return BadRequest("Invalid code.");
+        }
+        catch (Exception ex) when (ex.Message == "CODE_EXPIRED")
+        {
+            return BadRequest("Code expired.");
+        }
+        catch (Exception ex) when (ex.Message == "USER_NOT_FOUND")
+        {
+            return BadRequest("User not found.");
+        }
+        catch (Exception ex) when (ex.Message == "TOO_MANY_ATTEMPTS")
+        {
+            return BadRequest("Too many attempts.");
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Unexpected error during email confirmation");
+            return StatusCode(500, "An unexpected error occurred");
+        }
+    }
+    
     [HttpPost("resend-confirmation-email")]
     public async Task<IActionResult> ResendConfirmationEmail([FromBody] EmailDto request)
     {

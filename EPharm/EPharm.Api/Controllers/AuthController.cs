@@ -7,10 +7,10 @@ using Serilog;
 namespace EPharmApi.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/[controller]/{role}")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
-    [HttpPost("{role}/login")]
+    [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] AuthRequest request, [FromRoute] string role)
     {
         if (!ModelState.IsValid)
@@ -41,41 +41,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         }
     }
 
-    [HttpPost("{role}/confirm-email")]
-    public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-        
-        try
-        {
-            await authService.ConfirmEmailAsync(request);
-            return Ok("Email confirmed successfully");
-        }
-        catch (Exception ex) when (ex.Message == "INVALID_CODE")
-        {
-            return BadRequest("Invalid code.");
-        }
-        catch (Exception ex) when (ex.Message == "CODE_EXPIRED")
-        {
-            return BadRequest("Code expired.");
-        }
-        catch (Exception ex) when (ex.Message == "USER_NOT_FOUND")
-        {
-            return BadRequest("User not found.");
-        }
-        catch (Exception ex) when (ex.Message == "TOO_MANY_ATTEMPTS")
-        {
-            return BadRequest("Too many attempts.");
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Unexpected error during email confirmation");
-            return StatusCode(500, "An unexpected error occurred");
-        }
-    }
-
-    [HttpGet("{role}/refresh-token")]
+    [HttpGet("refresh-token")]
     public async Task<IActionResult> RefreshToken([FromRoute] string role)
     {
         try
@@ -113,7 +79,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         }
     }
 
-    [HttpPost("{role}/logout")]
+    [HttpPost("logout")]
     public IActionResult Logout()
     {
         RemoveAuthCookies();

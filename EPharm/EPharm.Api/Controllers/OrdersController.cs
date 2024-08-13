@@ -123,7 +123,7 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
         }
         catch (Exception ex)
         {
-            Log.Error("An error occurred while capturing order. Details: {@ex}", ex);
+            Log.Error(ex, "An error occurred while capturing order.");
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }

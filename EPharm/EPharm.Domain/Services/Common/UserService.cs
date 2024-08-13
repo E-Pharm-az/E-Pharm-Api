@@ -20,6 +20,9 @@ public class UserService(
     IPasswordHasher<AppIdentityUser> passwordHasher,
     IMapper mapper) : IUserService
 {
+    private const int MaxFailedLoginAttempts = 5;
+    private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(30);
+    
     public async Task<IEnumerable<GetUserDto>> GetAllUsersAsync()
     {
         var users = await userManager.Users.ToListAsync();
@@ -164,6 +167,53 @@ public class UserService(
         await userManager.AddToRolesAsync(userEntity, identityRoles);
 
         return userEntity;
+    }
+    
+    
+    public async Task ConfirmEmailAsync(ConfirmEmailDto request)
+    {
+        var user = await userManager.FindByEmailAsync(request.Email);
+
+        if (user == null)
+            throw new Exception("USER_NOT_FOUND");
+
+        // Checks if lockout duration ended
+        if (user.LockoutEnd > DateTime.UtcNow)
+            throw new Exception("TOO_MANY_ATTEMPTS");
+
+        if (user.CodeVerificationFailedAttempts >= MaxFailedLoginAttempts)
+        {
+            // If failed attempts count is larger than max count, then if the lockout end expired, reset the count to 0. Else lock the user.
+            if (user.LockoutEnd < DateTime.UtcNow)
+            {
+                user.CodeVerificationFailedAttempts = 0;
+                await userManager.UpdateAsync(user);
+            }
+            else
+            {
+                user.LockoutEnd = DateTime.UtcNow.Add(LockoutDuration);
+                await userManager.UpdateAsync(user);
+                
+                throw new Exception("TOO_MANY_ATTEMPTS");
+            }
+        }
+
+        if (user.Code == request.Code)
+        {
+            if (user.CodeExpiryTime > DateTime.UtcNow)
+            {
+                user.EmailConfirmed = true;
+                await userManager.UpdateAsync(user);
+                return;
+            }
+
+            throw new Exception("CODE_EXPIRED");
+        }
+
+        user.CodeVerificationFailedAttempts++;
+        await userManager.UpdateAsync(user);
+
+        throw new Exception("INVALID_CODE");
     }
 
     public async Task SendEmailConfirmationAsync(AppIdentityUser user)

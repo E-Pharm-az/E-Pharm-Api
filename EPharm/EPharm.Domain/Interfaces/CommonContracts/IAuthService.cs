@@ -5,7 +5,6 @@ namespace EPharm.Domain.Interfaces.CommonContracts;
 
 public interface IAuthService
 {
-    Task<AuthResponse> ProcessLoginAsync(AuthRequest request, string role);
-    Task ConfirmEmailAsync(ConfirmEmailDto request);
-    Task<AuthResponse> RefreshTokenAsync(string accessToken, string refreshToken, string role);    
+    public Task<AuthResponse> ProcessLoginAsync(AuthRequest request, string role);
+    public Task<AuthResponse> RefreshTokenAsync(string accessToken, string refreshToken, string role);    
 }
