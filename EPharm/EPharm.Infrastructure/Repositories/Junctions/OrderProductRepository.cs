@@ -7,12 +7,11 @@ using EPharm.Infrastructure.Repositories.Base;
 
 namespace EPharm.Infrastructure.Repositories.Junctions;
 
-public class OrderProductRepository(AppDbContext context, IProductRepository productRepository)
-    : Repository<OrderProduct>(context), IOrderProductRepository
+public class OrderProductRepository(AppDbContext context) : Repository<OrderProduct>(context), IOrderProductRepository
 {
     public async Task CreateManyOrderProductAsync(IEnumerable<OrderProduct> orderProducts)
     {
-        await context.OrderProducts.AddRangeAsync(orderProducts);
-        await context.SaveChangesAsync();
+        await Entities.AddRangeAsync(orderProducts);
+        await base.SaveChangesAsync();
     }
 }

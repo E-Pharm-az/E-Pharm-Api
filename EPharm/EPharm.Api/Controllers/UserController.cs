@@ -7,6 +7,7 @@ using EPharm.Infrastructure.Entities.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
 namespace EPharmApi.Controllers;
@@ -26,13 +27,19 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
     }
 
     [HttpGet("{userId}")]
-    [Authorize(Roles = IdentityData.Admin)]
+    [Authorize]
     public async Task<ActionResult<GetUserDto>> GetUserById(string userId)
     {
         var result = await userService.GetUserByIdAsync(userId);
-        if (result is not null) return Ok(result);
+        if (result is  null)
+            return NotFound($"User with ID: {userId} not found.");
+        
+        var currentUserId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
 
-        return NotFound($"User with ID: {userId} not found.");
+        if (!User.IsInRole(IdentityData.Admin) && currentUserId != result.Id)
+            return Forbid();
+
+        return Ok(result);
     }
 
     [HttpPost]
@@ -196,7 +203,7 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
 
-        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
 
         if (!User.IsInRole(IdentityData.Admin) && currentUserId != id)
             return Forbid();
@@ -214,7 +221,7 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
     [Authorize]
     public async Task<ActionResult> DeleteUser(string userId)
     {
-        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var currentUserId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
 
         if (!User.IsInRole(IdentityData.Admin) && currentUserId != userId)
             return Forbid();

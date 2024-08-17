@@ -14,6 +14,4 @@ public class GetOrderDto
     public string ShippingAddress { get; set; }
     public int PharmacyId { get; set; }
     public int WarehouseId { get; set; }
-
-    // TODO: If the following fields are null, then substitute them with the information from the identity user.
 }

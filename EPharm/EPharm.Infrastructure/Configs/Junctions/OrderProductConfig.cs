@@ -34,6 +34,6 @@ public class OrderProductConfig : IEntityTypeConfiguration<OrderProduct>
             .IsRequired();
 
         builder.Property(op => op.CreatedAt)
-            .IsRequired();
+            .HasDefaultValueSql("NOW()");
     }
 }

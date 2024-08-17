@@ -80,5 +80,6 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
     public async Task<IEnumerable<Product>> GetApprovedProductsByIdAsync(int[] productIds) =>
         await Entities
             .Where(product => productIds.Contains(product.Id) && product.IsApproved)
+            .Include(product => product.Stock).ThenInclude(product => product.Warehouse)
             .AsNoTracking().ToListAsync();
 }

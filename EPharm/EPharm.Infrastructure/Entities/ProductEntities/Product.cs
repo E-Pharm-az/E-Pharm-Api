@@ -32,7 +32,7 @@ public class Product : BaseEntity
     
     public int Price { get; set; }
     public int CostPerItem { get; set; }
-    public string BatchNumber { get; set; }
+    public string? BatchNumber { get; set; }
     public string? Barcode { get; set; }
     public decimal PackagingWeight { get; set; }
     

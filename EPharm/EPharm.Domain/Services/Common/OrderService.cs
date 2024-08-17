@@ -21,7 +21,6 @@ namespace EPharm.Domain.Services.Common;
 public class OrderService(
     IUnitOfWork unitOfWork,
     UserManager<AppIdentityUser> userManager,
-    IUserService userService,
     IOrderRepository orderRepository,
     IOrderProductRepository orderProductRepository,
     IProductRepository productRepository,
@@ -58,8 +57,28 @@ public class OrderService(
         return mapper.Map<GetOrderDto?>(order);
     }
 
+    public async Task<string> GenerateClientTokenAsync()
+    {
+        var accessToken = await GenerateAccessTokenAsync();
+        
+        var client = new RestClient(configuration["PayPalConfig:BaseUrl"]!);
+        var request = new RestRequest("/v1/identity/generate-token", Method.Post);
+
+        request.AddHeader("Authorization", $"Bearer {accessToken}");
+        request.AddHeader("Accept-Language", "en_US");
+        request.AddHeader("Content-Type", "application/json");
+
+        var response = await client.ExecuteAsync(request);
+        
+        var result = JsonConvert.DeserializeObject<GetClientToken>(response.Content);
+        if (result is null)
+            throw new Exception("INVALID_PAYPAL_RESPONSE");
+        
+        return result.ClientToken;
+    }
+
     // TODO: Cache user preferences for order delivery address.
-    public async Task<GetOrderDto> CreateOrderAsync(CreateOrderDto orderDto)
+    public async Task<CreateOrderResponse> CreateOrderAsync(CreateOrderDto orderDto)
     {
 
         var orderSummary = new OrderSummary();
@@ -68,7 +87,9 @@ public class OrderService(
 
         var orderProducts = orderDto.Products.ToDictionary(p => p.ProductId);
 
-        foreach (var product in products)
+        var enumerableProducts = products as Product[] ?? products.ToArray();
+        
+        foreach (var product in enumerableProducts)
         {
             if (product is null)
                 throw new Exception("PRODUCT_NOT_FOUND");
@@ -99,7 +120,7 @@ public class OrderService(
 
         var orderEntity = mapper.Map<Order>(orderDto);
 
-        orderEntity.TrackingId = response.Data.Id;
+        orderEntity.TrackingId = response.Data.Id; //TODO: Change tracking id type
         orderEntity.Status = OrderStatus.PendingPayment;
 
         var user = await userManager.FindByIdAsync(orderDto.UserId);
@@ -113,13 +134,20 @@ public class OrderService(
 
             var order = await orderRepository.InsertAsync(orderEntity);
             var orderProductEntities = mapper.Map<IEnumerable<OrderProduct>>(orderDto.Products);
+            
+            orderProductEntities = orderProductEntities.Select(op => 
+            {
+                op.OrderId = order.Id;
+                op.PharmacyId = enumerableProducts.First(p => p.Id == op.ProductId).PharmacyId;
+                return op;
+            });
 
             await orderProductRepository.CreateManyOrderProductAsync(orderProductEntities);
 
             await unitOfWork.CommitTransactionAsync();
             await unitOfWork.SaveChangesAsync();
 
-            return mapper.Map<GetOrderDto>(order);
+            return response.Data;
         }
         catch (Exception)
         {
@@ -135,10 +163,7 @@ public class OrderService(
         if (order is null)
             throw new ArgumentException("ORDER_NOT_FOUND");
 
-        var products =
-            await productRepository.GetApprovedProductsByIdAsync(order.OrderProducts.Select(p => p.ProductId)
-                .ToArray());
-
+        var products = await productRepository.GetApprovedProductsByIdAsync(order.OrderProducts.Select(p => p.ProductId).ToArray());
         var orderProducts = order.OrderProducts.ToDictionary(p => p.ProductId);
 
         // Validate that order product is still in purchasable state
@@ -156,8 +181,6 @@ public class OrderService(
                 if (product.Stock.Sum(s => s.Quantity) < orderProduct.Quantity)
                     throw new ArgumentException("STOCK_NOT_ENOUGH");
 
-
-                // TODO: Take use of the google api key to determine the most optimal warehouse
                 // If product is located in a single warehouse, then we directly order it from there;
                 if (product.Stock.Count == 1)
                 {
@@ -228,10 +251,7 @@ public class OrderService(
         if (configuration["PayPalConfig:ClientId"] is null || configuration["PayPalConfig:ClientSecret"] is null)
             throw new ArgumentException("MISSING_PAYPAL_API_CREDENTIALS");
 
-        var auth = Convert.ToBase64String(
-            System.Text.Encoding.UTF8.GetBytes(
-                $"{configuration["PayPalConfig:ClientId"]}:{configuration["PayPalConfig:ClientSecret"]}")
-        );
+        var auth = Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes($"{configuration["PayPalConfig:ClientId"]}:{configuration["PayPalConfig:ClientSecret"]}"));
 
         var client = new RestClient(configuration["PayPalConfig:BaseUrl"]!);
         var request = new RestRequest($"{configuration["PayPalConfig:BaseUrl"]}/v1/oauth2/token", Method.Post);
@@ -295,8 +315,9 @@ public class OrderService(
         var request = new RestRequest("/v2/checkout/orders", Method.Post);
 
         request.AddHeader("Authorization", $"Bearer {accessToken}");
-        request.AddJsonBody(payload);
-
+        request.AddHeader("Content-Type", "application/json");
+        request.AddStringBody(JsonConvert.SerializeObject(payload), ContentType.Json);
+        
         return await client.ExecuteAsync<CreateOrderResponse>(request);
     }
 }

@@ -1,5 +1,4 @@
 using System.Security.Claims;
-using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
