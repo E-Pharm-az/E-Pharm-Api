@@ -11,17 +11,13 @@ public class OrderConfig : IEntityTypeConfiguration<Order>
         builder.Property(o => o.TrackingId)
             .HasMaxLength(255)
             .IsRequired();
-        
+
         builder.Property(o => o.Status)
             .HasMaxLength(50);
-        
+
         builder.Property(o => o.TotalPrice)
             .IsRequired();
-        
-        builder.Property(o => o.ShippingAddress)
-            .IsRequired()
-            .HasMaxLength(255);
-        
+
         builder.Property(p => p.CreatedAt)
             .HasDefaultValueSql("NOW()");
     }
