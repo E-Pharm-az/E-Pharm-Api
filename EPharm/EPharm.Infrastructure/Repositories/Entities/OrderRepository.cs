@@ -15,12 +15,12 @@ public class OrderRepository(AppDbContext context) : Repository<Order>(context),
             .ThenInclude(o => o.Product)            
             .FirstOrDefaultAsync(o => o.Id == id);
 
-    public async Task<List<IEnumerable<OrderProduct>>> GetAllPharmacyOrdersAsync(int pharmacyId) =>
+    public async Task<IEnumerable<Order>> GetAllPharmacyOrdersAsync(int pharmacyId) =>
         await Entities
-            .Select(o => o.OrderProducts.Where(op => op.PharmacyId == pharmacyId))
+            .Include(o => o.OrderProducts.Where(op => op.PharmacyId == pharmacyId))
+            .ThenInclude(o => o.Product)
             .AsNoTracking()
             .ToListAsync();
-        
 
     public async Task<IEnumerable<Order>> GetAllUserOrdersAsync(string userId) =>
         await Entities.Where(o => o.UserId == userId)

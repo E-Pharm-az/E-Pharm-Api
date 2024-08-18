@@ -33,10 +33,10 @@ public class OrderService(
         return mapper.Map<IEnumerable<GetOrderDto>>(orders);
     }
     
-    public async Task<IEnumerable<GetOrderProductDto>> GetAllPharmacyOrders(int pharmacyId)
+    public async Task<IEnumerable<GetOrderPharmacyDto>> GetAllPharmacyOrders(int pharmacyId)
     {
         var orders = await orderRepository.GetAllPharmacyOrdersAsync(pharmacyId);
-        return mapper.Map<IEnumerable<GetOrderProductDto>>(orders);
+        return mapper.Map<IEnumerable<GetOrderPharmacyDto>>(orders);
     }
 
     public async Task<IEnumerable<GetOrderDto>> GetAllUserOrders(string userId)
@@ -139,6 +139,7 @@ public class OrderService(
             {
                 op.OrderId = order.Id;
                 op.PharmacyId = enumerableProducts.First(p => p.Id == op.ProductId).PharmacyId;
+                op.TotalPrice = enumerableProducts.Where(p => p.PharmacyId == op.PharmacyId).Sum(p => p.Price);
                 return op;
             });
 

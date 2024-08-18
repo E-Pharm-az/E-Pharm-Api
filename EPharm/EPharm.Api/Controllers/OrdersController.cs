@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.PharmaContracts;
@@ -6,6 +5,7 @@ using EPharm.Domain.Models.Identity;
 using EPharmApi.Attributes;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
 namespace EPharmApi.Controllers;
@@ -27,7 +27,7 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
     [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmacyStaff)]
     [RequirePharmacyId]
-    public async Task<ActionResult<IEnumerable<GetOrderProductDto>>> GetPharmacyOrders(int? pharmacyId)
+    public async Task<ActionResult<IEnumerable<GetOrderPharmacyDto>>> GetPharmacyOrders(int? pharmacyId)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
@@ -53,11 +53,12 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
     [Authorize]
     public async Task<ActionResult<IEnumerable<GetOrderDto>>> GetAllUserOrders(string userId)
     {
-        if (!User.IsInRole(IdentityData.Admin) && User.FindFirstValue(ClaimTypes.NameIdentifier) != userId)
+        var currentUserId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
+
+        if (!User.IsInRole(IdentityData.Admin) && currentUserId != userId)
             return Forbid();
         
         var result = await orderService.GetAllUserOrders(userId);
-        
         if (result.Any()) return Ok(result);
         
         return NotFound("Orders not found.");
