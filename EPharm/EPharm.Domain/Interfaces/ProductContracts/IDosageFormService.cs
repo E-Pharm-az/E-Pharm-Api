@@ -1,12 +1,12 @@
-using EPharm.Domain.Dtos.DosageFormDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 
 namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface IDosageFormService
 {
-    Task<IEnumerable<GetDosageFormDto>> GetAllDosageFormsAsync();
-    Task<GetDosageFormDto?> GetDosageFormByIdAsync(int id);
-    Task<GetDosageFormDto> CreateDosageFormAsync(CreateDosageFormDto dosageFormDto);
-    Task<bool> UpdateDosageFormAsync(int id, CreateDosageFormDto dosageFormDto);
+    Task<IEnumerable<GetAttributeDto>> GetAllDosageFormsAsync();
+    Task<GetAttributeDto?> GetDosageFormByIdAsync(int id);
+    public Task<GetAttributeDto> CreateDosageFormAsync(CreateAttributeDto dosageFormDto);
+    public Task<bool> UpdateDosageFormAsync(int id, CreateAttributeDto dosageFormDto);
     Task<bool> DeleteDosageFormAsync(int id);
 }

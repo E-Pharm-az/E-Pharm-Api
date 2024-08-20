@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.DosageFormDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
@@ -8,26 +8,26 @@ namespace EPharm.Domain.Services.Entities;
 
 public class DosageFormService(IDosageFormRepository dosageFormRepository, IMapper mapper) : IDosageFormService
 {
-    public async Task<IEnumerable<GetDosageFormDto>> GetAllDosageFormsAsync()
+    public async Task<IEnumerable<GetAttributeDto>> GetAllDosageFormsAsync()
     {
         var dosageForms = await dosageFormRepository.GetAllAsync();
-        return mapper.Map<IEnumerable<GetDosageFormDto>>(dosageForms);
+        return mapper.Map<IEnumerable<GetAttributeDto>>(dosageForms);
     }
 
-    public async Task<GetDosageFormDto?> GetDosageFormByIdAsync(int id)
+    public async Task<GetAttributeDto?> GetDosageFormByIdAsync(int id)
     {
         var dosageForm = await dosageFormRepository.GetByIdAsync(id);
-        return mapper.Map<GetDosageFormDto>(dosageForm);
+        return mapper.Map<GetAttributeDto>(dosageForm);
     }
 
-    public async Task<GetDosageFormDto> CreateDosageFormAsync(CreateDosageFormDto dosageFormDto)
+    public async Task<GetAttributeDto> CreateDosageFormAsync(CreateAttributeDto dosageFormDto)
     {
         try
         {
             var dosageFormEntity = mapper.Map<DosageForm>(dosageFormDto);
             var dosageForm = await dosageFormRepository.InsertAsync(dosageFormEntity);
 
-            return mapper.Map<GetDosageFormDto>(dosageForm);
+            return mapper.Map<GetAttributeDto>(dosageForm);
         }
         catch (Exception ex)
         {
@@ -35,7 +35,7 @@ public class DosageFormService(IDosageFormRepository dosageFormRepository, IMapp
         }
     }
 
-    public async Task<bool> UpdateDosageFormAsync(int id, CreateDosageFormDto dosageFormDto)
+    public async Task<bool> UpdateDosageFormAsync(int id, CreateAttributeDto dosageFormDto)
     {
         var dosageForm = await dosageFormRepository.GetByIdAsync(id);
 

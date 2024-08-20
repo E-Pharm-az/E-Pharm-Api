@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.SideEffectDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
@@ -8,26 +8,26 @@ namespace EPharm.Domain.Services.Entities;
 
 public class SideEffectService(ISideEffectRepository sideEffectRepository, IMapper mapper) : ISideEffectService
 {
-    public async Task<IEnumerable<GetSideEffectDto>> GetAllSideEffectsAsync()
+    public async Task<IEnumerable<GetAttributeDto>> GetAllSideEffectsAsync()
     {
         var sideEffects = await sideEffectRepository.GetAllAsync();
-        return mapper.Map<IEnumerable<GetSideEffectDto>>(sideEffects);
+        return mapper.Map<IEnumerable<GetAttributeDto>>(sideEffects);
     }
 
-    public async Task<GetSideEffectDto?> GetSideEffectByIdAsync(int id)
+    public async Task<GetAttributeDto?> GetSideEffectByIdAsync(int id)
     {
         var sideEffect = await sideEffectRepository.GetByIdAsync(id);
-        return mapper.Map<GetSideEffectDto>(sideEffect);
+        return mapper.Map<GetAttributeDto>(sideEffect);
     }
 
-    public async Task<GetSideEffectDto> CreateSideEffectAsync(CreateSideEffectDto sideEffectDto)
+    public async Task<GetAttributeDto> CreateSideEffectAsync(CreateAttributeDto sideEffectDto)
     {
         try
         {
             var sideEffectEntity = mapper.Map<SideEffect>(sideEffectDto);
             var sideEffect = await sideEffectRepository.InsertAsync(sideEffectEntity);
 
-            return mapper.Map<GetSideEffectDto>(sideEffect);
+            return mapper.Map<GetAttributeDto>(sideEffect);
         }
         catch (Exception ex)
         {
@@ -35,7 +35,7 @@ public class SideEffectService(ISideEffectRepository sideEffectRepository, IMapp
         }
     }
 
-    public async Task<bool> UpdateSideEffectAsync(int id, CreateSideEffectDto sideEffectDto)
+    public async Task<bool> UpdateSideEffectAsync(int id, CreateAttributeDto sideEffectDto)
     {
         var sideEffect = await sideEffectRepository.GetByIdAsync(id);
 

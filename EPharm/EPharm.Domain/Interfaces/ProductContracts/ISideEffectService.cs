@@ -1,12 +1,12 @@
-using EPharm.Domain.Dtos.SideEffectDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 
 namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface ISideEffectService
 {
-    Task<IEnumerable<GetSideEffectDto>> GetAllSideEffectsAsync();
-    Task<GetSideEffectDto?> GetSideEffectByIdAsync(int id);
-    Task<GetSideEffectDto> CreateSideEffectAsync(CreateSideEffectDto sideEffectDto);
-    Task<bool> UpdateSideEffectAsync(int id, CreateSideEffectDto sideEffectDto);
+    Task<IEnumerable<GetAttributeDto>> GetAllSideEffectsAsync();
+    Task<GetAttributeDto?> GetSideEffectByIdAsync(int id);
+    Task<GetAttributeDto> CreateSideEffectAsync(CreateAttributeDto sideEffectDto);
+    Task<bool> UpdateSideEffectAsync(int id, CreateAttributeDto sideEffectDto);
     Task<bool> DeleteSideEffectAsync(int id);
 }

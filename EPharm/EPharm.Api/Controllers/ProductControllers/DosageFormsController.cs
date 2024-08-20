@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.DosageFormDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 public class DosageFormsController(IDosageFormService dosageFormService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetDosageFormDto>>> GetAllDosageForms()
+    public async Task<ActionResult<IEnumerable<GetAttributeDto>>> GetAllDosageForms()
     {
         var result = await dosageFormService.GetAllDosageFormsAsync();
         if (result.Any()) return Ok(result);
@@ -21,7 +21,7 @@ public class DosageFormsController(IDosageFormService dosageFormService) : Contr
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GetDosageFormDto>> GetDosageFormById(int id)
+    public async Task<ActionResult<GetAttributeDto>> GetDosageFormById(int id)
     {
         var result = await dosageFormService.GetDosageFormByIdAsync(id);
         if (result is not null) return Ok(result);
@@ -31,7 +31,7 @@ public class DosageFormsController(IDosageFormService dosageFormService) : Contr
 
     [HttpPost]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<GetDosageFormDto>> CreateDosageForm(CreateDosageFormDto dosageFormDto)
+    public async Task<ActionResult<GetAttributeDto>> CreateDosageForm(CreateAttributeDto dosageFormDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
@@ -50,7 +50,7 @@ public class DosageFormsController(IDosageFormService dosageFormService) : Contr
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult> UpdateDosageForm(int id, CreateDosageFormDto dosageFormDto)
+    public async Task<ActionResult> UpdateDosageForm(int id, CreateAttributeDto dosageFormDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");

@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.SideEffectDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 public class SideEffectsController(ISideEffectService sideEffectService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetSideEffectDto>>> GetAllSideEffects()
+    public async Task<ActionResult<IEnumerable<GetAttributeDto>>> GetAllSideEffects()
     {
         var result = await sideEffectService.GetAllSideEffectsAsync();
         if (result.Any()) return Ok(result);
@@ -21,7 +21,7 @@ public class SideEffectsController(ISideEffectService sideEffectService) : Contr
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GetSideEffectDto>> GetSideEffectById(int id)
+    public async Task<ActionResult<GetAttributeDto>> GetSideEffectById(int id)
     {
         var result = await sideEffectService.GetSideEffectByIdAsync(id);
         if (result is not null) return Ok(result);
@@ -31,7 +31,7 @@ public class SideEffectsController(ISideEffectService sideEffectService) : Contr
 
     [HttpPost]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<GetSideEffectDto>> CreateSideEffect(CreateSideEffectDto sideEffectDto)
+    public async Task<ActionResult<GetAttributeDto>> CreateSideEffect(CreateAttributeDto sideEffectDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
@@ -50,7 +50,7 @@ public class SideEffectsController(ISideEffectService sideEffectService) : Contr
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult> UpdateSideEffect(int id, CreateSideEffectDto sideEffectDto)
+    public async Task<ActionResult> UpdateSideEffect(int id, CreateAttributeDto sideEffectDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");

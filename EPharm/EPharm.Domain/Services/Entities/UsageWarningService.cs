@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.UsageWarningDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
@@ -8,26 +8,26 @@ namespace EPharm.Domain.Services.Entities;
 
 public class UsageWarningService(IUsageWarningRepository usageWarningRepository, IMapper mapper) : IUsageWarningService
 {
-    public async Task<IEnumerable<GetUsageWarningDto>> GetAllUsageWarningsAsync()
+    public async Task<IEnumerable<GetAttributeDto>> GetAllUsageWarningsAsync()
     {
         var usageWarnings = await usageWarningRepository.GetAllAsync();
-        return mapper.Map<IEnumerable<GetUsageWarningDto>>(usageWarnings);
+        return mapper.Map<IEnumerable<GetAttributeDto>>(usageWarnings);
     }
 
-    public async Task<GetUsageWarningDto?> GetUsageWarningByIdAsync(int id)
+    public async Task<GetAttributeDto?> GetUsageWarningByIdAsync(int id)
     {
         var usageWarning = await usageWarningRepository.GetByIdAsync(id);
-        return mapper.Map<GetUsageWarningDto>(usageWarning);
+        return mapper.Map<GetAttributeDto>(usageWarning);
     }
 
-    public async Task<GetUsageWarningDto> CreateUsageWarningAsync(CreateUsageWarningDto usageWarningDto)
+    public async Task<GetAttributeDto> CreateUsageWarningAsync(CreateAttributeDto usageWarningDto)
     {
         try
         {
             var usageWarningEntity = mapper.Map<UsageWarning>(usageWarningDto);
             var usageWarning = await usageWarningRepository.InsertAsync(usageWarningEntity);
 
-            return mapper.Map<GetUsageWarningDto>(usageWarning);
+            return mapper.Map<GetAttributeDto>(usageWarning);
         }
         catch (Exception ex)
         {
@@ -35,7 +35,7 @@ public class UsageWarningService(IUsageWarningRepository usageWarningRepository,
         }
     }
 
-    public async Task<bool> UpdateUsageWarningAsync(int id, CreateUsageWarningDto usageWarningDto)
+    public async Task<bool> UpdateUsageWarningAsync(int id, CreateAttributeDto usageWarningDto)
     {
         var usageWarning = await usageWarningRepository.GetByIdAsync(id);
 

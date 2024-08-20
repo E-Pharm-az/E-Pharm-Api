@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.IndicationDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
@@ -8,26 +8,26 @@ namespace EPharm.Domain.Services.Entities;
 
 public class IndicationService(IIndicationRepository indicationRepository, IMapper mapper) : IIndicationService
 {
-    public async Task<List<GetIndicationDto>> GetAllIndicationsAsync()
+    public async Task<List<GetAttributeDto>> GetAllIndicationsAsync()
     {
         var indications = await indicationRepository.GetAllAsync();
-        return mapper.Map<List<GetIndicationDto>>(indications);
+        return mapper.Map<List<GetAttributeDto>>(indications);
     }
 
-    public async Task<GetIndicationDto?> GetIndicationByIdAsync(int id)
+    public async Task<GetAttributeDto?> GetIndicationByIdAsync(int id)
     {
         var indication = await indicationRepository.GetByIdAsync(id);
-        return mapper.Map<GetIndicationDto>(indication);
+        return mapper.Map<GetAttributeDto>(indication);
     }
 
-    public async Task<GetIndicationDto> CreateIndicationAsync(CreateIndicationDto newIndication)
+    public async Task<GetAttributeDto> CreateIndicationAsync(CreateAttributeDto newIndication)
     {
         try
         {
             var indicationEntity = mapper.Map<Indication>(newIndication);
             var indication = await indicationRepository.InsertAsync(indicationEntity);
 
-            return mapper.Map<GetIndicationDto>(indication);
+            return mapper.Map<GetAttributeDto>(indication);
         }
         catch (Exception ex)
         {
@@ -35,7 +35,7 @@ public class IndicationService(IIndicationRepository indicationRepository, IMapp
         }
     }
 
-    public async Task<bool> UpdateIndicationAsync(int id, CreateIndicationDto updatedIndication)
+    public async Task<bool> UpdateIndicationAsync(int id, CreateAttributeDto updatedIndication)
     {
         var indication = await indicationRepository.GetByIdAsync(id);
 

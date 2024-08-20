@@ -1,6 +1,6 @@
-namespace EPharm.Domain.Dtos.IndicationDto;
+namespace EPharm.Domain.Dtos.AttributeDtos;
 
-public class CreateIndicationDto
+public class CreateAttributeDto
 {
     public string Name { get; set; }
     public string? Description { get; set; }

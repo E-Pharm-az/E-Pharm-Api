@@ -1,12 +1,12 @@
-using EPharm.Domain.Dtos.IndicationDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 
 namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface IIndicationService
 {
-    Task<List<GetIndicationDto>> GetAllIndicationsAsync();
-    Task<GetIndicationDto?> GetIndicationByIdAsync(int id);
-    Task<GetIndicationDto> CreateIndicationAsync(CreateIndicationDto newIndication);
-    Task<bool> UpdateIndicationAsync(int id, CreateIndicationDto updatedIndication);
+    Task<List<GetAttributeDto>> GetAllIndicationsAsync();
+    Task<GetAttributeDto?> GetIndicationByIdAsync(int id);
+    Task<GetAttributeDto> CreateIndicationAsync(CreateAttributeDto newIndication);
+    Task<bool> UpdateIndicationAsync(int id, CreateAttributeDto updatedIndication);
     Task<bool> DeleteIndicationAsync(int id);
 }

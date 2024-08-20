@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.AllergyDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 public class AllergiesController(IAllergyService allergyService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetAllergyDto>>> GetAllAllergies()
+    public async Task<ActionResult<IEnumerable<GetAttributeDto>>> GetAllAllergies()
     {
         var result = await allergyService.GetAllAllergiesAsync();
         if (result.Any()) return Ok(result);
@@ -21,7 +21,7 @@ public class AllergiesController(IAllergyService allergyService) : ControllerBas
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GetAllergyDto>> GetAllergyById(int id)
+    public async Task<ActionResult<GetAttributeDto>> GetAllergyById(int id)
     {
         var result = await allergyService.GetAllergyByIdAsync(id);
         if (result is not null) return Ok(result);
@@ -31,7 +31,7 @@ public class AllergiesController(IAllergyService allergyService) : ControllerBas
 
     [HttpPost]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<GetAllergyDto>> CreateAllergy(CreateAllergyDto allergyDto)
+    public async Task<ActionResult<GetAttributeDto>> CreateAllergy(CreateAttributeDto allergyDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
@@ -50,7 +50,7 @@ public class AllergiesController(IAllergyService allergyService) : ControllerBas
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult> UpdateAllergy(int id, CreateAllergyDto allergyDto)
+    public async Task<ActionResult> UpdateAllergy(int id, CreateAttributeDto allergyDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");

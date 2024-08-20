@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.AllergyDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
@@ -8,26 +8,26 @@ namespace EPharm.Domain.Services.Entities;
 
 public class AllergyService(IAllergyRepository allergyRepository, IMapper mapper) : IAllergyService
 {
-    public async Task<IEnumerable<GetAllergyDto>> GetAllAllergiesAsync()
+    public async Task<IEnumerable<GetAttributeDto>> GetAllAllergiesAsync()
     {
         var allergies = await allergyRepository.GetAllAsync();
-        return mapper.Map<IEnumerable<GetAllergyDto>>(allergies);
+        return mapper.Map<IEnumerable<GetAttributeDto>>(allergies);
     }
 
-    public async Task<GetAllergyDto?> GetAllergyByIdAsync(int id)
+    public async Task<GetAttributeDto?> GetAllergyByIdAsync(int id)
     {
         var allergy = await allergyRepository.GetByIdAsync(id);
-        return mapper.Map<GetAllergyDto>(allergy);
+        return mapper.Map<GetAttributeDto>(allergy);
     }
 
-    public async Task<GetAllergyDto> CreateAllergyAsync(CreateAllergyDto allergyDto)
+    public async Task<GetAttributeDto> CreateAllergyAsync(CreateAttributeDto allergyDto)
     {
         try
         {
             var allergyEntity = mapper.Map<Allergy>(allergyDto);
             var allergy = await allergyRepository.InsertAsync(allergyEntity);
 
-            return mapper.Map<GetAllergyDto>(allergy);
+            return mapper.Map<GetAttributeDto>(allergy);
         }
         catch (Exception ex)
         {
@@ -35,7 +35,7 @@ public class AllergyService(IAllergyRepository allergyRepository, IMapper mapper
         }
     }
 
-    public async Task<bool> UpdateAllergyAsync(int id, CreateAllergyDto allergyDto)
+    public async Task<bool> UpdateAllergyAsync(int id, CreateAttributeDto allergyDto)
     {
         var allergy = await allergyRepository.GetByIdAsync(id);
 

@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.RouteOfAdministrationDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 public class RouteOfAdministrationsController(IRouteOfAdministrationService routeOfAdministrationService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetRouteOfAdministrationDto>>> GetAllRouteOfAdministrations()
+    public async Task<ActionResult<IEnumerable<GetAttributeDto>>> GetAllRouteOfAdministrations()
     {
         var result = await routeOfAdministrationService.GetAllRouteOfAdministrationsAsync();
         if (result.Any()) return Ok(result);
@@ -21,7 +21,7 @@ public class RouteOfAdministrationsController(IRouteOfAdministrationService rout
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GetRouteOfAdministrationDto>> GetRouteOfAdministrationById(int id)
+    public async Task<ActionResult<GetAttributeDto>> GetRouteOfAdministrationById(int id)
     {
         var result = await routeOfAdministrationService.GetRouteOfAdministrationByIdAsync(id);
         if (result is not null) return Ok(result);
@@ -31,7 +31,7 @@ public class RouteOfAdministrationsController(IRouteOfAdministrationService rout
 
     [HttpPost]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<GetRouteOfAdministrationDto>> CreateRouteOfAdministration(CreateRouteOfAdministrationDto routeOfAdministrationDto)
+    public async Task<ActionResult<GetAttributeDto>> CreateRouteOfAdministration(CreateAttributeDto routeOfAdministrationDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
@@ -50,12 +50,12 @@ public class RouteOfAdministrationsController(IRouteOfAdministrationService rout
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult> UpdateRouteOfAdministration(int id, CreateRouteOfAdministrationDto routeOfAdministrationDto)
+    public async Task<ActionResult> UpdateRouteOfAdministration(int id, CreateAttributeDto routeOfAdministrationDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
         
-        var result = await routeOfAdministrationService.UpdateRouteOfAdministrationAsync(id, routeOfAdministrationDto);
+        var result = await routeOfAdministrationService.UpdateRouteOfAdministrationAsync(id,  routeOfAdministrationDto);
         if (result) return Ok();
         
         return BadRequest($"Route of administration with ID: {id} could not be updated.");

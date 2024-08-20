@@ -1,4 +1,4 @@
-using EPharm.Domain.Dtos.IndicationDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Domain.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +12,7 @@ namespace EPharmApi.Controllers.ProductControllers;
 public class IndicationsController(IIndicationService indicationService) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GetIndicationDto>>> GetAllIndications()
+    public async Task<ActionResult<IEnumerable<GetAttributeDto>>> GetAllIndications()
     {
         var result = await indicationService.GetAllIndicationsAsync();
         if (result.Count != 0) return Ok(result);
@@ -21,7 +21,7 @@ public class IndicationsController(IIndicationService indicationService) : Contr
     }
 
     [HttpGet("{id:int}")]
-    public async Task<ActionResult<GetIndicationDto>> GetIndicationById(int id)
+    public async Task<ActionResult<GetAttributeDto>> GetIndicationById(int id)
     {
         var result = await indicationService.GetIndicationByIdAsync(id);
         if (result is not null) return Ok(result);
@@ -31,7 +31,7 @@ public class IndicationsController(IIndicationService indicationService) : Contr
 
     [HttpPost]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<GetIndicationDto>> CreateIndication(CreateIndicationDto indicationDto)
+    public async Task<ActionResult<GetAttributeDto>> CreateIndication(CreateAttributeDto indicationDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
@@ -50,7 +50,7 @@ public class IndicationsController(IIndicationService indicationService) : Contr
 
     [HttpPut("{id:int}")]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult> UpdateIndication(int id, CreateIndicationDto indicationDto)
+    public async Task<ActionResult> UpdateIndication(int id, CreateAttributeDto indicationDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");

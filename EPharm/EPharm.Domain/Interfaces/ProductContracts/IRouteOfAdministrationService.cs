@@ -1,15 +1,12 @@
-using EPharm.Domain.Dtos.RouteOfAdministrationDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 
 namespace EPharm.Domain.Interfaces.ProductContracts;
 
 public interface IRouteOfAdministrationService
 {
-    Task<IEnumerable<GetRouteOfAdministrationDto>> GetAllRouteOfAdministrationsAsync();
-    Task<GetRouteOfAdministrationDto?> GetRouteOfAdministrationByIdAsync(int id);
-
-    Task<GetRouteOfAdministrationDto> CreateRouteOfAdministrationAsync(
-        CreateRouteOfAdministrationDto routeOfAdministrationDto);
-
-    Task<bool> UpdateRouteOfAdministrationAsync(int id, CreateRouteOfAdministrationDto routeOfAdministrationDto);
+    Task<IEnumerable<GetAttributeDto>> GetAllRouteOfAdministrationsAsync();
+    Task<GetAttributeDto?> GetRouteOfAdministrationByIdAsync(int id);
+    Task<GetAttributeDto> CreateRouteOfAdministrationAsync(CreateAttributeDto routeOfAdministrationDto);
+    Task<bool> UpdateRouteOfAdministrationAsync(int id, CreateAttributeDto routeOfAdministrationDto);
     Task<bool> DeleteRouteOfAdministrationAsync(int id);
 }

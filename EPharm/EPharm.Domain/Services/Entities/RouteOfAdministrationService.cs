@@ -1,5 +1,5 @@
 using AutoMapper;
-using EPharm.Domain.Dtos.RouteOfAdministrationDto;
+using EPharm.Domain.Dtos.AttributeDtos;
 using EPharm.Domain.Interfaces.ProductContracts;
 using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
@@ -10,27 +10,26 @@ public class RouteOfAdministrationService(
     IRouteOfAdministrationRepository routeOfAdministrationRepository,
     IMapper mapper) : IRouteOfAdministrationService
 {
-    public async Task<IEnumerable<GetRouteOfAdministrationDto>> GetAllRouteOfAdministrationsAsync()
+    public async Task<IEnumerable<GetAttributeDto>> GetAllRouteOfAdministrationsAsync()
     {
         var routeOfAdministrations = await routeOfAdministrationRepository.GetAllAsync();
-        return mapper.Map<IEnumerable<GetRouteOfAdministrationDto>>(routeOfAdministrations);
+        return mapper.Map<IEnumerable<GetAttributeDto>>(routeOfAdministrations);
     }
 
-    public async Task<GetRouteOfAdministrationDto?> GetRouteOfAdministrationByIdAsync(int id)
+    public async Task<GetAttributeDto?> GetRouteOfAdministrationByIdAsync(int id)
     {
         var routeOfAdministration = await routeOfAdministrationRepository.GetByIdAsync(id);
-        return mapper.Map<GetRouteOfAdministrationDto>(routeOfAdministration);
+        return mapper.Map<GetAttributeDto>(routeOfAdministration);
     }
 
-    public async Task<GetRouteOfAdministrationDto> CreateRouteOfAdministrationAsync(
-        CreateRouteOfAdministrationDto routeOfAdministrationDto)
+    public async Task<GetAttributeDto> CreateRouteOfAdministrationAsync(CreateAttributeDto routeOfAdministrationDto)
     {
         try
         {
             var routeOfAdministrationEntity = mapper.Map<RouteOfAdministration>(routeOfAdministrationDto);
             var routeOfAdministration = await routeOfAdministrationRepository.InsertAsync(routeOfAdministrationEntity);
 
-            return mapper.Map<GetRouteOfAdministrationDto>(routeOfAdministration);
+            return mapper.Map<GetAttributeDto>(routeOfAdministration);
         }
         catch (Exception ex)
         {
@@ -38,8 +37,7 @@ public class RouteOfAdministrationService(
         }
     }
 
-    public async Task<bool> UpdateRouteOfAdministrationAsync(int id,
-        CreateRouteOfAdministrationDto routeOfAdministrationDto)
+    public async Task<bool> UpdateRouteOfAdministrationAsync(int id, CreateAttributeDto routeOfAdministrationDto)
     {
         var routeOfAdministration = await routeOfAdministrationRepository.GetByIdAsync(id);
 
