@@ -1,4 +1,3 @@
-using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Jwt;
 using Microsoft.AspNetCore.Mvc;

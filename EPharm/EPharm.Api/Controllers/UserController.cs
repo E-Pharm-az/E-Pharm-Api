@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using EPharm.Domain.Dtos.AuthDto;
 using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
@@ -98,25 +97,6 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
             return StatusCode(500, new { error = "An unexpected error occurred", code = "INTERNAL_SERVER_ERROR" });
         }
     }
-    
-    [HttpPost("guest")]
-    public async Task<IActionResult> RegisterGuest([FromBody] CreateGuestDto request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            await userService.CreateUserAsync(request);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error creating guest.");
-            return BadRequest("Error creating guest.");
-        }
-    }
-    
     
     [HttpPost("confirm-email")]
     public async Task<IActionResult> ConfirmEmail(ConfirmEmailDto request)
@@ -236,7 +216,7 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
 
     [HttpPost]
     [Route("initiate-password-change")]
-    public async Task<IActionResult> InitiatePasswordChange([FromBody] InitiatePasswordChangeRequest request)
+    public async Task<IActionResult> InitiatePasswordChange([FromBody] EmailDto request)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);

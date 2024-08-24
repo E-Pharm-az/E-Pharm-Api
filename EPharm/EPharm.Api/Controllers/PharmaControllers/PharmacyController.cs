@@ -116,25 +116,6 @@ public class PharmacyController(IPharmacyService pharmacyService) : ControllerBa
         }
     }
 
-    [HttpPost("register")]
-    [Authorize(Roles = IdentityData.Admin)]
-    public async Task<IActionResult> Register([FromBody] CreatePharmaDto request)
-    {
-        if (!ModelState.IsValid)
-            return BadRequest(ModelState);
-
-        try
-        {
-            await pharmacyService.Register(request);
-            return Ok();
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "Error creating pharma admin.");
-            return BadRequest("Error creating admin.");
-        }
-    }
-
     [HttpPut("{id:int}")]
     [Authorize(Roles = IdentityData.Admin)]
     public async Task<ActionResult> UpdatePharmaCompany(int id, [FromBody] CreatePharmacyDto pharmacyDto)

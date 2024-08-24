@@ -14,7 +14,7 @@ public interface IUserService
     public Task InitializeUserAsync(InitializeUserDto initializeUserDto);
     public Task<GetUserDto> CreateAdminAsync(EmailDto emailDto);
     public Task<bool> UpdateUserAsync(string id, EmailDto emailDto);
-    public Task InitiatePasswordChange(InitiatePasswordChangeRequest passwordChangeRequest);
+    public Task InitiatePasswordChange(EmailDto passwordChangeRequest);
     public Task<AppIdentityUser> CreateUserAsync<T>(T user, string[]? identityRoles = null) where T : EmailDto;
     public Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest);
     public Task ConfirmEmailAsync(ConfirmEmailDto request);

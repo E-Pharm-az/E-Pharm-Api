@@ -10,7 +10,6 @@ public interface IPharmacyService
     public Task<GetPharmacyDto?> GetPharmacyByIdAsync(int pharmaCompanyId);
     public Task InviteAsync(InvitePharmacyDto invitePharmacyDto);
     public Task<AppIdentityUser> VerifyInvitationAsync(string userId);
-    public Task<GetPharmacyDto> Register(CreatePharmaDto createPharmaDto);
     public Task<GetPharmacyDto> CreateAsync(string userId, CreatePharmacyDto createPharmacyDto);
     public Task<bool> UpdateAsync(int id, CreatePharmacyDto pharmacyDto);
     public Task<bool> DeleteAsync(int pharmacyId);

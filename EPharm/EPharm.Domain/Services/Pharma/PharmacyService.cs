@@ -111,32 +111,6 @@ public class PharmacyService(
         return mapper.Map<GetPharmacyDto>(pharmacy);
     }
 
-    public async Task<GetPharmacyDto> Register(CreatePharmaDto createPharmaDto)
-    {
-        var user = await userService.CreateUserAsync(createPharmaDto.UserRequest, [IdentityData.PharmacyAdmin, IdentityData.PharmacyStaff]);
-        
-        GetPharmacyDto pharmacyDto = new();
-
-        await unitOfWork.ExecuteTransactionAsync(async () =>
-        {
-            var pharmacy = await CreatePharmacyAsync(createPharmaDto.PharmacyRequest, user.Id);
-            pharmacyDto = mapper.Map<GetPharmacyDto>(pharmacy);
-            
-            await pharmacyStaffService.CreateAsync(new CreatePharmacyStaffDto
-            {
-                Email = user.Email!,
-                ExternalId = user.Id,
-                PharmacyId = pharmacy.Id
-            });
-        });
-
-        user.EmailConfirmed = true;
-        user.IsAccountSetup = true;
-        await userManager.UpdateAsync(user);
-
-        return pharmacyDto;
-    }
-
     public async Task<bool> UpdateAsync(int id, CreatePharmacyDto pharmacyDto)
     {
         var pharmaCompany = await pharmacyRepository.GetByIdAsync(id);
