@@ -40,6 +40,7 @@ both technical and non-technical users with a clear understanding of how to inte
 
 - [Auth overview](https://github.com/E-Pharm-az/E-Pharm-Api/blob/main/EPharm/EPharm.Api/Controllers/Docs/auth-overview.md)
 - [User and registration overview](https://github.com/E-Pharm-az/E-Pharm-Api/blob/main/EPharm/EPharm.Api/Controllers/Docs/user-overview.md)
+- _More comming soon..._
 
 
 ## Todo
