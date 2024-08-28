@@ -213,6 +213,8 @@ public class Startup(IConfiguration configuration)
 
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
+        
+       services.AddScoped<IPayPalClient, PayPalClient>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder,

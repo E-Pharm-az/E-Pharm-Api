@@ -17,4 +17,6 @@ public class AppIdentityUser : IdentityUser
     public int CodeVerificationFailedAttempts { get; set; }
     public DateTime CodeExpiryTime { get; set; }
     public DateTime LockoutEnd { get; set; }
+    public DateTime LastLoginTime { get; set; }
+    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

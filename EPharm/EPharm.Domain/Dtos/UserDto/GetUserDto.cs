@@ -10,4 +10,5 @@ public class GetUserDto
     public string? District { get; set; }
     public string? City { get; set; }
     public int? Zip { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

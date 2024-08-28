@@ -81,5 +81,5 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
         await Entities
             .Where(product => productIds.Contains(product.Id) && product.IsApproved)
             .Include(product => product.Stock).ThenInclude(product => product.Warehouse)
-            .AsNoTracking().ToListAsync();
+            .ToListAsync();
 }

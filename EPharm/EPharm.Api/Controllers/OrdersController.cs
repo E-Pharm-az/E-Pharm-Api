@@ -64,13 +64,6 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
         return NotFound("Orders not found.");
     }
 
-    [HttpPost("token")]
-    public async Task<ActionResult<string>> GetToken()
-    {
-        var token = await orderService.GenerateClientTokenAsync();
-        return Ok(token);
-    }
-
     [HttpPost]
     public async Task<ActionResult<GetOrderDto>> CreateOrder([FromBody] CreateOrderDto orderDto)
     {
@@ -105,7 +98,7 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
         }
     }
 
-    [HttpPost("{orderId}")]
+    [HttpPost("{orderId}/capture")]
     public async Task<IActionResult> CaptureOrder(string orderId)
     {
         try

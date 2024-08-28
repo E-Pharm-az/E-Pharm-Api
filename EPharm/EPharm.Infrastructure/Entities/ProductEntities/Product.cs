@@ -30,7 +30,7 @@ public class Product : BaseEntity
     public int? RegulatoryInformationId { get; set; }
     public RegulatoryInformation? RegulatoryInformation { get; set; }
     
-    public int Price { get; set; }
+    public decimal Price { get; set; }
     public int CostPerItem { get; set; }
     public string? BatchNumber { get; set; }
     public string? Barcode { get; set; }

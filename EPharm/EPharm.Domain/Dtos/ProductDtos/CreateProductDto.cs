@@ -30,7 +30,7 @@ public class CreateProductDto
     public int[]? UsageWarningsIds { get; set; }
     public DateTime ManufacturingDate { get; set; }
     public DateTime ExpiryDate { get; set; }
-    public int Price { get; set; }
+    public decimal Price { get; set; }
     public int CostPerItem { get; set; }
     public List<CreateStockDto> Stocks { get; set; }
     public string? BatchNumber { get; set; }
