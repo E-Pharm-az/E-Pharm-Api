@@ -143,11 +143,6 @@ public class Startup(IConfiguration configuration)
             );
         });
         
-        services.Configure<FormOptions>(options =>
-        {
-            options.MultipartBodyLengthLimit = 10 * 1024 * 1024; // 10 MB
-        });
-
         services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
         services.AddDbContext<AppDbContext>(

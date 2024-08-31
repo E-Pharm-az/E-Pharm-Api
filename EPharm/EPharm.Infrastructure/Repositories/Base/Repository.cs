@@ -29,7 +29,7 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         
         await _context.SaveChangesAsync();
 
-        return (await Entities.AsNoTracking().SingleOrDefaultAsync(s => s.Id == entityItem.Entity.Id))!;
+        return (await Entities.SingleOrDefaultAsync(s => s.Id == entityItem.Entity.Id))!;
     }
 
     public virtual async Task InsertManyAsync(IEnumerable<T> entities)

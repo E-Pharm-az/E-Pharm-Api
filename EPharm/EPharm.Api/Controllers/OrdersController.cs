@@ -75,10 +75,6 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
             var result = await orderService.CreateOrderAsync(orderDto);
             return Ok(result);
         }
-        catch (Exception ex) when (ex.Message == "MISSING_EMAIL_FOR_ORDER")
-        {
-            return BadRequest(new { Error = "Email is required for the order." });
-        }
         catch (Exception ex) when (ex.Message == "PRODUCT_NOT_FOUND")
         {
             return NotFound(new { Error = "One or more products in the order were not found." });

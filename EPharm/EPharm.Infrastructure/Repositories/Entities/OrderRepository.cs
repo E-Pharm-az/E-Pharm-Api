@@ -23,7 +23,7 @@ public class OrderRepository(AppDbContext context) : Repository<Order>(context),
             .ToListAsync();
 
     public async Task<IEnumerable<Order>> GetAllUserOrdersAsync(string userId) =>
-        await Entities.Where(o => o.UserId == userId)
+        await Entities.Where(o => o.UserId == userId && o.IsPaid == true)
             .Include(o => o.OrderProducts)
             .ThenInclude(o => o.Product)
             .ToListAsync();

@@ -72,6 +72,7 @@ public class OrderService(
                 throw new ArgumentException("FAILED_TO_CAPTURE_PAYPAL_ORDER");
 
             order.Status = OrderStatus.Paid;
+            order.IsPaid = true;
             orderRepository.Update(order);
         });
     }
