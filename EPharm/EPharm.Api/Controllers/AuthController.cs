@@ -98,7 +98,7 @@ public class AuthController(IAuthService authService) : ControllerBase
             HttpOnly = true,
             Secure = true,
             IsEssential = true,
-            SameSite = SameSiteMode.Strict,
+            SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(-1)
         };
 
