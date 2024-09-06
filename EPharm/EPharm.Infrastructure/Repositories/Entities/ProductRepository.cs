@@ -35,23 +35,67 @@ public class ProductRepository(AppDbContext context) : Repository<Product>(conte
             .ToListAsync();
     }
 
-    public async Task<Product?> GetDetailProductByIdAsync(int id) =>
-        await Entities 
+    public async Task<Product?> GetDetailProductByIdAsync(int id)
+    {
+        var product = await Entities
             .Where(product => product.Id == id)
             .Include(product => product.Pharmacy)
             .Include(product => product.SpecialRequirement)
             .Include(product => product.Manufacturer)
             .Include(product => product.RegulatoryInformation)
-            .Include(product => product.Stock).ThenInclude(product => product.Warehouse)
-            .Include(product => product.ActiveIngredients).ThenInclude(product => product.ActiveIngredient)
-            .Include(product => product.DosageForms).ThenInclude(product => product.DosageForm)
-            .Include(product => product.RouteOfAdministrations).ThenInclude(product => product.RouteOfAdministration)
-            .Include(product => product.SideEffects).ThenInclude(product => product.SideEffect)
-            .Include(product => product.UsageWarnings).ThenInclude(product => product.UsageWarning)
-            .Include(product => product.Allergies).ThenInclude(product => product.Allergy)
-            .Include(product => product.Indications).ThenInclude(product => product.Indication)
             .AsNoTracking()
             .SingleOrDefaultAsync();
+
+        if (product != null)
+        {
+            await LoadRelatedEntities(product);
+        }
+
+        return product;
+    }
+    
+    private async Task LoadRelatedEntities(Product product)
+    {
+        product.Stock = await context.WarehouseProduct
+            .Where(s => s.ProductId == product.Id)
+            .Include(s => s.Warehouse)
+            .ToListAsync();
+
+        product.ActiveIngredients = await context.ProductActiveIngredients
+            .Where(ai => ai.ProductId == product.Id)
+            .Include(ai => ai.ActiveIngredient)
+            .ToListAsync();
+
+        product.DosageForms = await context.ProductDosageForms
+            .Where(df => df.ProductId == product.Id)
+            .Include(df => df.DosageForm)
+            .ToListAsync();
+        
+        product.RouteOfAdministrations = await context.ProductRouteOfAdministrations
+            .Where(roa => roa.ProductId == product.Id)
+            .Include(roa => roa.RouteOfAdministration)
+            .ToListAsync();
+
+        product.SideEffects = await context.ProductSideEffects
+            .Where(se => se.ProductId == product.Id)
+            .Include(se => se.SideEffect)
+            .ToListAsync();
+
+        product.UsageWarnings = await context.ProductUsageWarnings
+            .Where(uw => uw.ProductId == product.Id)
+            .Include(uw => uw.UsageWarning)
+            .ToListAsync();
+
+        product.Allergies = await context.ProductAllergies
+            .Where(a => a.ProductId == product.Id)
+            .Include(a => a.Allergy)
+            .ToListAsync();
+
+        product.Indications = await context.IndicationProducts
+            .Where(i => i.ProductId == product.Id)
+            .Include(i => i.Indication)
+            .ToListAsync();
+    }
 
     public async Task<IEnumerable<Product>> GetApprovedAllPharmaCompanyProductsAsync(int pharmaCompanyId, int page, int pageSize)
     {

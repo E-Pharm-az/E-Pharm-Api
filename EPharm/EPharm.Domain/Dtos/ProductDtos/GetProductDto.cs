@@ -18,5 +18,5 @@ public class GetProductDto
     public DateTime ExpiryDate { get; set; }
 
     public decimal Price { get; set; }
-    public ICollection<GetStockDto> Stock { get; set; }
+    public int Stock { set; get; }
 }

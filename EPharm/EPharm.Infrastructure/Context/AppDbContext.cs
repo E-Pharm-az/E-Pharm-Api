@@ -23,7 +23,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<SpecialRequirement> SpecialRequirements { get; set; }
     public DbSet<UsageWarning> UsageWarnings { get; set; }
     public DbSet<Warehouse> Warehouses { get; set; }
-    
+    public DbSet<WarehouseProduct> WarehouseProduct { get; set; }
     public DbSet<IndicationProduct> IndicationProducts { get; set; }
     public DbSet<ProductActiveIngredient> ProductActiveIngredients { get; set; }
     public DbSet<ProductAllergy> ProductAllergies { get; set; }
