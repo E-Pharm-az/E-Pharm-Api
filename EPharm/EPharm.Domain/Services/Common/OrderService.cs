@@ -1,5 +1,6 @@
 using System.Globalization;
 using AutoMapper;
+using EPharm.Domain.Dtos.EmailDto;
 using EPharm.Domain.Dtos.OrderDto;
 using EPharm.Domain.Dtos.PayPalDtos;
 using EPharm.Domain.Dtos.PayPalDtos.Payload;
@@ -22,7 +23,9 @@ public class OrderService(
     IOrderProductRepository orderProductRepository,
     IProductRepository productRepository,
     IMapper mapper,
-    IPayPalClient payPalClient)
+    IPayPalClient payPalClient,
+    IEmailSender emailSender,
+    IOrderConfirmationEmail orderConfirmationEmail)
     : IOrderService
 {
 
@@ -71,9 +74,19 @@ public class OrderService(
             if (!response.IsSuccessful)
                 throw new ArgumentException("FAILED_TO_CAPTURE_PAYPAL_ORDER");
 
-            order.Status = OrderStatus.Paid;
+            order.Status = OrderStatus.Confirmed;
             order.IsPaid = true;
             orderRepository.Update(order);
+
+            var user = await userManager.FindByIdAsync(order.UserId) ?? throw new Exception("USER_NOT_FOUND");
+            var email = orderConfirmationEmail.GenerateEmail(order, user);
+            
+            await emailSender.SendEmailAsync(new CreateEmailDto
+            {
+                Email = user.Email!,
+                Subject = "Order Confirmation",
+                Message = email
+            });
         });
     }
 
@@ -136,7 +149,7 @@ public class OrderService(
     {
         var orderEntity = mapper.Map<Order>(orderDto);
         orderEntity.TrackingId = payPalResponse.Id;
-        orderEntity.Status = OrderStatus.PendingPayment;
+        orderEntity.Status = OrderStatus.Pending;
 
         var user = await userManager.FindByIdAsync(orderDto.UserId) ?? throw new Exception("USER_NOT_FOUND");
 

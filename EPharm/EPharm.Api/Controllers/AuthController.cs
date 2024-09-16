@@ -1,5 +1,7 @@
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Models.Jwt;
+using EPharm.Infrastructure.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
@@ -18,8 +20,9 @@ public class AuthController(IAuthService authService) : ControllerBase
         try
         {
             var response = await authService.ProcessLoginAsync(request, role);
-            SetAuthCookies(response);
-            return Ok(response);
+            SetAuthCookies(response.TokenResponse);
+            
+            return Ok(response.UserResponse);
         }
         catch (Exception ex) when (ex.Message == "INVALID_CREDENTIALS")
         {
@@ -52,8 +55,9 @@ public class AuthController(IAuthService authService) : ControllerBase
                 return BadRequest("Token not found.");
                 
             var response = await authService.RefreshTokenAsync(accessToken, refreshToken, role);
-            SetAuthCookies(response);
-            return Ok(response);
+            SetAuthCookies(response.TokenResponse);
+            
+            return Ok(response.UserResponse);
         }
         catch (Exception ex) when (ex.Message == "INVALID_TOKEN")
         {
@@ -85,7 +89,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         return Ok();
     }
 
-    private void SetAuthCookies(AuthResponse response)
+    private void SetAuthCookies(TokenResponse response)
     {
         SetCookie("accessToken", response.Token, DateTime.MaxValue);
         SetCookie("refreshToken", response.RefreshToken, DateTime.UtcNow.AddDays(7));

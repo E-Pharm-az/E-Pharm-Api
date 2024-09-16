@@ -38,8 +38,11 @@ public class TokenService(IConfiguration configuration) : ITokenService
 
         return new AuthResponse
         {
-            Token = tokenString,
-            ValidTo = token.ValidTo.ToString(CultureInfo.InvariantCulture)
+            TokenResponse = new TokenResponse
+            {
+                Token = tokenString,
+                ValidTo = token.ValidTo.ToString(CultureInfo.InvariantCulture)
+            }
         }; 
     }
 

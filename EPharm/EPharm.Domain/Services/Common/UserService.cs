@@ -70,14 +70,14 @@ public class UserService(
         return mapper.Map<GetUserDto>(user);
     }
 
-    public async Task<bool> UpdateUserAsync(string id, EmailDto emailDto)
+    public async Task<bool> UpdateUserAsync(string id, UpdateUserDto userDto)
     {
         var user = await userManager.FindByIdAsync(id);
 
         if (user is null)
             return false;
 
-        mapper.Map(emailDto, user);
+        mapper.Map(userDto, user);
 
         var result = await userManager.UpdateAsync(user);
 

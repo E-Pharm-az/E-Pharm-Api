@@ -208,8 +208,9 @@ public class Startup(IConfiguration configuration)
 
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IAuthService, AuthService>();
-        
-       services.AddScoped<IPayPalClient, PayPalClient>();
+
+        services.AddScoped<IPayPalClient, PayPalClient>();
+        services.AddScoped<IOrderConfirmationEmail, OrderConfirmationEmail>();
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DbSeeder dbSeeder,
@@ -244,5 +245,6 @@ public class Startup(IConfiguration configuration)
         emailService.CompileEmail("pharmacy-staff-invitation", "Emails/pharmacy_staff_invitation.html").Wait();
         emailService.CompileEmail("change-password", "Emails/change_password.html").Wait();
         emailService.CompileEmail("confirmation", "Emails/confirmation.html").Wait();
+        emailService.CompileEmail("order-confirmation", "Emails/order_confirmation.html").Wait();
     }
 }

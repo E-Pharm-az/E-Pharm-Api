@@ -178,7 +178,7 @@ public class UserController(IUserService userService, UserManager<AppIdentityUse
 
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<ActionResult> UpdateUser(string id, [FromBody] EmailDto userDto)
+    public async Task<ActionResult> UpdateUser(string id, [FromBody] UpdateUserDto userDto)
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");

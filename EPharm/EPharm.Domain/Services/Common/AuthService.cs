@@ -1,4 +1,6 @@
 using System.Security.Claims;
+using AutoMapper;
+using EPharm.Domain.Dtos.UserDto;
 using EPharm.Domain.Interfaces.CommonContracts;
 using EPharm.Domain.Interfaces.JwtContracts;
 using EPharm.Domain.Models.Identity;
@@ -15,6 +17,7 @@ public class AuthService(
     ITokenService tokenService,
     IPharmacyRepository pharmacyRepository,
     IPharmacyStaffRepository pharmacyStaffRepository,
+    IMapper mapper,
     IConfiguration configuration)
     : IAuthService
 {
@@ -42,7 +45,9 @@ public class AuthService(
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(Convert.ToInt32(configuration["JwtSettings:RefreshTokenExpirationDays"]));
         await userManager.UpdateAsync(user);
 
-        response.RefreshToken = user.RefreshToken;
+        response.TokenResponse.RefreshToken = user.RefreshToken;
+        response.UserResponse = mapper.Map<GetUserDto>(user);
+        
         return response;
     }
 
@@ -68,7 +73,8 @@ public class AuthService(
             throw new Exception("INVALID_ROLE");
 
         var response = await CreateTokenBasedOnRole(user, roles);
-        response.RefreshToken = user.RefreshToken;
+        response.TokenResponse.RefreshToken = user.RefreshToken;
+        response.UserResponse = mapper.Map<GetUserDto>(user);
 
         return response;
     }

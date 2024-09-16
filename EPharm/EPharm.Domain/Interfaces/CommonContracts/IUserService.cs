@@ -13,7 +13,7 @@ public interface IUserService
     public Task CreateCustomerAsync(EmailDto emailDto);
     public Task InitializeUserAsync(InitializeUserDto initializeUserDto);
     public Task<GetUserDto> CreateAdminAsync(EmailDto emailDto);
-    public Task<bool> UpdateUserAsync(string id, EmailDto emailDto);
+    public Task<bool> UpdateUserAsync(string id, UpdateUserDto userDto);
     public Task InitiatePasswordChange(EmailDto passwordChangeRequest);
     public Task<AppIdentityUser> CreateUserAsync<T>(T user, string[]? identityRoles = null) where T : EmailDto;
     public Task ChangePassword(ChangePasswordWithTokenRequest passwordWithTokenRequest);

@@ -6,7 +6,7 @@ public class GetOrderDto
     public string UserId { get; set; }
     public ICollection<GetOrderProductDto> OrderProducts { get; set; }
     public string TrackingId { get; set; }
-    public string OrderStatus { get; set; }
+    public string Status { get; set; }
     public decimal TotalPrice { get; set; }
     public string Address { get; set; }
     public string District { get; set; }
