@@ -23,7 +23,6 @@ using EPharmApi.Services;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -198,6 +197,7 @@ public class Startup(IConfiguration configuration)
         services.AddScoped<IUsageWarningService, UsageWarningService>();
         services.AddScoped<IWarehouseService, WarehouseService>();
         services.AddScoped<IProductImageService, ProductImageService>();
+        services.AddScoped<ISalesService, SalesService>();
 
         services.AddScoped<IPharmacyService, PharmacyService>();
         services.AddScoped<IPharmacyStaffService, PharmacyStaffService>();

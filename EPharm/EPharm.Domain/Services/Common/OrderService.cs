@@ -84,7 +84,7 @@ public class OrderService(
             await emailSender.SendEmailAsync(new CreateEmailDto
             {
                 Email = user.Email!,
-                Subject = "Order Confirmation",
+                Subject = $"Order Confirmation #{order.TrackingId}",
                 Message = email
             });
         });
