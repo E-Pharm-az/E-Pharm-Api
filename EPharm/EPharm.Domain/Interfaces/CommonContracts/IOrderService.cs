@@ -6,8 +6,8 @@ namespace EPharm.Domain.Interfaces.CommonContracts;
 public interface IOrderService
 {
     public Task<IEnumerable<GetOrderDto>> GetAllOrders();
-    public Task<IEnumerable<GetOrderPharmacyDto>> GetAllPharmacyOrders(int pharmacyId);
-    public Task<IEnumerable<GetOrderDto>> GetAllUserOrders(string userId);
+    public Task<IEnumerable<GetOrderPharmacyDto>> GetAllPharmacyOrders(int pharmacyId, int page, int limit);
+    public Task<IEnumerable<GetOrderDto>> GetAllUserOrders(string userId, int page, int limit);
     public Task<GetOrderDto?> GetOrderByTrackingNumberAsync(string trackingNumber);
     public Task<GetOrderDto?> GetOrderByIdAsync(int orderId);
     public Task<CreateOrderResponse> CreateOrderAsync(CreateOrderDto orderDto);

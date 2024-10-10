@@ -1,6 +1,7 @@
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Entities.ProductEntities;
 using EPharm.Infrastructure.Interfaces.Entities;
+using EPharm.Infrastructure.Models;
 using EPharm.Infrastructure.Repositories.Base;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,17 +12,17 @@ public class OrderRepository(AppDbContext context) : Repository<Order>(context),
     public override async Task<Order?> GetByIdAsync(int id) =>
         await Entities
             .Include(o => o.OrderProducts)
-            .ThenInclude(o => o.Product)            
+            .ThenInclude(o => o.Product)
             .FirstOrDefaultAsync(o => o.Id == id);
 
-    public async Task<IEnumerable<Order>> GetAllPharmacyOrdersAsync(int pharmacyId) =>
-        await Entities
-            .Where(o => o.OrderProducts.Any(op => op.PharmacyId == pharmacyId))
-            .Include(o => o.OrderProducts.Where(op => op.PharmacyId == pharmacyId))
-            .ThenInclude(op => op.Product)
-            .AsNoTracking()
-            .ToListAsync();
-     
+    public async Task<PageResult<Order>> GetAllPharmacyOrdersAsync(int pharmacyId, int page, int limit)
+    {
+        return await base.GetPageAsync(page, limit, new QueryParameters<Order>
+        {
+            Filter = o => o.OrderProducts.Any(op => op.PharmacyId == pharmacyId),
+            Include = query => query.Include(o => o.OrderProducts.Where(op => op.PharmacyId == pharmacyId))
+        });
+    }
     public async Task<IEnumerable<Order>> GetAllUserOrdersAsync(string userId) =>
         await Entities.Where(o => o.UserId == userId && o.IsPaid == true)
             .Include(o => o.OrderProducts)
@@ -31,9 +32,9 @@ public class OrderRepository(AppDbContext context) : Repository<Order>(context),
     public async Task<IEnumerable<Order>> GetAllOrdersByDate(DateTime startDate, DateTime endDate, Func<IQueryable<Order>, IQueryable<Order>>? additionalQuery = null)
     {
         var baseQuery = Entities.Where(o => o.CreatedAt >= startDate && o.CreatedAt <= endDate);
-        
+
         var finalQuery = additionalQuery != null ? additionalQuery(baseQuery) : baseQuery;
-        
+
         return await finalQuery
             .Include(o => o.OrderProducts)
             .ThenInclude(o => o.Product)

@@ -21,7 +21,7 @@ public class AuthController(IAuthService authService) : ControllerBase
         {
             var response = await authService.ProcessLoginAsync(request, role);
             SetAuthCookies(response.TokenResponse);
-            
+
             return Ok(response.UserResponse);
         }
         catch (Exception ex) when (ex.Message == "INVALID_CREDENTIALS")
@@ -50,13 +50,13 @@ public class AuthController(IAuthService authService) : ControllerBase
         {
             var accessToken = HttpContext.Request.Cookies["accessToken"];
             var refreshToken = HttpContext.Request.Cookies["refreshToken"];
-            
+
             if (string.IsNullOrEmpty(accessToken) || string.IsNullOrEmpty(refreshToken))
                 return BadRequest("Token not found.");
-                
+
             var response = await authService.RefreshTokenAsync(accessToken, refreshToken, role);
             SetAuthCookies(response.TokenResponse);
-            
+
             return Ok(response.UserResponse);
         }
         catch (Exception ex) when (ex.Message == "INVALID_TOKEN")

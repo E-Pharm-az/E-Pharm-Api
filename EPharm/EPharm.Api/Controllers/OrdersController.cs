@@ -8,11 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Serilog;
 
-namespace EPharmApi.Controllers;
-
 [ApiController]
 [Route("api/[controller]")]
-public class OrdersController(IOrderService orderService, IPharmacyService pharmacyService) : ControllerBase
+public class OrdersController(IOrderService orderService) : ControllerBase
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
@@ -27,40 +25,36 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
     [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.Admin + "," + IdentityData.PharmacyStaff)]
     [RequirePharmacyId]
-    public async Task<ActionResult<IEnumerable<GetOrderPharmacyDto>>> GetPharmacyOrders(int? pharmacyId)
+    public async Task<ActionResult<IEnumerable<GetOrderPharmacyDto>>> GetPharmacyOrders([FromQuery] int? pharmacyId, [FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
             if (pharmacyId is null)
                 return BadRequest("PharmacyId is required.");
-            
-            var pharmacy = await pharmacyService.GetPharmacyByIdAsync(pharmacyId.Value);
-
-            if (pharmacy is null)
-                return NotFound("Pharmacy not found.");
         }
         else
         {
             pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
-        }        
-        var result = await orderService.GetAllPharmacyOrders(pharmacyId.Value);
+        }
+
+        var result = await orderService.GetAllPharmacyOrders(pharmacyId.Value, page, limit);
         if (result.Any()) return Ok(result);
 
         return NotFound("Orders not found.");
     }
-    
+
     [HttpGet("user/{userId}")]
     [Authorize]
-    public async Task<ActionResult<IEnumerable<GetOrderDto>>> GetAllUserOrders(string userId)
+    public async Task<ActionResult<IEnumerable<GetOrderDto>>> GetAllUserOrders(string userId, [FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         var currentUserId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
 
         if (!User.IsInRole(IdentityData.Admin) && currentUserId != userId)
             return Forbid();
-        
-        var result = await orderService.GetAllUserOrders(userId);
+
+        var result = await orderService.GetAllUserOrders(userId, page, limit);
         if (result.Any()) return Ok(result);
-        
+
         return NotFound("Orders not found.");
     }
 
@@ -131,20 +125,20 @@ public class OrdersController(IOrderService orderService, IPharmacyService pharm
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid");
-        
+
         var result = await orderService.UpdateOrderAsync(id, orderDto);
         if (result) return Ok();
-        
+
         return BadRequest($"Order with ID: {id} could not be updated.");
     }
-    
+
     [HttpDelete("{id:int}")]
     [Authorize(Roles = IdentityData.Admin)]
     public async Task<ActionResult> DeleteOrder(int id)
     {
         var result = await orderService.DeleteOrderAsync(id);
         if (result) return Ok();
-        
+
         return BadRequest($"Order with ID: {id} could not be deleted.");
     }
 }

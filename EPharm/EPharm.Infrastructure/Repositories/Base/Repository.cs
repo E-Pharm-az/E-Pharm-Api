@@ -1,6 +1,8 @@
+using System.Linq.Expressions;
 using EPharm.Infrastructure.Context;
 using EPharm.Infrastructure.Entities.Base;
 using EPharm.Infrastructure.Interfaces.Base;
+using EPharm.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EPharm.Infrastructure.Repositories.Base;
@@ -16,6 +18,31 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         Entities = context.Set<T>();
     }
 
+    public virtual async Task<PageResult<T>> GetPageAsync(int page, int limit, QueryParameters<T>? queryParameters = null)
+    {
+        IQueryable<T> query = Entities;
+
+        if (queryParameters != null)
+        {
+            if (queryParameters.Filter != null)
+                query = query.Where(queryParameters.Filter);
+
+            if (queryParameters.Include != null)
+                query = queryParameters.Include(query);
+        }
+
+        var offset = (page - 1) * limit;
+        var totalItems = await query.CountAsync();
+
+        var items = await query
+            .Skip(offset)
+            .Take(limit)
+            .AsNoTracking()
+            .ToListAsync();
+
+        return new PageResult<T>(limit, totalItems, items);
+    }
+
     public virtual async Task<IEnumerable<T>> GetAllAsync() =>
         await Entities.AsNoTracking().ToListAsync();
 
@@ -26,7 +53,7 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         ArgumentNullException.ThrowIfNull(entity);
         var entityItem = await Entities.AddAsync(entity);
-        
+
         await _context.SaveChangesAsync();
 
         return (await Entities.SingleOrDefaultAsync(s => s.Id == entityItem.Entity.Id))!;

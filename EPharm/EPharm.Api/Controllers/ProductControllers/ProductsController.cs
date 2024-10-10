@@ -19,7 +19,7 @@ public class ProductsController(
 {
     [HttpGet]
     [Authorize(Roles = IdentityData.Admin)]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllProducts([FromQuery] int page)
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllProducts([FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         try
         {
@@ -34,25 +34,25 @@ public class ProductsController(
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-    
+
     [HttpGet("{id:int}", Name = "getProductById")]
     public async Task<ActionResult<GetDetailProductDto>> GetProductById(int id)
     {
         try
         {
             var product = await productService.GetProductByIdAsync(id);
-            
+
             if (product is null)
                 return NotFound($"Product with ID: {id} not found.");
 
             if (product.IsApproved)
                 return Ok(product);
-            
+
             var user = HttpContext.User;
 
             if (user.IsInRole(IdentityData.Admin))
                 return Ok(product);
-        
+
             var pharmacyIdClaim = HttpContext.User.FindFirst("PharmacyId");
             if (pharmacyIdClaim == null || !int.TryParse(pharmacyIdClaim.Value, out var pharmacyId))
                 return BadRequest("Invalid or missing PharmacyId");
@@ -71,7 +71,7 @@ public class ProductsController(
     }
 
     [HttpGet("search")]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct([FromQuery] string query, [FromQuery] int page)
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> SearchProduct([FromQuery] string query, [FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         try
         {
@@ -90,13 +90,13 @@ public class ProductsController(
     [HttpGet("pharmacy")]
     [Authorize(Roles = IdentityData.PharmacyStaff + "," + IdentityData.Admin)]
     [RequirePharmacyId]
-    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllPharmacyProducts([FromQuery] int page, [FromQuery] int? pharmacyId = null)
+    public async Task<ActionResult<IEnumerable<GetProductDto>>> GetAllPharmacyProducts([FromQuery] int? pharmacyId = null, [FromQuery] int page = 1, [FromQuery] int limit = 10)
     {
         if (User.IsInRole(IdentityData.Admin))
         {
             if (pharmacyId is null)
                 return BadRequest("PharmacyId is required.");
-            
+
             var pharmacy = await pharmacyService.GetPharmacyByIdAsync(pharmacyId.Value);
 
             if (pharmacy is null)
@@ -106,7 +106,7 @@ public class ProductsController(
         {
             pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
         }
-        
+
         try
         {
             var result = await productService.GetAllPharmaCompanyProductsAsync(pharmacyId.Value, page);
@@ -126,7 +126,7 @@ public class ProductsController(
     public async Task<ActionResult> ApproveProduct(int productId)
     {
         var adminId = User.FindFirst(JwtRegisteredClaimNames.Jti)!.Value;
-        
+
         try
         {
             await productService.ApproveProductAsync(adminId, productId);
@@ -138,7 +138,7 @@ public class ProductsController(
             return StatusCode(500, new { Error = "An unexpected error occurred. Please try again later." });
         }
     }
-    
+
     [HttpPost]
     [Authorize(Roles = IdentityData.PharmacyStaff)]
     [RequirePharmacyId]
@@ -146,7 +146,7 @@ public class ProductsController(
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
-        
+
         var pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
 
         try
@@ -168,7 +168,7 @@ public class ProductsController(
     {
         if (!ModelState.IsValid)
             return BadRequest("Model not valid.");
-        
+
         var pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
 
         var result = await productService.UpdateProductAsync(pharmacyId, id, productDto);
@@ -192,7 +192,7 @@ public class ProductsController(
         {
             pharmacyId = (int)HttpContext.Items["PharmacyId"]!;
         }
-        
+
         var result = await productService.DeleteProductAsync(pharmacyId.Value, productId);
 
         if (result) return NoContent();

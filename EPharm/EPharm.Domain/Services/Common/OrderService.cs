@@ -32,10 +32,12 @@ public class OrderService(
     public async Task<IEnumerable<GetOrderDto>> GetAllOrders()
         => mapper.Map<IEnumerable<GetOrderDto>>(await orderRepository.GetAllAsync());
 
-    public async Task<IEnumerable<GetOrderPharmacyDto>> GetAllPharmacyOrders(int pharmacyId)
-        => mapper.Map<IEnumerable<GetOrderPharmacyDto>>(await orderRepository.GetAllPharmacyOrdersAsync(pharmacyId));
+    public async Task<IEnumerable<GetOrderPharmacyDto>> GetAllPharmacyOrders(int pharmacyId, int page, int limit)
+    {
+        return mapper.Map<IEnumerable<GetOrderPharmacyDto>>(await orderRepository.GetAllPharmacyOrdersAsync(pharmacyId, page, limit));
+    }
 
-    public async Task<IEnumerable<GetOrderDto>> GetAllUserOrders(string userId)
+    public async Task<IEnumerable<GetOrderDto>> GetAllUserOrders(string userId, int page, int limit)
         => mapper.Map<IEnumerable<GetOrderDto>>(await orderRepository.GetAllUserOrdersAsync(userId));
 
     public async Task<GetOrderDto?> GetOrderByTrackingNumberAsync(string trackingNumber)
@@ -52,6 +54,9 @@ public class OrderService(
         var response = await payPalClient.CreatePayPalOrderAsync(payload);
 
         if (!response.IsSuccessful)
+            throw new Exception("FAILED_TO_CREATE_PAYPAL_ORDER");
+
+        if (response.Data is null)
             throw new Exception("FAILED_TO_CREATE_PAYPAL_ORDER");
 
         return await SaveOrder(orderDto, response.Data, products);
@@ -80,7 +85,7 @@ public class OrderService(
 
             var user = await userManager.FindByIdAsync(order.UserId) ?? throw new Exception("USER_NOT_FOUND");
             var email = orderConfirmationEmail.GenerateEmail(order, user);
-            
+
             await emailSender.SendEmailAsync(new CreateEmailDto
             {
                 Email = user.Email!,
